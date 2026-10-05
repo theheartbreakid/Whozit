@@ -2,9 +2,11 @@ package com.crescentapps.turnly.presentation.m3expressive
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.unit.dp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
@@ -14,6 +16,8 @@ import com.crescentapps.turnly.TurnlyApplication
 import com.crescentapps.turnly.core.model.Schedule
 import com.crescentapps.turnly.core.model.ThemeMode
 import com.crescentapps.turnly.data.preferences.UserPreferences
+import com.crescentapps.turnly.presentation.components.TurnlyBackdropBackground
+import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import com.crescentapps.turnly.presentation.m3expressive.navigation.M3ExpressiveDock
 import com.crescentapps.turnly.presentation.m3expressive.screens.calendar.M3CalendarScreen
 import com.crescentapps.turnly.presentation.m3expressive.screens.history.M3HistoryScreen
@@ -51,6 +55,7 @@ fun Material3ExpressiveApp(
         useExpressiveMotion = prefs.m3UseExpressiveMotion && !prefs.isReduceMotion,
         prefs = prefs
     ) {
+        val backdrop = rememberLayerBackdrop()
         val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -65,33 +70,49 @@ fun Material3ExpressiveApp(
             Screen.Settings.route
         )
         val showDock = currentRoute in mainRoutes
+        
+        val dockState = remember(showDock) { com.crescentapps.turnly.presentation.theme.DockSafeAreaState().apply { dockHeight = if (showDock) 90.dp else 0.dp } }
 
-        Scaffold(
-            containerColor = MaterialTheme.colorScheme.background
-        ) { paddingValues ->
+        CompositionLocalProvider(
+            com.crescentapps.turnly.presentation.theme.LocalDockSafeArea provides dockState
+        ) {
+            Scaffold(
+                containerColor = Color.Transparent
+            ) { paddingValues ->
             Box(modifier = Modifier.fillMaxSize()) {
-                NavHost(
-                    navController = navController,
-                    startDestination = Screen.Home.route,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = paddingValues.calculateTopPadding()),
+                TurnlyBackdropBackground(
+                    backdrop = backdrop,
+                    isDark = isDark,
+                    isAmoled = prefs.isAmoled,
+                    isReduceMotion = prefs.isReduceMotion
+                )
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = androidx.compose.ui.Alignment.TopCenter
+                ) {
+                    NavHost(
+                        navController = navController,
+                        startDestination = Screen.Home.route,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .widthIn(max = 840.dp)
+                            .padding(top = paddingValues.calculateTopPadding()),
                     enterTransition = { androidx.compose.animation.slideInHorizontally(
-                        animationSpec = androidx.compose.animation.core.tween(300),
+                        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f),
                         initialOffsetX = { fullWidth -> fullWidth / 8 }
-                    ) + androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.tween(300)) },
+                    ) + androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f)) },
                     exitTransition = { androidx.compose.animation.slideOutHorizontally(
-                        animationSpec = androidx.compose.animation.core.tween(300),
+                        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f),
                         targetOffsetX = { fullWidth -> -fullWidth / 8 }
-                    ) + androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.tween(300)) },
+                    ) + androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f)) },
                     popEnterTransition = { androidx.compose.animation.slideInHorizontally(
-                        animationSpec = androidx.compose.animation.core.tween(300),
+                        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f),
                         initialOffsetX = { fullWidth -> -fullWidth / 8 }
-                    ) + androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.tween(300)) },
+                    ) + androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f)) },
                     popExitTransition = { androidx.compose.animation.slideOutHorizontally(
-                        animationSpec = androidx.compose.animation.core.tween(300),
+                        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f),
                         targetOffsetX = { fullWidth -> fullWidth / 8 }
-                    ) + androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.tween(300)) }
+                    ) + androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f)) }
                 ) {
                     composable(Screen.Home.route) {
                         val homeViewModel: HomeViewModel = viewModel { HomeViewModel(app.repository, app.roomRepository) }
@@ -240,6 +261,7 @@ fun Material3ExpressiveApp(
                         )
                     }
                 } // End of NavHost
+                } // End of constrained NavHost Box
                 
                 if (showDock) {
                     M3ExpressiveDock(
@@ -258,5 +280,6 @@ fun Material3ExpressiveApp(
                 }
             } // End of Box
         } // End of Scaffold
+        } // End of CompositionLocalProvider
     } // End of TurnlyExpressiveTheme
 }

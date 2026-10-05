@@ -2,7 +2,9 @@ package com.crescentapps.turnly.presentation.gaussianblur
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,7 +73,11 @@ fun GaussianBlurApp(
 
     GaussianBlurTheme(prefs = prefs) {
         GaussianBlurBackdropHost(prefs = prefs) {
-            Box(modifier = Modifier.fillMaxSize()) {
+            val dockState = remember { com.crescentapps.turnly.presentation.theme.DockSafeAreaState().apply { dockHeight = 100.dp } }
+            CompositionLocalProvider(
+                com.crescentapps.turnly.presentation.theme.LocalDockSafeArea provides dockState
+            ) {
+                Box(modifier = Modifier.fillMaxSize()) {
                 NavHost(
                     navController = navController,
                     startDestination = "today",
@@ -209,6 +215,7 @@ fun GaussianBlurApp(
                     },
                     modifier = Modifier.align(Alignment.BottomCenter)
                 )
+            }
             }
         }
     }

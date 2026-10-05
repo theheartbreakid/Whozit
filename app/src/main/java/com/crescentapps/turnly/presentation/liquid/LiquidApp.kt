@@ -236,7 +236,16 @@ fun LiquidApp(
                         }
 
                         // Main Navigation Area
-                        Box(modifier = Modifier.weight(1f).fillMaxSize()) {
+                        val showDock = !isExpanded && currentRoute in listOf(
+                            Screen.Home.route, Screen.Calendar.route, Screen.Schedules.route,
+                            Screen.Rooms.route, Screen.History.route, Screen.Settings.route
+                        )
+                        val dockState = remember(showDock) { com.crescentapps.turnly.presentation.theme.DockSafeAreaState().apply { dockHeight = if (showDock) 100.dp else 0.dp } }
+                        
+                        CompositionLocalProvider(
+                            com.crescentapps.turnly.presentation.theme.LocalDockSafeArea provides dockState
+                        ) {
+                            Box(modifier = Modifier.weight(1f).fillMaxSize()) {
                                 NavHost(
                                     navController = navController,
                                     startDestination = Screen.Home.route,
@@ -430,4 +439,5 @@ fun LiquidApp(
             }
         }
     }
+}
 

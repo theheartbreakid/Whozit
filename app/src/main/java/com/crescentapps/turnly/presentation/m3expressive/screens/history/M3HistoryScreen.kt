@@ -29,15 +29,20 @@ fun M3HistoryScreen(viewModel: HistoryViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
-            LargeTopAppBar(
+            TopAppBar(
                 title = { 
                     Text(
                         "History",
                         style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold
                     ) 
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    scrolledContainerColor = Color.Transparent
+                )
             )
         }
     ) { padding ->
@@ -56,7 +61,8 @@ fun M3HistoryScreen(viewModel: HistoryViewModel) {
             SingleChoiceSegmentedButtonRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = ExpressiveTokens.spacing.normal, vertical = ExpressiveTokens.spacing.small)
+                    .heightIn(max = 40.dp)
+                    .padding(horizontal = ExpressiveTokens.spacing.normal)
             ) {
                 statusFilters.forEachIndexed { index, (status, label) ->
                     val isSelected = uiState.selectedStatus == status
@@ -143,15 +149,16 @@ fun M3HistoryScreen(viewModel: HistoryViewModel) {
                     items(uiState.filteredItems) { item ->
                         TurnlyExpressiveCard(
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(24.dp),
+                            shape = RoundedCornerShape(20.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                            )
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                         ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(16.dp),
+                                    .padding(14.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
@@ -161,85 +168,77 @@ fun M3HistoryScreen(viewModel: HistoryViewModel) {
                                 ) {
                                     Surface(
                                         shape = RoundedCornerShape(16.dp),
-                                        color = MaterialTheme.colorScheme.primaryContainer,
-                                        modifier = Modifier.size(48.dp)
+                                        color = MaterialTheme.colorScheme.secondaryContainer,
+                                        modifier = Modifier.size(44.dp)
                                     ) {
                                         Box(contentAlignment = Alignment.Center) {
                                             Icon(
                                                 imageVector = Icons.Default.Person,
                                                 contentDescription = null,
                                                 modifier = Modifier.size(24.dp),
-                                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                                tint = MaterialTheme.colorScheme.onSecondaryContainer
                                             )
                                         }
                                     }
 
-                                    Spacer(modifier = Modifier.width(16.dp))
+                                    Spacer(modifier = Modifier.width(12.dp))
 
                                     Column {
                                         Text(
-                                            text = item.scheduleName,
+                                            text = item.participantName,
                                             style = MaterialTheme.typography.titleMedium,
                                             fontWeight = FontWeight.Bold,
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
                                         Spacer(modifier = Modifier.height(2.dp))
+                                        val statusText = when (item.occurrence.status) {
+                                            OccurrenceStatus.COMPLETED -> "Completed"
+                                            OccurrenceStatus.SKIPPED -> "Skipped"
+                                            OccurrenceStatus.MISSED -> "Missed"
+                                            else -> "Pending"
+                                        }
                                         Text(
-                                            text = "Turn: ${item.participantName}",
-                                            style = MaterialTheme.typography.bodyMedium,
+                                            text = "${item.occurrence.date} • $statusText",
+                                            style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                        Spacer(modifier = Modifier.height(2.dp))
-                                        Text(
-                                            text = item.occurrence.date,
-                                            style = MaterialTheme.typography.labelMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
                                         )
                                     }
                                 }
 
-                                val (statusText, statusBg, statusFg) = when (item.occurrence.status) {
+                                val (statusIcon, statusBg, statusFg) = when (item.occurrence.status) {
                                     OccurrenceStatus.COMPLETED -> Triple(
-                                        "Completed",
-                                        Color(0xFFE2F3E8),
-                                        Color(0xFF1E6334)
+                                        Icons.Default.Check,
+                                        MaterialTheme.colorScheme.tertiaryContainer,
+                                        MaterialTheme.colorScheme.onTertiaryContainer
                                     )
                                     OccurrenceStatus.SKIPPED -> Triple(
-                                        "Skipped",
-                                        Color(0xFFFFECD6),
-                                        Color(0xFF8A4B00)
+                                        Icons.Default.MoreVert, // ideally an outline skip icon
+                                        MaterialTheme.colorScheme.secondaryContainer,
+                                        MaterialTheme.colorScheme.onSecondaryContainer
                                     )
                                     OccurrenceStatus.MISSED -> Triple(
-                                        "Missed",
-                                        Color(0xFFFFDAD6),
-                                        Color(0xFF93000A)
+                                        Icons.Default.MoreVert, // ideally a priority high icon
+                                        MaterialTheme.colorScheme.errorContainer,
+                                        MaterialTheme.colorScheme.onErrorContainer
                                     )
                                     else -> Triple(
-                                        "Pending",
+                                        Icons.Default.MoreVert,
                                         MaterialTheme.colorScheme.surfaceContainerHighest,
                                         MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
 
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Surface(
-                                        shape = CircleShape,
-                                        color = statusBg
-                                    ) {
-                                        Text(
-                                            text = statusText,
-                                            style = MaterialTheme.typography.labelMedium,
-                                            fontWeight = FontWeight.Bold,
-                                            color = statusFg,
-                                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                                        )
-                                    }
-
-                                    IconButton(onClick = {}) {
+                                Surface(
+                                    shape = CircleShape,
+                                    color = statusBg,
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
                                         Icon(
-                                            imageVector = Icons.Default.MoreVert,
-                                            contentDescription = "Options",
-                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                            imageVector = statusIcon,
+                                            contentDescription = item.occurrence.status.name,
+                                            tint = statusFg,
+                                            modifier = Modifier.size(18.dp)
                                         )
                                     }
                                 }

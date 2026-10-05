@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.compose.material3.*
 import com.crescentapps.turnly.presentation.m3expressive.components.TurnlyExpressiveButton
+import com.crescentapps.turnly.presentation.m3expressive.components.TurnlyExpressiveCard
 import com.crescentapps.turnly.presentation.screens.room.RoomViewModel
 import com.crescentapps.turnly.presentation.catalog.utils.LocalBackdrop
 
@@ -95,9 +96,10 @@ fun M3JoinRoomScreen(
         // Confirmation Screen if Room Preview Data is Ready
         val preview = uiState.previewRoomData
         if (preview != null) {
-            androidx.compose.material3.Card(
+            TurnlyExpressiveCard(
                 modifier = Modifier.fillMaxWidth(),
-                
+                shape = RoundedCornerShape(32.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
             ) {
                 Column(
                     modifier = Modifier
@@ -204,11 +206,12 @@ fun M3JoinRoomScreen(
             }
         } else if (isScanningMode) {
             // Live Scanner View
-            androidx.compose.material3.Card(
+            TurnlyExpressiveCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f, fill = false),
-                
+                shape = RoundedCornerShape(32.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
             ) {
                 Column(
                     modifier = Modifier
@@ -251,9 +254,10 @@ fun M3JoinRoomScreen(
             }
         } else {
             // MODE A: ENTER CODE MANUALLY
-            androidx.compose.material3.Card(
+            TurnlyExpressiveCard(
                 modifier = Modifier.fillMaxWidth(),
-                
+                shape = RoundedCornerShape(32.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
             ) {
                 Column(
                     modifier = Modifier

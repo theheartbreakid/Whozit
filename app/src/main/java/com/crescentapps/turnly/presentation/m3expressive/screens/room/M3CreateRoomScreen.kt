@@ -44,6 +44,7 @@ import com.crescentapps.turnly.core.model.Schedule
 import com.crescentapps.turnly.core.util.QRCodeUtils
 import androidx.compose.material3.*
 import com.crescentapps.turnly.presentation.m3expressive.components.TurnlyExpressiveButton
+import com.crescentapps.turnly.presentation.m3expressive.components.TurnlyExpressiveCard
 import com.crescentapps.turnly.presentation.screens.room.RoomViewModel
 import com.crescentapps.turnly.presentation.catalog.utils.LocalBackdrop
 
@@ -135,9 +136,10 @@ fun M3CreateRoomScreen(
                 }
 
                 item {
-                    androidx.compose.material3.Card(
+                    TurnlyExpressiveCard(
                         modifier = Modifier.fillMaxWidth(),
-                        
+                        shape = RoundedCornerShape(32.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
                     ) {
                         Column(
                             modifier = Modifier
@@ -297,9 +299,10 @@ fun M3CreateRoomScreen(
                     Spacer(modifier = Modifier.height(14.dp))
 
                     // Privacy Note
-                    androidx.compose.material3.Card(
+                    TurnlyExpressiveCard(
                         modifier = Modifier.fillMaxWidth(),
-                        
+                        shape = RoundedCornerShape(32.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
                     ) {
                         Column(
                             modifier = Modifier
@@ -327,9 +330,10 @@ fun M3CreateRoomScreen(
                         LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             items(uiState.availableSchedules, key = { it.id }) { schedule ->
                                 val isChecked = selectedScheduleIds.contains(schedule.id)
-                                androidx.compose.material3.Card(
+                                TurnlyExpressiveCard(
                                     modifier = Modifier.fillMaxWidth(),
-                                    
+                                    shape = RoundedCornerShape(32.dp),
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
                                     onClick = {
                                         selectedScheduleIds = if (isChecked) {
                                             selectedScheduleIds - schedule.id

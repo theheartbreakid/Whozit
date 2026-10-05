@@ -28,9 +28,10 @@ import androidx.compose.ui.unit.sp
 import com.crescentapps.turnly.core.model.RoomRole
 import androidx.compose.material3.*
 import com.crescentapps.turnly.presentation.m3expressive.components.TurnlyExpressiveButton
+import com.crescentapps.turnly.presentation.m3expressive.components.TurnlyExpressiveCard
 import com.crescentapps.turnly.presentation.screens.room.RoomDetailViewModel
 import com.crescentapps.turnly.presentation.catalog.utils.LocalBackdrop
-import com.crescentapps.turnly.presentation.components.ConfirmDialog
+import com.crescentapps.turnly.presentation.m3expressive.components.TurnlyExpressiveDialog
 
 @Composable
 fun M3RoomSettingsScreen(
@@ -97,9 +98,10 @@ fun M3RoomSettingsScreen(
         ) {
             // General Info
             item {
-                androidx.compose.material3.Card(
+                TurnlyExpressiveCard(
                     modifier = Modifier.fillMaxWidth(),
-                    
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
                 ) {
                     Column(
                         modifier = Modifier
@@ -144,9 +146,10 @@ fun M3RoomSettingsScreen(
 
             // Shared Data Privacy Disclosure
             item {
-                androidx.compose.material3.Card(
+                TurnlyExpressiveCard(
                     modifier = Modifier.fillMaxWidth(),
-                    
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
                 ) {
                     Column(
                         modifier = Modifier
@@ -177,9 +180,10 @@ fun M3RoomSettingsScreen(
 
             // Actions: Leave / Delete
             item {
-                androidx.compose.material3.Card(
+                TurnlyExpressiveCard(
                     modifier = Modifier.fillMaxWidth(),
-                    
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
                 ) {
                     Column(
                         modifier = Modifier
@@ -219,7 +223,7 @@ fun M3RoomSettingsScreen(
     }
 
     if (showLeaveConfirm) {
-        ConfirmDialog(
+        TurnlyExpressiveDialog(
             title = "Leave ${room.name}?",
             message = "You will no longer receive updates from this room. Your local copy of the schedules will be kept safely.",
             confirmText = "Leave Room",
@@ -229,12 +233,12 @@ fun M3RoomSettingsScreen(
                 showLeaveConfirm = false
                 viewModel.leaveRoom(keepLocalCopy = true, onComplete = onRoomExited)
             },
-            onDismiss = { showLeaveConfirm = false }
+            onDismissRequest = { showLeaveConfirm = false }
         )
     }
 
     if (showDeleteConfirm) {
-        ConfirmDialog(
+        TurnlyExpressiveDialog(
             title = "Delete ${room.name}?",
             message = "This will permanently stop synchronization for all connected members. Local schedule copies will remain intact.",
             confirmText = "Delete Room",
@@ -244,7 +248,7 @@ fun M3RoomSettingsScreen(
                 showDeleteConfirm = false
                 viewModel.deleteRoom(keepLocalCopy = true, onComplete = onRoomExited)
             },
-            onDismiss = { showDeleteConfirm = false }
+            onDismissRequest = { showDeleteConfirm = false }
         )
     }
 }

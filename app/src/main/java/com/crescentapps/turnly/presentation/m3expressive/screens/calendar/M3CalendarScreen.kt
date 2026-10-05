@@ -16,6 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -37,8 +38,9 @@ fun M3CalendarScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
-            LargeTopAppBar(
+            TopAppBar(
                 title = { 
                     Text(
                         "Calendar",
@@ -53,7 +55,11 @@ fun M3CalendarScreen(
                     ) {
                         Text("Today", fontWeight = FontWeight.Bold)
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    scrolledContainerColor = Color.Transparent
+                )
             )
         }
     ) { padding ->
@@ -223,15 +229,14 @@ private fun CalendarGridContent(
                                 val isToday = date == LocalDate.now()
                                 val hasTurns = uiState.dayTurnMap[date]?.isNotEmpty() == true
 
-                                Box(
+                               Box(
                                     modifier = Modifier
                                         .weight(1f)
                                         .aspectRatio(1f)
                                         .clip(CircleShape)
                                         .background(
                                             if (isSelected) MaterialTheme.colorScheme.primary
-                                            else if (isToday) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-                                            else MaterialTheme.colorScheme.surfaceContainerHigh
+                                            else Color.Transparent
                                         )
                                         .clickable { onSelectDate(date) },
                                     contentAlignment = Alignment.Center
@@ -242,12 +247,12 @@ private fun CalendarGridContent(
                                     ) {
                                         Text(
                                             text = dayNumber.toString(),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = if (isSelected || isToday) FontWeight.Bold else FontWeight.Normal,
+                                            style = if (isSelected) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyMedium,
+                                            fontWeight = if (isSelected || isToday) FontWeight.Bold else FontWeight.Medium,
                                             color = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                                            else if (isToday) MaterialTheme.colorScheme.onPrimaryContainer
+                                            else if (isToday) MaterialTheme.colorScheme.primary
                                             else MaterialTheme.colorScheme.onSurface,
-                                            fontSize = 14.sp
+                                            fontSize = 16.sp
                                         )
 
                                         if (hasTurns) {

@@ -3,6 +3,9 @@ package com.crescentapps.turnly.presentation.m3expressive.screens.schedule
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -10,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.crescentapps.turnly.presentation.m3expressive.components.TurnlyExpressiveButton
 import com.crescentapps.turnly.presentation.m3expressive.components.TurnlyExpressiveCard
 import com.crescentapps.turnly.presentation.m3expressive.theme.ExpressiveTokens
@@ -31,14 +35,19 @@ fun M3CreateScheduleScreen(
     }
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
-            LargeTopAppBar(
+            TopAppBar(
                 title = { Text("New Schedule") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    scrolledContainerColor = Color.Transparent
+                )
             )
         }
     ) { padding ->
@@ -48,87 +57,119 @@ fun M3CreateScheduleScreen(
                 .padding(padding)
                 .padding(horizontal = ExpressiveTokens.spacing.normal)
         ) {
-            // Very simple step representation
-            when (uiState.currentStep) {
-                1 -> {
-                    Text("Basic Info", style = MaterialTheme.typography.titleLarge)
-                    Spacer(Modifier.height(ExpressiveTokens.spacing.normal))
-                    OutlinedTextField(
-                        value = uiState.name,
-                        onValueChange = { viewModel.updateName(it) },
-                        label = { Text("Schedule Name") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(Modifier.height(ExpressiveTokens.spacing.group))
-                    TurnlyExpressiveButton(
-                        onClick = { viewModel.nextStep() },
-                        text = "Next",
-                        modifier = Modifier.align(Alignment.End)
-                    )
-                }
-                2 -> {
-                    Text("Participants", style = MaterialTheme.typography.titleLarge)
-                    Spacer(Modifier.height(ExpressiveTokens.spacing.normal))
-                    var newName by remember { mutableStateOf("") }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedTextField(
-                            value = newName,
-                            onValueChange = { newName = it },
-                            label = { Text("Name") },
-                            modifier = Modifier.weight(1f)
-                        )
-                        Spacer(Modifier.width(ExpressiveTokens.spacing.small))
-                        TurnlyExpressiveButton(
-                            onClick = {
-                                viewModel.addParticipant(newName, null, "")
-                                newName = ""
-                            },
-                            text = "Add",
-                            isPrimary = false
-                        )
-                    }
-                    Spacer(Modifier.height(ExpressiveTokens.spacing.normal))
-                    LazyColumn(modifier = Modifier.weight(1f)) {
-                        itemsIndexed(uiState.participants) { index, p ->
-                            ListItem(
-                                trailingContent = {
-                                    IconButton(onClick = { viewModel.removeParticipant(index) }) {
-                                        Icon(Icons.Default.Delete, contentDescription = "Remove")
+            TurnlyExpressiveCard(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                shape = RoundedCornerShape(32.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(24.dp)
+                ) {
+                    when (uiState.currentStep) {
+                        1 -> {
+                            Text("Schedule Identity", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                            Text("Basic information", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Spacer(Modifier.height(ExpressiveTokens.spacing.normal))
+                            OutlinedTextField(
+                                value = uiState.name,
+                                onValueChange = { viewModel.updateName(it) },
+                                label = { Text("Schedule Name") },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            Spacer(Modifier.weight(1f))
+                            TurnlyExpressiveButton(
+                                onClick = { viewModel.nextStep() },
+                                text = "Next",
+                                modifier = Modifier.align(Alignment.End)
+                            )
+                        }
+                        2 -> {
+                            Text("Turn Order", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                            Text("Who participates in this rotation", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Spacer(Modifier.height(ExpressiveTokens.spacing.normal))
+                            var newName by remember { mutableStateOf("") }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                OutlinedTextField(
+                                    value = newName,
+                                    onValueChange = { newName = it },
+                                    label = { Text("Add Member") },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(16.dp)
+                                )
+                                Spacer(Modifier.width(ExpressiveTokens.spacing.small))
+                                TurnlyExpressiveButton(
+                                    onClick = {
+                                        if (newName.isNotBlank()) {
+                                            viewModel.addParticipant(newName, null, "")
+                                            newName = ""
+                                        }
+                                    },
+                                    text = "Add",
+                                    isPrimary = false
+                                )
+                            }
+                            Spacer(Modifier.height(ExpressiveTokens.spacing.normal))
+                            LazyColumn(
+                                modifier = Modifier.weight(1f),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                itemsIndexed(uiState.participants) { index, p ->
+                                    Surface(
+                                        shape = RoundedCornerShape(16.dp),
+                                        color = MaterialTheme.colorScheme.surfaceContainerHigh
+                                    ) {
+                                        ListItem(
+                                            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                                            trailingContent = {
+                                                IconButton(onClick = { viewModel.removeParticipant(index) }) {
+                                                    Icon(Icons.Default.Delete, contentDescription = "Remove", tint = MaterialTheme.colorScheme.error)
+                                                }
+                                            }
+                                        ) {
+                                            Text(p.name, fontWeight = FontWeight.Bold)
+                                        }
                                     }
                                 }
+                            }
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(top = ExpressiveTokens.spacing.normal),
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(p.name)
+                                TurnlyExpressiveButton(onClick = { viewModel.previousStep() }, text = "Back", isPrimary = false)
+                                TurnlyExpressiveButton(onClick = { viewModel.nextStep() }, text = "Next")
+                            }
+                        }
+                        3 -> {
+                            Text("Review & Save", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                            Spacer(Modifier.height(ExpressiveTokens.spacing.normal))
+                            Surface(
+                                shape = RoundedCornerShape(24.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(Modifier.padding(ExpressiveTokens.spacing.normal)) {
+                                    Text("Name: ${uiState.name}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                                    Spacer(Modifier.height(4.dp))
+                                    Text("Participants: ${uiState.participants.size}", style = MaterialTheme.typography.bodyLarge)
+                                    Spacer(Modifier.height(4.dp))
+                                    Text("Frequency: ${uiState.frequencyType.name}", style = MaterialTheme.typography.bodyLarge)
+                                }
+                            }
+                            Spacer(Modifier.weight(1f))
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(top = ExpressiveTokens.spacing.normal),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                TurnlyExpressiveButton(onClick = { viewModel.previousStep() }, text = "Back", isPrimary = false)
+                                TurnlyExpressiveButton(onClick = { viewModel.saveSchedule() }, text = "Create Schedule")
                             }
                         }
                     }
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = ExpressiveTokens.spacing.normal),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        TurnlyExpressiveButton(onClick = { viewModel.previousStep() }, text = "Back", isPrimary = false)
-                        TurnlyExpressiveButton(onClick = { viewModel.nextStep() }, text = "Next")
-                    }
-                }
-                3 -> {
-                    Text("Review & Save", style = MaterialTheme.typography.titleLarge)
-                    Spacer(Modifier.height(ExpressiveTokens.spacing.normal))
-                    TurnlyExpressiveCard(modifier = Modifier.fillMaxWidth()) {
-                        Column(Modifier.padding(ExpressiveTokens.spacing.normal)) {
-                            Text("Name: ${uiState.name}", style = MaterialTheme.typography.bodyLarge)
-                            Text("Participants: ${uiState.participants.size}", style = MaterialTheme.typography.bodyLarge)
-                            Text("Frequency: ${uiState.frequencyType}", style = MaterialTheme.typography.bodyLarge)
-                        }
-                    }
-                    Spacer(Modifier.weight(1f))
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = ExpressiveTokens.spacing.normal),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        TurnlyExpressiveButton(onClick = { viewModel.previousStep() }, text = "Back", isPrimary = false)
-                        TurnlyExpressiveButton(onClick = { viewModel.saveSchedule() }, text = "Create Schedule")
-                    }
                 }
             }
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

@@ -97,4 +97,14 @@ class HomeViewModel(
             repository.undoTurnCompletion(turn.schedule.id, turn.date)
         }
     }
+    fun skipTurn(turn: ResolvedTurn) {
+        viewModelScope.launch {
+            repository.markTurnSkipped(
+                scheduleId = turn.schedule.id,
+                date = turn.date,
+                participantId = turn.participant.id,
+                note = "Skipped"
+            )
+        }
+    }
 }

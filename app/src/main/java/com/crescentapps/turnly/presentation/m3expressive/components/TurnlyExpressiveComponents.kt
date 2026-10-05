@@ -72,7 +72,8 @@ fun TurnlyExpressiveButton(
             onClick = onClick, 
             modifier = modifier.expressiveLightRay(shape = ExpressiveShapes.Full), 
             colors = colors,
-            shape = ExpressiveShapes.Full
+            shape = ExpressiveShapes.Full,
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp)
         ) {
             if (icon != null) {
                 icon()
@@ -85,7 +86,8 @@ fun TurnlyExpressiveButton(
             onClick = onClick, 
             modifier = modifier.expressiveLightRay(shape = ExpressiveShapes.Full), 
             colors = colors,
-            shape = ExpressiveShapes.Full
+            shape = ExpressiveShapes.Full,
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp)
         ) {
             if (icon != null) {
                 icon()
@@ -106,7 +108,8 @@ fun TurnlyExpressiveSplitButton(
     Button(
         onClick = onPrimaryClick,
         shape = ExpressiveShapes.Full,
-        modifier = modifier
+        modifier = modifier,
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp)
     ) {
         if (primaryIcon != null) {
             primaryIcon()
@@ -194,4 +197,56 @@ fun TurnlyExpressiveLoadingIndicator(
     modifier: Modifier = Modifier
 ) {
     LoadingIndicator(modifier = modifier)
+}
+
+@Composable
+fun TurnlyExpressiveDialog(
+    onDismissRequest: () -> Unit,
+    title: String,
+    message: String,
+    confirmText: String = "Confirm",
+    dismissText: String = "Cancel",
+    isDestructive: Boolean = false,
+    onConfirm: () -> Unit,
+    content: (@Composable () -> Unit)? = null
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        shape = RoundedCornerShape(32.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                if (message.isNotBlank()) {
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                content?.invoke()
+            }
+        },
+        confirmButton = {
+            TurnlyExpressiveButton(
+                text = confirmText,
+                onClick = onConfirm,
+                isDestructive = isDestructive
+            )
+        },
+        dismissButton = {
+            TurnlyExpressiveButton(
+                text = dismissText,
+                onClick = onDismissRequest,
+                isPrimary = false
+            )
+        }
+    )
 }

@@ -6,6 +6,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Undo
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -174,29 +176,69 @@ fun GaussianHomeScreen(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                                 ) {
+                                    if (firstPending.status == OccurrenceStatus.COMPLETED) {
+                                        GaussianButton(
+                                            onClick = { viewModel.undoCompletion(firstPending) },
+                                            modifier = Modifier.weight(1f),
+                                            accentTint = colors.surfaceTint.copy(alpha = 0.2f)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Undo,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(16.dp),
+                                                tint = colors.textPrimary
+                                            )
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(
+                                                text = "Undo Done",
+                                                fontWeight = FontWeight.Bold,
+                                                color = colors.textPrimary
+                                            )
+                                        }
+                                    } else {
+                                        GaussianButton(
+                                            onClick = {
+                                                if (firstPending.schedule.type == ScheduleType.MONEY) {
+                                                    turnForAmountDialog = firstPending
+                                                    enteredAmount = firstPending.schedule.defaultAmount?.toString() ?: ""
+                                                } else {
+                                                    viewModel.markTurnComplete(firstPending)
+                                                }
+                                            },
+                                            modifier = Modifier.weight(1f),
+                                            accentTint = colors.accent
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(16.dp),
+                                                tint = colors.textOnAccent
+                                            )
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(
+                                                text = if (firstPending.schedule.type == ScheduleType.MONEY) "Record & Done" else "Mark as Done",
+                                                fontWeight = FontWeight.Bold,
+                                                color = colors.textOnAccent
+                                            )
+                                        }
+                                    }
+                                    
                                     GaussianButton(
-                                        onClick = {
-                                            if (firstPending.schedule.type == ScheduleType.MONEY) {
-                                                turnForAmountDialog = firstPending
-                                                enteredAmount = firstPending.schedule.defaultAmount?.toString() ?: ""
-                                            } else {
-                                                viewModel.markTurnComplete(firstPending)
-                                            }
-                                        },
-                                        modifier = Modifier.fillMaxWidth(),
-                                        accentTint = colors.accent
+                                        onClick = { viewModel.skipTurn(firstPending) },
+                                        modifier = Modifier.weight(1f),
+                                        accentTint = colors.surfaceTint.copy(alpha = 0.1f)
                                     ) {
                                         Icon(
-                                            imageVector = Icons.Default.Add,
+                                            imageVector = Icons.Default.SwapHoriz,
                                             contentDescription = null,
                                             modifier = Modifier.size(16.dp),
-                                            tint = colors.textOnAccent
+                                            tint = colors.textPrimary
                                         )
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Text(
-                                            text = if (firstPending.schedule.type == ScheduleType.MONEY) "Record & Done" else "Mark as Done",
+                                            text = "Swap",
                                             fontWeight = FontWeight.Bold,
-                                            color = colors.textOnAccent
+                                            color = colors.textPrimary
                                         )
                                     }
                                 }
@@ -260,7 +302,8 @@ fun GaussianHomeScreen(
                                 viewModel.markTurnComplete(turn)
                             }
                         },
-                        onSkip = { sId -> },
+                        onSkip = { sId -> viewModel.skipTurn(turn) },
+                        onUndo = { sId -> viewModel.undoCompletion(turn) },
                         onClick = { onScheduleClick(turn.schedule.id) }
                     )
                 }

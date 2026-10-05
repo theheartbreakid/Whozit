@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Turnly - Expressive UI Design System</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Space Grotesk"', 'sans-serif'],
+          },
+          colors: {
+            turnly: {
+              bg: '#0A0D18',
+              surface: 'rgba(255, 255, 255, 0.04)',
+              surfaceHighlight: 'rgba(255, 255, 255, 0.08)',
+              border: 'rgba(255, 255, 255, 0.12)',
+              primary: '#9D62F8',
+              accent: '#00E5FF',
+              amber: '#FF9100',
+              pink: '#F43F5E',
+              violet: '#311B92',
+              emerald: '#10B981'
+            }
+          }
+        }
+      }
+    }
+  </script>
+<!-- BEGIN: Custom CSS Tokens & Expressive Lighting Engine -->
+<style data-purpose="expressive-lighting">
+    :root {
+      --light-x: 0.3;
+      --light-y: 0.2;
+      --light-dir: 135deg;
+      --light-intensity: 0.45;
+      --light-width: 0.5;
+      --light-color: 157, 98, 248; /* #9D62F8 */
+      --accent-color: 0, 229, 255;  /* #00E5FF */
+      --active-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    body {
+      background-color: #070913;
+      color: #F1F5F9;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    /* Ambient Lighting Canvas background */
+    .ambient-glow-bg {
+      background: 
+        radial-gradient(circle at calc(var(--light-x) * 100%) calc(var(--light-y) * 100%), rgba(var(--light-color), calc(var(--light-intensity) * 0.45)) 0%, transparent 60%),
+        radial-gradient(circle at 85% 80%, rgba(var(--accent-color), 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 20% 90%, rgba(244, 63, 94, 0.12) 0%, transparent 45%),
+        #090C16;
+    }
+
+    /* Expressive Glass Card with Dynamic Radial Gradient Fill */
+    .glass-card {
+      background: linear-gradient(
+        var(--light-dir),
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.02) 100%
+      );
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6),
+                  inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        circle at calc(var(--light-x) * 100%) calc(var(--light-y) * 100%),
+        rgba(var(--light-color), calc(var(--light-intensity) * 0.35)) 0%,
+        transparent calc(var(--light-width) * 100%)
+      );
+      pointer-events: none;
+      z-index: 1;
+      transition: background 0.2s ease;
+    }
+
+    /* Hero Turnly Card with dynamic pulse aura */
+    .hero-glow-card {
+      background: linear-gradient(135deg, rgba(82, 39, 158, 0.5) 0%, rgba(20, 24, 48, 0.7) 100%);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 25px 50px -12px rgba(124, 58, 237, 0.4),
+                  inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    }
+
+    /* Expressive Pill Button Styling */
+    .pill-btn-primary {
+      background: linear-gradient(135deg, #A855F7 0%, #7C3AED 50%, #6366F1 100%);
+      box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+      transition: transform 0.15s var(--active-spring), box-shadow 0.15s ease;
+    }
+    .pill-btn-primary:active {
+      transform: scale(0.96);
+      box-shadow: 0 4px 12px -2px rgba(139, 92, 246, 0.6);
+    }
+
+    /* Hide standard scrollbars */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Spring micro-interactions */
+    .press-feedback {
+      transition: transform 0.15s var(--active-spring);
+    }
+    .press-feedback:active {
+      transform: scale(0.94);
+    }
+
+    /* Pulse radar sync effect */
+    @keyframes p2p-pulse {
+      0% { transform: scale(0.85); opacity: 0.8; }
+      50% { transform: scale(1.2); opacity: 0.2; }
+      100% { transform: scale(0.85); opacity: 0.8; }
+    }
+    .p2p-wave {
+      animation: p2p-pulse 3s infinite ease-in-out;
+    }
+  </style>
+<!-- END: Custom CSS Tokens & Expressive Lighting Engine -->
+</head>
+<body class="ambient-glow-bg min-h-screen text-slate-100 flex flex-col justify-between items-center selection:bg-purple-500 selection:text-white">
+<!-- BEGIN: Application Shell Container (Mobile iOS Frame) -->
+<main class="w-full max-w-md min-h-screen relative flex flex-col pb-28 pt-2 shadow-2xl border-x border-white/5 bg-[#080B15]/90">
+<!-- BEGIN: iOS Status Bar Simulation -->
+<header class="w-full px-7 pt-3 pb-2 flex justify-between items-center text-xs font-semibold tracking-wider text-slate-300 select-none z-30" data-purpose="ios-status-bar">
+<span>9:41</span>
+<!-- Dynamic Island Capsule -->
+<div class="w-24 h-5 bg-black rounded-full flex items-center justify-end px-2 space-x-1.5 border border-white/10 shadow-inner">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-indigo-900 border border-indigo-400/40"></span>
+</div>
+<div class="flex items-center space-x-1.5 text-[11px]">
+<svg class="w-3.5 h-3.5 fill-current" viewbox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.28 19.64 10.58 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"></path></svg>
+<span>5G</span>
+<div class="w-5 h-2.5 border border-slate-300 rounded-[3px] p-0.5 flex items-center">
+<div class="h-full bg-slate-200 rounded-[1px] w-3/4"></div>
+</div>
+</div>
+</header>
+<!-- END: iOS Status Bar Simulation -->
+<!-- BEGIN: Main App Top Bar with User Avatar & Brand -->
+<section class="px-6 py-2.5 flex items-center justify-between z-20" data-purpose="brand-header">
+<div class="flex items-center space-x-3">
+<button class="relative group p-0.5 rounded-full ring-2 ring-purple-500/50 hover:ring-purple-400 transition" id="userProfileBtn" title="User Profile">
+<!-- User Avatar Placeholder -->
+<div class="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-bold text-sm text-white shadow-md">
+            M
+          </div>
+<span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-[#0A0D18] rounded-full"></span>
+</button>
+<div>
+<div class="flex items-center space-x-1.5">
+<h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">Turnly</h1>
+<span class="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">M3 Expressive</span>
+</div>
+<p class="text-xs text-slate-400 font-medium" id="topBarSubtitle">Family Home • 2 active</p>
+</div>
+</div>
+<div class="flex items-center space-x-2">
+<button class="press-feedback relative p-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-cyan-300 transition" id="p2pSyncBtn" title="P2P Mesh Network Status">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+</button>
+<button class="press-feedback p-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-slate-200 transition" id="quickCreateTopBtn" title="Quick Actions">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</section>
+<!-- END: Main App Top Bar -->
+<!-- BEGIN: Primary Views Container (Switched via bottom dock) -->
+<div class="flex-1 w-full px-5 py-2 overflow-y-auto no-scrollbar relative z-10" id="viewsViewport">
+<!-- ============================================== -->
+<!-- DESTINATION 1: TODAY SCREEN (Exact Match)     -->
+<!-- ============================================== -->
+<section class="view-panel space-y-5 animate-fadeIn" id="view-today">
+<!-- Hero Next Turn Card (Mohsin) -->
+<article class="hero-glow-card rounded-[32px] p-6 relative overflow-hidden group shadow-2xl" data-purpose="hero-turn-card">
+<!-- Dynamic backdrop lighting orb -->
+<div class="absolute -right-8 -top-8 w-44 h-44 bg-purple-500/30 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute -left-10 -bottom-10 w-44 h-44 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+<div class="relative z-10 flex justify-between items-start">
+<div>
+<div class="flex items-center space-x-2">
+<span class="text-xs uppercase tracking-wider font-semibold text-purple-300/90 flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+                  Next Turn
+                </span>
+<span class="text-[11px] px-2 py-0.5 rounded-full bg-white/10 border border-white/10 text-slate-300">House Cleaning</span>
+</div>
+<h2 class="text-3xl font-extrabold tracking-tight text-white mt-1.5" id="heroTurnPerson">mohsin</h2>
+<div class="flex items-center space-x-2 mt-1">
+<span class="text-lg font-semibold text-purple-200" id="heroCountdown">2h 18m left</span>
+<span class="text-slate-400 text-xs">•</span>
+<span class="text-xs text-slate-300 font-medium">Today • 11:59 PM</span>
+</div>
+</div>
+<!-- Glowing Turn Badge Orb -->
+<div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-600 p-0.5 shadow-lg shadow-purple-500/30 flex items-center justify-center relative">
+<div class="w-full h-full bg-[#1A1235]/80 rounded-[14px] flex items-center justify-center backdrop-blur-md">
+<svg class="w-8 h-8 text-cyan-300" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+</div>
+<!-- Quick Action Buttons for current turn -->
+<div class="mt-6 pt-4 border-t border-white/10 flex items-center gap-3">
+<button class="flex-1 pill-btn-primary py-3 px-4 rounded-2xl font-bold text-sm flex items-center justify-center space-x-2 text-white shadow-lg" id="btnCompleteTurn">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg>
+<span>Mark Done</span>
+</button>
+<button class="press-feedback px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-semibold text-slate-200 flex items-center space-x-1.5 transition" id="btnSwapTurn">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Swap</span>
+</button>
+</div>
+</article>
+<!-- Upcoming Section -->
+<div class="space-y-3" data-purpose="upcoming-turn-list">
+<div class="flex items-center justify-between px-1">
+<h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Upcoming</h3>
+<span class="text-xs text-purple-400 font-medium">3 shifts queued</span>
+</div>
+<!-- Upcoming Turn Card 1 (Ayesha - Kitchen) -->
+<div class="glass-card rounded-[24px] p-4 flex items-center justify-between transition hover:border-purple-500/40">
+<div class="flex items-center space-x-3.5 z-10">
+<div class="w-11 h-11 rounded-2xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 font-bold text-sm">
+                AY
+              </div>
+<div>
+<h4 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+                  Ayesha
+                  <span class="text-[11px] font-normal px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Kitchen</span>
+</h4>
+<p class="text-xs text-slate-400 mt-0.5">Tomorrow • 8:00 AM</p>
+</div>
+</div>
+<button class="press-feedback z-10 w-9 h-9 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 flex items-center justify-center text-slate-300">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+<!-- Upcoming Turn Card 2 (Ali - Living Room) -->
+<div class="glass-card rounded-[24px] p-4 flex items-center justify-between transition hover:border-purple-500/40">
+<div class="flex items-center space-x-3.5 z-10">
+<div class="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 font-bold text-sm">
+                AL
+              </div>
+<div>
+<h4 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+                  Ali
+                  <span class="text-[11px] font-normal px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Living Room</span>
+</h4>
+<p class="text-xs text-slate-400 mt-0.5">Tomorrow • 8:00 PM</p>
+</div>
+</div>
+<button class="press-feedback z-10 w-9 h-9 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 flex items-center justify-center text-slate-300">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+<!-- Upcoming Turn Card 3 (Mohsin - Plants) -->
+<div class="glass-card rounded-[24px] p-4 flex items-center justify-between transition hover:border-purple-500/40">
+<div class="flex items-center space-x-3.5 z-10">
+<div class="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 font-bold text-sm">
+                MO
+              </div>
+<div>
+<h4 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+                  Mohsin
+                  <span class="text-[11px] font-normal px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Garden Plants</span>
+</h4>
+<p class="text-xs text-slate-400 mt-0.5">Sun, Oct 2 • 9:00 AM</p>
+</div>
+</div>
+<button class="press-feedback z-10 w-9 h-9 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 flex items-center justify-center text-slate-300">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+</section>
+<!-- ============================================== -->
+<!-- DESTINATION 2: CALENDAR SCREEN                 -->
+<!-- ============================================== -->
+<section class="view-panel hidden space-y-4" id="view-calendar">
+<!-- Calendar Header -->
+<div class="flex items-center justify-between px-1">
+<div class="flex items-center space-x-2">
+<h2 class="text-xl font-extrabold text-white">September 2026</h2>
+<button class="text-slate-400 hover:text-white p-1">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+<div class="flex items-center space-x-1.5">
+<button class="px-3 py-1 rounded-full bg-purple-600/30 border border-purple-500/40 text-xs font-semibold text-purple-200">Today</button>
+<button class="p-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16m-7 6h7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+<!-- Interactive Calendar Matrix Card -->
+<div class="glass-card rounded-[28px] p-4 z-10">
+<!-- Weekday Labels -->
+<div class="grid grid-cols-7 text-center text-xs font-semibold text-slate-400 mb-2">
+<span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+</div>
+<!-- Calendar Days Grid (Matching reference dates) -->
+<div class="grid grid-cols-7 gap-y-2 text-center text-sm font-medium" id="calendarDaysGrid">
+<span class="text-slate-600 py-1.5">28</span>
+<span class="text-slate-600 py-1.5">29</span>
+<!-- Active Selected Day 30 -->
+<button class="py-1.5 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white font-bold shadow-lg shadow-purple-500/30 ring-2 ring-purple-300/40">30</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">1</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">2</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">3</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">4</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">5</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">6</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">7</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">8</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">9</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">10</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">11</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">12</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">13</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">14</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">15</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">16</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-purple-300 font-bold">• 17</button>
+<button class="py-1.5 hover:bg-white/10 rounded-2xl text-slate-200">18</button>
+</div>
+</div>
+<!-- Day Agenda for Selected Date -->
+<div class="space-y-2.5">
+<h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Tue, Sep 30, 2026</h3>
+<div class="glass-card rounded-2xl p-3.5 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 font-bold text-xs">
+                MO
+              </div>
+<div>
+<p class="font-bold text-sm text-white">mohsin</p>
+<p class="text-xs text-slate-400">11:59 PM • House Cleaning</p>
+</div>
+</div>
+<span class="text-xs px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Kitchen</span>
+</div>
+<div class="glass-card rounded-2xl p-3.5 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center text-cyan-300 font-bold text-xs">
+                AY
+              </div>
+<div>
+<p class="font-bold text-sm text-white">Ayesha</p>
+<p class="text-xs text-slate-400">8:00 AM • Kitchen</p>
+</div>
+</div>
+<span class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Living Room</span>
+</div>
+<div class="glass-card rounded-2xl p-3.5 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 font-bold text-xs">
+                AL
+              </div>
+<div>
+<p class="font-bold text-sm text-white">Ali</p>
+<p class="text-xs text-slate-400">8:00 PM • Trash Takeout</p>
+</div>
+</div>
+<span class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Bedroom</span>
+</div>
+</div>
+</section>
+<!-- ============================================== -->
+<!-- DESTINATION 3: SCHEDULES SCREEN                -->
+<!-- ============================================== -->
+<section class="view-panel hidden space-y-4" id="view-schedules">
+<!-- Top bar with split action -->
+<div class="flex items-center justify-between">
+<h2 class="text-2xl font-extrabold text-white">Schedules</h2>
+<!-- Split Action Button with Dropdown trigger -->
+<div class="relative inline-flex rounded-2xl shadow-lg shadow-purple-600/30">
+<button class="pill-btn-primary px-3.5 py-2 rounded-l-2xl text-xs font-bold text-white flex items-center space-x-1.5 border-r border-white/20" id="btnNewScheduleDirect">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg>
+<span>New Schedule</span>
+</button>
+<button class="pill-btn-primary px-2.5 py-2 rounded-r-2xl text-white flex items-center justify-center" id="btnSplitMenu">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg>
+</button>
+</div>
+</div>
+<!-- Search Input Bar -->
+<div class="relative">
+<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-2xl text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 backdrop-blur-md" id="scheduleSearchInput" placeholder="Search schedules..." type="text"/>
+</div>
+<!-- Filter Segmented Tabs -->
+<div class="flex items-center justify-between">
+<div class="inline-flex p-1 bg-white/5 rounded-2xl border border-white/10 text-xs">
+<button class="filter-sched-btn px-4 py-1.5 rounded-xl font-semibold bg-purple-600 text-white shadow" data-filter="all">All</button>
+<button class="filter-sched-btn px-4 py-1.5 rounded-xl font-semibold text-slate-400 hover:text-white" data-filter="active">Active</button>
+<button class="filter-sched-btn px-4 py-1.5 rounded-xl font-semibold text-slate-400 hover:text-white" data-filter="inactive">Inactive</button>
+</div>
+<button class="p-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+<!-- Schedule Items List -->
+<div class="space-y-3" id="schedulesCardContainer">
+<!-- Schedule Card 1: absa -->
+<div class="glass-card rounded-[24px] p-4 schedule-item" data-status="active">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<h4 class="font-bold text-sm text-white">absa</h4>
+<p class="text-xs text-slate-400">Next: mohsin • Today, 11:59 PM</p>
+</div>
+</div>
+<div class="flex items-center space-x-2">
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Active</span>
+<button class="open-options-btn text-slate-400 hover:text-white p-1">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<!-- Schedule Card 2: House Cleaning -->
+<div class="glass-card rounded-[24px] p-4 schedule-item" data-status="active">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<h4 class="font-bold text-sm text-white">House Cleaning</h4>
+<p class="text-xs text-slate-400">Next: Ayesha • Tomorrow, 8:00 AM</p>
+</div>
+</div>
+<div class="flex items-center space-x-2">
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Active</span>
+<button class="open-options-btn text-slate-400 hover:text-white p-1">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<!-- Schedule Card 3: Plants -->
+<div class="glass-card rounded-[24px] p-4 schedule-item" data-status="active">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center text-cyan-300">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<h4 class="font-bold text-sm text-white">Plants</h4>
+<p class="text-xs text-slate-400">Next: Ali • Sun, 8:00 AM</p>
+</div>
+</div>
+<div class="flex items-center space-x-2">
+<button class="p-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-300">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="open-options-btn text-slate-400 hover:text-white p-1">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<!-- Schedule Card 4: Study (Inactive) -->
+<div class="glass-card rounded-[24px] p-4 schedule-item opacity-80" data-status="inactive">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-12 h-12 rounded-2xl bg-slate-700/40 border border-slate-600/40 flex items-center justify-center text-slate-400">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<h4 class="font-bold text-sm text-slate-300">Study</h4>
+<p class="text-xs text-slate-500">Next: mohsin • Mon, 9:00 PM</p>
+</div>
+</div>
+<div class="flex items-center space-x-2">
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">Inactive</span>
+<button class="open-options-btn text-slate-400 hover:text-white p-1">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ============================================== -->
+<!-- DESTINATION 4: ROOMS (P2P SYNC) SCREEN         -->
+<!-- ============================================== -->
+<section class="view-panel hidden space-y-4" id="view-rooms">
+<div class="flex items-center justify-between">
+<h2 class="text-2xl font-extrabold text-white">Rooms</h2>
+<div class="flex items-center space-x-2">
+<button class="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-bold text-slate-200 flex items-center space-x-1" id="btnJoinRoomTrigger">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Join</span>
+</button>
+<button class="pill-btn-primary px-3.5 py-1.5 rounded-full text-xs font-bold text-white flex items-center space-x-1" id="btnCreateRoomTrigger">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Create</span>
+</button>
+</div>
+</div>
+<!-- Room Detail Card (Family Home) -->
+<div class="glass-card rounded-[28px] p-5 space-y-4 border-purple-500/30">
+<div class="flex items-start justify-between">
+<div class="flex items-center space-x-3.5">
+<div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/30">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<h3 class="font-extrabold text-base text-white">Family Home</h3>
+<p class="text-xs text-slate-400">3 members • 2 schedules</p>
+</div>
+</div>
+<span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Active</span>
+</div>
+<!-- Member Stack -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center -space-x-2">
+<div class="w-9 h-9 rounded-full border-2 border-[#0A0D18] bg-purple-600 flex items-center justify-center text-xs font-bold text-white shadow">MO</div>
+<div class="w-9 h-9 rounded-full border-2 border-[#0A0D18] bg-cyan-600 flex items-center justify-center text-xs font-bold text-white shadow">AY</div>
+<div class="w-9 h-9 rounded-full border-2 border-[#0A0D18] bg-amber-600 flex items-center justify-center text-xs font-bold text-white shadow">AL</div>
+<div class="w-9 h-9 rounded-full border-2 border-[#0A0D18] bg-white/10 flex items-center justify-center text-xs text-slate-300 shadow">+</div>
+</div>
+<button class="text-xs text-purple-400 hover:text-purple-300 font-semibold flex items-center space-x-1" id="btnOpenRoomDetails">
+<span>Room Details</span>
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+<!-- No More Rooms State / P2P Mesh Banner -->
+<div class="glass-card rounded-[28px] p-6 text-center space-y-4">
+<div class="w-16 h-16 mx-auto rounded-3xl bg-purple-500/10 border border-purple-400/20 flex items-center justify-center relative">
+<div class="w-8 h-8 rounded-full bg-purple-500/30 p2p-wave absolute"></div>
+<svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<h4 class="font-bold text-base text-white">No more rooms</h4>
+<p class="text-xs text-slate-400 max-w-xs mx-auto mt-1">Sync schedules directly with family using instant local room codes or Bluetooth peer-to-peer mesh.</p>
+</div>
+<button class="pill-btn-primary px-6 py-2.5 rounded-full text-xs font-bold text-white inline-flex items-center space-x-2" id="btnCreateRoomSecondary">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Create Room</span>
+</button>
+</div>
+</section>
+<!-- ============================================== -->
+<!-- DESTINATION 5: HISTORY SCREEN                  -->
+<!-- ============================================== -->
+<section class="view-panel hidden space-y-4" id="view-history">
+<div class="flex items-center justify-between">
+<h2 class="text-2xl font-extrabold text-white">History</h2>
+<button class="p-2 rounded-xl bg-white/5 border border-white/10 text-slate-300">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+<!-- History Filter Chips (All, Completed, Skipped, Missed) -->
+<div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar py-0.5">
+<button class="history-filter px-4 py-1.5 rounded-full text-xs font-bold bg-purple-600 text-white shadow">All</button>
+<button class="history-filter px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10">Completed</button>
+<button class="history-filter px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10">Skipped</button>
+<button class="history-filter px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10">Missed</button>
+</div>
+<!-- Group 1: Tue, Sep 30, 2026 -->
+<div class="space-y-2.5">
+<h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Tue, Sep 30, 2026</h3>
+<!-- mohsin Complete -->
+<div class="glass-card rounded-2xl p-3.5 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-300 font-bold text-xs flex items-center justify-center">MO</div>
+<div>
+<p class="font-bold text-sm text-white">mohsin</p>
+<p class="text-xs text-slate-400">11:59 PM • Complete</p>
+</div>
+</div>
+<div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg>
+</div>
+</div>
+<!-- Ayesha Skipped -->
+<div class="glass-card rounded-2xl p-3.5 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-300 font-bold text-xs flex items-center justify-center">AY</div>
+<div>
+<p class="font-bold text-sm text-white">Ayesha</p>
+<p class="text-xs text-slate-400">8:00 AM • Skipped</p>
+</div>
+</div>
+<div class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 5l7 7-7 7M5 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg>
+</div>
+</div>
+<!-- Ali Missed -->
+<div class="glass-card rounded-2xl p-3.5 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-pink-500/20 text-pink-300 font-bold text-xs flex items-center justify-center">AL</div>
+<div>
+<p class="font-bold text-sm text-white">Ali</p>
+<p class="text-xs text-slate-400">8:00 PM • Missed</p>
+</div>
+</div>
+<div class="w-6 h-6 rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30 flex items-center justify-center">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg>
+</div>
+</div>
+</div>
+<!-- Group 2: Mon, Sep 29, 2026 -->
+<div class="space-y-2.5">
+<h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Mon, Sep 29, 2026</h3>
+<div class="glass-card rounded-2xl p-3.5 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-300 font-bold text-xs flex items-center justify-center">AY</div>
+<div>
+<p class="font-bold text-sm text-white">Ayesha</p>
+<p class="text-xs text-slate-400">8:00 AM • Complete</p>
+</div>
+</div>
+<div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg>
+</div>
+</div>
+</div>
+</section>
+<!-- ============================================== -->
+<!-- DESTINATION 6: SETTINGS SCREEN                 -->
+<!-- ============================================== -->
+<section class="view-panel hidden space-y-4" id="view-settings">
+<div class="flex items-center justify-between">
+<h2 class="text-2xl font-extrabold text-white">Settings</h2>
+<span class="text-xs text-purple-400 font-medium">v1.0.0 Expressive</span>
+</div>
+<!-- Settings List Menu Items -->
+<div class="glass-card rounded-[28px] overflow-hidden divide-y divide-white/5">
+<!-- Item 1: Appearance -->
+<button class="w-full p-4 flex items-center justify-between hover:bg-white/5 transition text-left" id="btnOpenAppearance">
+<div class="flex items-center space-x-3.5">
+<div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-300 flex items-center justify-center">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<p class="font-bold text-sm text-white">Appearance</p>
+<p class="text-xs text-slate-400">Theme, color, typography, shapes</p>
+</div>
+</div>
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<!-- Item 2: Expressive Effects (Gradient Fills) -->
+<button class="w-full p-4 flex items-center justify-between hover:bg-white/5 transition text-left" id="btnOpenGradientSettings">
+<div class="flex items-center space-x-3.5">
+<div class="w-10 h-10 rounded-2xl bg-purple-500/20 text-purple-300 flex items-center justify-center">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<p class="font-bold text-sm text-white">Expressive Effects</p>
+<p class="text-xs text-slate-400">Gradient fills, blur, motion</p>
+</div>
+</div>
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<!-- Item 3: Components -->
+<button class="w-full p-4 flex items-center justify-between hover:bg-white/5 transition text-left">
+<div class="flex items-center space-x-3.5">
+<div class="w-10 h-10 rounded-2xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<p class="font-bold text-sm text-white">Components</p>
+<p class="text-xs text-slate-400">Navigation, FAB, containments</p>
+</div>
+</div>
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<!-- Item 4: Accessibility -->
+<button class="w-full p-4 flex items-center justify-between hover:bg-white/5 transition text-left">
+<div class="flex items-center space-x-3.5">
+<div class="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<p class="font-bold text-sm text-white">Accessibility</p>
+<p class="text-xs text-slate-400">Reduced motion, contrast, scaling</p>
+</div>
+</div>
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<!-- Item 5: Data & Sync -->
+<button class="w-full p-4 flex items-center justify-between hover:bg-white/5 transition text-left">
+<div class="flex items-center space-x-3.5">
+<div class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<p class="font-bold text-sm text-white">Data &amp; Sync</p>
+<p class="text-xs text-slate-400">Backup, restore, mesh state</p>
+</div>
+</div>
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+<!-- Quick Live Preview Card in Settings -->
+<div class="glass-card rounded-[28px] p-5 space-y-3">
+<div class="flex items-center justify-between">
+<span class="text-xs uppercase tracking-wider text-purple-300 font-bold">Dynamic Surface Test</span>
+<span class="text-[10px] text-slate-400">Reacts to Lighting Sliders</span>
+</div>
+<div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
+<span class="text-xs font-semibold text-white">Expressive lighting tokens applied</span>
+<span class="w-3 h-3 rounded-full bg-cyan-400 shadow-md shadow-cyan-500/50"></span>
+</div>
+</div>
+</section>
+</div>
+<!-- END: Primary Views Container -->
+<!-- BEGIN: Floating Action Button (FAB) Speed Dial -->
+<div class="fixed bottom-24 right-6 z-40 max-w-md pointer-events-auto" data-purpose="expressive-fab">
+<!-- Speed dial sub-menu (hidden by default) -->
+<div class="hidden flex-col items-end space-y-2.5 mb-3 transition-all duration-200" id="fabSpeedDialMenu">
+<!-- Action 1: New Schedule -->
+<button class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-[#181B2A] border border-white/20 text-xs font-semibold text-white shadow-xl hover:bg-purple-600 transition" id="fabActionNewSchedule">
+<span>New Schedule</span>
+<span class="w-7 h-7 rounded-full bg-purple-500/30 flex items-center justify-center text-purple-300">+</span>
+</button>
+<!-- Action 2: Join Room -->
+<button class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-[#181B2A] border border-white/20 text-xs font-semibold text-white shadow-xl hover:bg-purple-600 transition" id="fabActionJoinRoom">
+<span>Join Room</span>
+<span class="w-7 h-7 rounded-full bg-cyan-500/30 flex items-center justify-center text-cyan-300">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+</button>
+<!-- Action 3: Scan Code -->
+<button class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-[#181B2A] border border-white/20 text-xs font-semibold text-white shadow-xl hover:bg-purple-600 transition" id="fabActionScanCode">
+<span>Scan Code</span>
+<span class="w-7 h-7 rounded-full bg-amber-500/30 flex items-center justify-center text-amber-300">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M4 8h16M4 16h4M4 4h4v4H4V4zm12 0h4v4h-4V4zM4 16h4v4H4v-4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+</button>
+</div>
+<!-- Main FAB Button -->
+<button class="w-14 h-14 rounded-full pill-btn-primary flex items-center justify-center text-white shadow-2xl transition transform" id="mainFabToggle" title="Quick Menu">
+<svg class="w-7 h-7 transition-transform duration-200" fill="none" id="fabPlusIcon" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</button>
+</div>
+<!-- END: Floating Action Button (FAB) Speed Dial -->
+<!-- BEGIN: Floating Dock Navigation Bar (6 M3 Expressive Destinations) -->
+<nav class="fixed bottom-3 left-0 right-0 max-w-md mx-auto px-4 z-40" data-purpose="floating-dock-nav">
+<div class="h-16 rounded-[28px] bg-[#0E1222]/90 backdrop-blur-2xl border border-white/12 px-2 flex items-center justify-around shadow-2xl shadow-black/80">
+<!-- Tab 1: Today (Default Active) -->
+<button class="dock-tab active flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl transition-all duration-200" data-view="today">
+<div class="tab-indicator px-3 py-1 rounded-full bg-purple-600/40 text-purple-300 border border-purple-400/30 flex items-center justify-center transition">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[10px] font-bold mt-0.5 text-purple-300">Today</span>
+</button>
+<!-- Tab 2: Calendar -->
+<button class="dock-tab flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl transition-all duration-200 text-slate-400 hover:text-slate-200" data-view="calendar">
+<div class="tab-indicator px-2 py-1 rounded-full flex items-center justify-center">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[10px] font-semibold mt-0.5">Calendar</span>
+</button>
+<!-- Tab 3: Schedules -->
+<button class="dock-tab flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl transition-all duration-200 text-slate-400 hover:text-slate-200" data-view="schedules">
+<div class="tab-indicator px-2 py-1 rounded-full flex items-center justify-center">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[10px] font-semibold mt-0.5">Schedules</span>
+</button>
+<!-- Tab 4: Rooms -->
+<button class="dock-tab flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl transition-all duration-200 text-slate-400 hover:text-slate-200" data-view="rooms">
+<div class="tab-indicator px-2 py-1 rounded-full flex items-center justify-center">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[10px] font-semibold mt-0.5">Rooms</span>
+</button>
+<!-- Tab 5: History -->
+<button class="dock-tab flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl transition-all duration-200 text-slate-400 hover:text-slate-200" data-view="history">
+<div class="tab-indicator px-2 py-1 rounded-full flex items-center justify-center">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[10px] font-semibold mt-0.5">History</span>
+</button>
+<!-- Tab 6: Settings -->
+<button class="dock-tab flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl transition-all duration-200 text-slate-400 hover:text-slate-200" data-view="settings">
+<div class="tab-indicator px-2 py-1 rounded-full flex items-center justify-center">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[10px] font-semibold mt-0.5">Settings</span>
+</button>
+</div>
+</nav>
+<!-- END: Floating Dock Navigation Bar -->
+</main>
+<!-- END: Application Shell Container -->
+<!-- ============================================================== -->
+<!-- MODALS & BOTTOM SHEETS (EXPRESSIVE OVERLAYS FROM COLLAGE)     -->
+<!-- ============================================================== -->
+<!-- BEGIN: Modal 1 - Gradient Fill Lighting Settings Modal -->
+<aside class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md hidden" data-purpose="gradient-settings-modal" id="modalGradientSettings">
+<div class="w-full max-w-sm glass-card rounded-[32px] p-6 space-y-5 border border-white/20 shadow-2xl relative">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<button class="p-1.5 rounded-full bg-white/5 hover:bg-white/10 text-slate-300" id="closeGradientModal">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<h3 class="font-extrabold text-base text-white">Gradient Fills</h3>
+</div>
+<button class="text-xs text-purple-400 font-semibold px-2 py-1 rounded bg-purple-500/10 hover:bg-purple-500/20" id="btnResetGradients">Reset</button>
+</div>
+<!-- Color Source Segmented (Primary, Secondary, Tertiary) -->
+<div class="space-y-1.5">
+<label class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Color Source</label>
+<div class="grid grid-cols-3 gap-1.5 p-1 bg-white/5 rounded-2xl border border-white/10 text-xs text-center font-medium">
+<button class="py-1.5 rounded-xl bg-purple-600 text-white font-bold">Primary</button>
+<button class="py-1.5 rounded-xl text-slate-400 hover:text-white">Secondary</button>
+<button class="py-1.5 rounded-xl text-slate-400 hover:text-white">Tertiary</button>
+</div>
+</div>
+<!-- Interactive Sliders matching reference layout -->
+<div class="space-y-3.5">
+<!-- Light Position X Slider -->
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-medium">
+<span class="text-slate-300">Light Position X</span>
+<span class="text-purple-400" id="labelPosX">0.3</span>
+</div>
+<input class="w-full accent-purple-500 bg-white/10 h-1.5 rounded-lg appearance-none cursor-pointer" id="sliderPosX" max="1" min="0" step="0.05" type="range" value="0.3"/>
+</div>
+<!-- Light Position Y Slider -->
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-medium">
+<span class="text-slate-300">Light Position Y</span>
+<span class="text-purple-400" id="labelPosY">0.2</span>
+</div>
+<input class="w-full accent-purple-500 bg-white/10 h-1.5 rounded-lg appearance-none cursor-pointer" id="sliderPosY" max="1" min="0" step="0.05" type="range" value="0.2"/>
+</div>
+<!-- Direction Slider -->
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-medium">
+<span class="text-slate-300">Direction</span>
+<span class="text-purple-400" id="labelDir">135°</span>
+</div>
+<input class="w-full accent-purple-500 bg-white/10 h-1.5 rounded-lg appearance-none cursor-pointer" id="sliderDir" max="360" min="0" step="5" type="range" value="135"/>
+</div>
+<!-- Width Slider -->
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-medium">
+<span class="text-slate-300">Width</span>
+<span class="text-purple-400" id="labelWidth">0.5</span>
+</div>
+<input class="w-full accent-purple-500 bg-white/10 h-1.5 rounded-lg appearance-none cursor-pointer" id="sliderWidth" max="1" min="0.1" step="0.05" type="range" value="0.5"/>
+</div>
+</div>
+<!-- Preset Orbs Grid -->
+<div class="space-y-1.5">
+<label class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Presets</label>
+<div class="grid grid-cols-4 gap-2 text-[10px] text-center font-medium">
+<button class="preset-pill p-2 rounded-2xl bg-white/5 border border-white/10 hover:border-purple-400" data-px="0.1" data-py="0.1">Top Left</button>
+<button class="preset-pill p-2 rounded-2xl bg-white/5 border border-white/10 hover:border-purple-400" data-px="0.9" data-py="0.1">Top Right</button>
+<button class="preset-pill p-2 rounded-2xl bg-white/5 border border-white/10 hover:border-purple-400" data-px="0.1" data-py="0.9">Bottom L</button>
+<button class="preset-pill p-2 rounded-2xl bg-white/5 border border-white/10 hover:border-purple-400" data-px="0.9" data-py="0.9">Bottom R</button>
+</div>
+</div>
+<button class="w-full pill-btn-primary py-3 rounded-2xl font-bold text-sm text-white" id="btnApplyGradientSettings">
+        Apply Tokens
+      </button>
+</div>
+</aside>
+<!-- END: Modal 1 - Gradient Fill Lighting Settings Modal -->
+<!-- BEGIN: Modal 2 - Create / Edit Schedule Dialog -->
+<aside class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md hidden" data-purpose="create-schedule-dialog" id="modalCreateSchedule">
+<div class="w-full max-w-sm glass-card rounded-[32px] p-6 space-y-4 border border-white/20 shadow-2xl relative max-h-[90vh] overflow-y-auto no-scrollbar">
+<div class="flex items-center justify-between pb-1 border-b border-white/10">
+<div class="flex items-center space-x-2">
+<button class="p-1.5 rounded-full bg-white/5 hover:bg-white/10 text-slate-300" id="closeCreateScheduleModal">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<h3 class="font-extrabold text-base text-white">Create Schedule</h3>
+</div>
+<button class="text-xs font-bold text-purple-300 px-3 py-1 rounded-full bg-purple-600/40 border border-purple-500/40" id="btnSaveScheduleTop">Save</button>
+</div>
+<!-- Schedule Name -->
+<div class="space-y-1">
+<label class="text-xs text-slate-300 font-semibold">Name</label>
+<input class="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 rounded-2xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500" id="inputNewScheduleName" placeholder="e.g. House Cleaning, Plant Watering" type="text"/>
+</div>
+<!-- Icon & Color Selector -->
+<div class="space-y-1.5">
+<label class="text-xs text-slate-300 font-semibold">Icon &amp; Color</label>
+<div class="flex items-center space-x-2">
+<button class="category-icon-btn p-3 rounded-2xl bg-purple-600 text-white ring-2 ring-purple-400" data-cat="home">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="category-icon-btn p-3 rounded-2xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10" data-cat="food">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="category-icon-btn p-3 rounded-2xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10" data-cat="clean">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="category-icon-btn p-3 rounded-2xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10" data-cat="heart">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+<!-- Turn Order Stack -->
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<label class="text-xs text-slate-300 font-semibold">Turn Order</label>
+<span class="text-[10px] text-purple-400">Drag to reorder</span>
+</div>
+<div class="space-y-1.5" id="turnOrderList">
+<div class="p-2.5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-xs">
+<div class="flex items-center space-x-2">
+<span class="w-6 h-6 rounded-full bg-purple-500/30 text-purple-300 flex items-center justify-center font-bold text-[10px]">1</span>
+<span class="text-white font-medium">mohsin</span>
+</div>
+<button class="text-slate-500 hover:text-pink-400">×</button>
+</div>
+<div class="p-2.5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-xs">
+<div class="flex items-center space-x-2">
+<span class="w-6 h-6 rounded-full bg-cyan-500/30 text-cyan-300 flex items-center justify-center font-bold text-[10px]">2</span>
+<span class="text-white font-medium">Ayesha</span>
+</div>
+<button class="text-slate-500 hover:text-pink-400">×</button>
+</div>
+<div class="p-2.5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-xs">
+<div class="flex items-center space-x-2">
+<span class="w-6 h-6 rounded-full bg-amber-500/30 text-amber-300 flex items-center justify-center font-bold text-[10px]">3</span>
+<span class="text-white font-medium">Ali</span>
+</div>
+<button class="text-slate-500 hover:text-pink-400">×</button>
+</div>
+</div>
+<input class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-purple-400" id="inputAddMember" placeholder="+ Add member name and press Enter..." type="text"/>
+</div>
+<!-- Repeat Cadence -->
+<div class="flex items-center justify-between pt-1">
+<label class="text-xs text-slate-300 font-semibold">Repeat</label>
+<select class="bg-[#151928] border border-white/10 text-xs rounded-xl px-3 py-1.5 text-slate-200">
+<option>Daily</option>
+<option selected="">Weekly</option>
+<option>Bi-weekly</option>
+<option>Monthly</option>
+</select>
+</div>
+<!-- Submit Button -->
+<button class="w-full pill-btn-primary py-3 rounded-2xl font-bold text-sm text-white" id="btnSaveScheduleSubmit">
+        Create Schedule
+      </button>
+</div>
+</aside>
+<!-- END: Modal 2 - Create / Edit Schedule Dialog -->
+<!-- BEGIN: Bottom Sheet 1 - Schedule Context Options -->
+<aside class="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm hidden" data-purpose="schedule-options-sheet" id="sheetScheduleOptions">
+<div class="w-full max-w-md glass-card rounded-t-[32px] p-6 space-y-4 border-t border-white/20 shadow-2xl animate-slideUp">
+<div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-2"></div>
+<div class="flex items-center justify-between">
+<h4 class="font-extrabold text-base text-white">Schedule Options</h4>
+<button class="p-1 rounded-full text-slate-400 hover:text-white" id="closeScheduleOptions">✕</button>
+</div>
+<div class="space-y-1 text-sm font-medium">
+<button class="w-full p-3 rounded-2xl hover:bg-white/5 flex items-center space-x-3 text-left">
+<svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-slate-200">Create from Template</span>
+</button>
+<button class="w-full p-3 rounded-2xl hover:bg-white/5 flex items-center space-x-3 text-left">
+<svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-slate-200">Duplicate Schedule</span>
+</button>
+<button class="w-full p-3 rounded-2xl hover:bg-white/5 flex items-center space-x-3 text-left">
+<svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-slate-200">Share Schedule Code</span>
+</button>
+<button class="w-full p-3 rounded-2xl hover:bg-red-500/10 flex items-center space-x-3 text-left text-rose-400" id="btnTriggerDeleteConfirm">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Delete Schedule</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- END: Bottom Sheet 1 - Schedule Context Options -->
+<!-- BEGIN: Modal 3 - Delete Confirmation Dialog -->
+<aside class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden" data-purpose="delete-confirmation-dialog" id="dialogDeleteConfirm">
+<div class="w-full max-w-xs glass-card rounded-[28px] p-6 text-center space-y-4 border border-rose-500/30 shadow-2xl">
+<div class="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<h4 class="font-extrabold text-base text-white">Delete Schedule?</h4>
+<p class="text-xs text-slate-400 mt-1">This will permanently delete this schedule and all associated historical shifts.</p>
+</div>
+<div class="grid grid-cols-2 gap-2 pt-2">
+<button class="py-2.5 rounded-2xl bg-white/10 hover:bg-white/15 text-xs font-bold text-slate-200" id="btnCancelDelete">Cancel</button>
+<button class="py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white shadow-lg shadow-rose-600/30" id="btnConfirmDelete">Delete</button>
+</div>
+</div>
+</aside>
+<!-- END: Modal 3 - Delete Confirmation Dialog -->
+<!-- BEGIN: Interactive Toast / Expressive Snackbar -->
+<aside class="fixed top-12 left-0 right-0 max-w-sm mx-auto px-4 z-50 pointer-events-none transition-all duration-300 transform -translate-y-20 opacity-0" data-purpose="toast-notification" id="turnlyToast">
+<div class="rounded-2xl glass-card p-3.5 flex items-center justify-between border border-emerald-400/40 shadow-2xl pointer-events-auto bg-[#0E1528]/90">
+<div class="flex items-center space-x-3">
+<div class="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center" id="toastIconContainer">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg>
+</div>
+<p class="text-xs font-semibold text-white" id="toastMessage">Schedule updated successfully</p>
+</div>
+<button class="text-xs text-slate-400 hover:text-white px-2 py-0.5" id="toastDismissBtn">✕</button>
+</div>
+</aside>
+<!-- END: Interactive Toast / Expressive Snackbar -->
+<!-- BEGIN: Reactive Application State Engine & Interactions -->
+<script data-purpose="turnly-reactive-state">
+    // Master Application State
+    const AppState = {
+      activeTab: 'today',
+      lighting: {
+        x: 0.3,
+        y: 0.2,
+        direction: 135,
+        width: 0.5,
+        intensity: 0.45
+      },
+      currentTurn: {
+        assignee: 'mohsin',
+        task: 'House Cleaning',
+        dueText: '2h 18m left'
+      },
+      schedules: [
+        { id: 1, name: 'absa', assignee: 'mohsin', time: 'Today, 11:59 PM', status: 'active', category: 'home' },
+        { id: 2, name: 'House Cleaning', assignee: 'Ayesha', time: 'Tomorrow, 8:00 AM', status: 'active', category: 'clean' },
+        { id: 3, name: 'Plants', assignee: 'Ali', time: 'Sun, 8:00 AM', status: 'active', category: 'nature' },
+        { id: 4, name: 'Study', assignee: 'mohsin', time: 'Mon, 9:00 PM', status: 'inactive', category: 'food' }
+      ]
+    };
+
+    // Helper: Toast Trigger
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('turnlyToast');
+      const toastMsg = document.getElementById('toastMessage');
+      const iconContainer = document.getElementById('toastIconContainer');
+      
+      toastMsg.textContent = message;
+      if (isError) {
+        iconContainer.className = "w-7 h-7 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center";
+        iconContainer.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>`;
+      } else {
+        iconContainer.className = "w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center";
+        iconContainer.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
+      }
+
+      toast.classList.remove('-translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.add('-translate-y-20', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 3200);
+    }
+
+    document.getElementById('toastDismissBtn').addEventListener('click', () => {
+      const toast = document.getElementById('turnlyToast');
+      toast.classList.add('-translate-y-20', 'opacity-0');
+    });
+
+    // Navigation Switcher (6 Destinations)
+    const tabs = document.querySelectorAll('.dock-tab');
+    const views = document.querySelectorAll('.view-panel');
+    const subtitle = document.getElementById('topBarSubtitle');
+
+    const viewSubtitles = {
+      today: 'Family Home • 2 active',
+      calendar: 'September 2026 • 3 shifts queued',
+      schedules: '4 configured schedules',
+      rooms: 'Mesh P2P Connected • 3 peers',
+      history: 'Recent activity logs',
+      settings: 'Material 3 Expressive Tokens'
+    };
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetView = tab.getAttribute('data-view');
+        AppState.activeTab = targetView;
+
+        // Reset tab styles
+        tabs.forEach(t => {
+          t.classList.remove('active', 'text-purple-300');
+          t.classList.add('text-slate-400');
+          const ind = t.querySelector('.tab-indicator');
+          ind.className = 'tab-indicator px-2 py-1 rounded-full flex items-center justify-center';
+        });
+
+        // Set active tab style
+        tab.classList.add('active', 'text-purple-300');
+        tab.classList.remove('text-slate-400');
+        const activeIndicator = tab.querySelector('.tab-indicator');
+        activeIndicator.className = 'tab-indicator px-3 py-1 rounded-full bg-purple-600/40 text-purple-300 border border-purple-400/30 flex items-center justify-center transition';
+
+        // Switch visible view panel
+        views.forEach(v => v.classList.add('hidden'));
+        const activeSection = document.getElementById(`view-${targetView}`);
+        if (activeSection) {
+          activeSection.classList.remove('hidden');
+        }
+
+        if (subtitle && viewSubtitles[targetView]) {
+          subtitle.textContent = viewSubtitles[targetView];
+        }
+      });
+    });
+
+    // Mark Done action on Today Hero
+    const btnDone = document.getElementById('btnCompleteTurn');
+    if (btnDone) {
+      btnDone.addEventListener('click', () => {
+        const heroName = document.getElementById('heroTurnPerson');
+        const countdown = document.getElementById('heroCountdown');
+        if (heroName.textContent === 'mohsin') {
+          heroName.textContent = 'Ayesha';
+          countdown.textContent = 'Tomorrow 8:00 AM';
+          showToast('Turn completed! Passed to Ayesha.');
+        } else {
+          heroName.textContent = 'mohsin';
+          countdown.textContent = '2h 18m left';
+          showToast('Turn reset to Mohsin.');
+        }
+      });
+    }
+
+    // Swap Turn action
+    const btnSwap = document.getElementById('btnSwapTurn');
+    if (btnSwap) {
+      btnSwap.addEventListener('click', () => {
+        showToast('Turn swapped with Ali for Living Room.');
+      });
+    }
+
+    // Schedules Search & Filter
+    const searchInput = document.getElementById('scheduleSearchInput');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        const items = document.querySelectorAll('.schedule-item');
+        items.forEach(item => {
+          const text = item.textContent.toLowerCase();
+          item.style.display = text.includes(query) ? 'block' : 'none';
+        });
+      });
+    }
+
+    const filterBtns = document.querySelectorAll('.filter-sched-btn');
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => {
+          b.className = 'filter-sched-btn px-4 py-1.5 rounded-xl font-semibold text-slate-400 hover:text-white';
+        });
+        btn.className = 'filter-sched-btn px-4 py-1.5 rounded-xl font-semibold bg-purple-600 text-white shadow';
+
+        const filterVal = btn.getAttribute('data-filter');
+        const items = document.querySelectorAll('.schedule-item');
+        items.forEach(item => {
+          if (filterVal === 'all') {
+            item.style.display = 'block';
+          } else {
+            const status = item.getAttribute('data-status');
+            item.style.display = status === filterVal ? 'block' : 'none';
+          }
+        });
+      });
+    });
+  </script>
+<!-- BEGIN: Interactive Sliders & Live Lighting Token Synchronization -->
+<script data-purpose="lighting-sliders-engine">
+    const root = document.documentElement;
+    const sliderX = document.getElementById('sliderPosX');
+    const sliderY = document.getElementById('sliderPosY');
+    const sliderDir = document.getElementById('sliderDir');
+    const sliderWidth = document.getElementById('sliderWidth');
+
+    const labelX = document.getElementById('labelPosX');
+    const labelY = document.getElementById('labelPosY');
+    const labelDir = document.getElementById('labelDir');
+    const labelWidth = document.getElementById('labelWidth');
+
+    function updateLightingTokens() {
+      root.style.setProperty('--light-x', sliderX.value);
+      root.style.setProperty('--light-y', sliderY.value);
+      root.style.setProperty('--light-dir', sliderDir.value + 'deg');
+      root.style.setProperty('--light-width', sliderWidth.value);
+
+      if (labelX) labelX.textContent = sliderX.value;
+      if (labelY) labelY.textContent = sliderY.value;
+      if (labelDir) labelDir.textContent = sliderDir.value + '°';
+      if (labelWidth) labelWidth.textContent = sliderWidth.value;
+    }
+
+    if (sliderX) sliderX.addEventListener('input', updateLightingTokens);
+    if (sliderY) sliderY.addEventListener('input', updateLightingTokens);
+    if (sliderDir) sliderDir.addEventListener('input', updateLightingTokens);
+    if (sliderWidth) sliderWidth.addEventListener('input', updateLightingTokens);
+
+    // Preset Buttons
+    const presets = document.querySelectorAll('.preset-pill');
+    presets.forEach(p => {
+      p.addEventListener('click', () => {
+        const px = p.getAttribute('data-px');
+        const py = p.getAttribute('data-py');
+        sliderX.value = px;
+        sliderY.value = py;
+        updateLightingTokens();
+        showToast('Preset gradient lighting applied!');
+      });
+    });
+
+    const resetGradients = document.getElementById('btnResetGradients');
+    if (resetGradients) {
+      resetGradients.addEventListener('click', () => {
+        sliderX.value = 0.3;
+        sliderY.value = 0.2;
+        sliderDir.value = 135;
+        sliderWidth.value = 0.5;
+        updateLightingTokens();
+        showToast('Gradient settings restored to default.');
+      });
+    }
+
+    // Modal Triggers: Gradient Settings
+    const modalGradient = document.getElementById('modalGradientSettings');
+    const openGradientBtn = document.getElementById('btnOpenGradientSettings');
+    const closeGradientBtn = document.getElementById('closeGradientModal');
+    const applyGradientBtn = document.getElementById('btnApplyGradientSettings');
+
+    if (openGradientBtn) {
+      openGradientBtn.addEventListener('click', () => modalGradient.classList.remove('hidden'));
+    }
+    if (closeGradientBtn) {
+      closeGradientBtn.addEventListener('click', () => modalGradient.classList.add('hidden'));
+    }
+    if (applyGradientBtn) {
+      applyGradientBtn.addEventListener('click', () => {
+        modalGradient.classList.add('hidden');
+        showToast('M3 Expressive tokens updated globally!');
+      });
+    }
+  </script>
+<!-- BEGIN: Overlays, Context Sheets & Floating Action Speed-Dial -->
+<script data-purpose="overlay-sheet-handlers">
+    // FAB speed-dial trigger
+    const fabToggle = document.getElementById('mainFabToggle');
+    const fabMenu = document.getElementById('fabSpeedDialMenu');
+    const fabPlusIcon = document.getElementById('fabPlusIcon');
+
+    let fabOpen = false;
+    if (fabToggle) {
+      fabToggle.addEventListener('click', () => {
+        fabOpen = !fabOpen;
+        if (fabOpen) {
+          fabMenu.classList.remove('hidden');
+          fabMenu.classList.add('flex');
+          fabPlusIcon.style.transform = 'rotate(45deg)';
+        } else {
+          fabMenu.classList.add('hidden');
+          fabMenu.classList.remove('flex');
+          fabPlusIcon.style.transform = 'rotate(0deg)';
+        }
+      });
+    }
+
+    // Create Schedule Modal Handlers
+    const modalCreateSchedule = document.getElementById('modalCreateSchedule');
+    const closeCreateSchedule = document.getElementById('closeCreateScheduleModal');
+    const btnNewScheduleDirect = document.getElementById('btnNewScheduleDirect');
+    const quickCreateTop = document.getElementById('quickCreateTopBtn');
+    const fabActionNew = document.getElementById('fabActionNewSchedule');
+    const btnSaveTop = document.getElementById('btnSaveScheduleTop');
+    const btnSaveSubmit = document.getElementById('btnSaveScheduleSubmit');
+    const inputSchedName = document.getElementById('inputNewScheduleName');
+
+    function openCreateScheduleModal() {
+      if (modalCreateSchedule) modalCreateSchedule.classList.remove('hidden');
+      if (fabOpen && fabToggle) fabToggle.click();
+    }
+    function closeCreateScheduleModal() {
+      if (modalCreateSchedule) modalCreateSchedule.classList.add('hidden');
+    }
+
+    if (btnNewScheduleDirect) btnNewScheduleDirect.addEventListener('click', openCreateScheduleModal);
+    if (quickCreateTop) quickCreateTop.addEventListener('click', openCreateScheduleModal);
+    if (fabActionNew) fabActionNew.addEventListener('click', openCreateScheduleModal);
+    if (closeCreateSchedule) closeCreateSchedule.addEventListener('click', closeCreateScheduleModal);
+
+    function handleSaveSchedule() {
+      const name = inputSchedName.value.trim() || 'New Chores';
+      const container = document.getElementById('schedulesCardContainer');
+      
+      const newCard = document.createElement('div');
+      newCard.className = 'glass-card rounded-[24px] p-4 schedule-item animate-fadeIn';
+      newCard.setAttribute('data-status', 'active');
+      newCard.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-sm text-white">${name}</h4>
+              <p class="text-xs text-slate-400">Next: mohsin • Today, 9:00 PM</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Active</span>
+            <button class="open-options-btn text-slate-400 hover:text-white p-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg>
+            </button>
+          </div>
+        </div>
+      `;
+
+      container.prepend(newCard);
+      closeCreateScheduleModal();
+      inputSchedName.value = '';
+      showToast(`Schedule "${name}" added to Family Home!`);
+      attachOptionTriggers();
+    }
+
+    if (btnSaveTop) btnSaveTop.addEventListener('click', handleSaveSchedule);
+    if (btnSaveSubmit) btnSaveSubmit.addEventListener('click', handleSaveSchedule);
+
+    // Schedule Options Bottom Sheet
+    const sheetOptions = document.getElementById('sheetScheduleOptions');
+    const closeOptionsBtn = document.getElementById('closeScheduleOptions');
+    const deleteConfirmDialog = document.getElementById('dialogDeleteConfirm');
+    const btnTriggerDelete = document.getElementById('btnTriggerDeleteConfirm');
+    const btnCancelDel = document.getElementById('btnCancelDelete');
+    const btnConfirmDel = document.getElementById('btnConfirmDelete');
+
+    function attachOptionTriggers() {
+      document.querySelectorAll('.open-options-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          sheetOptions.classList.remove('hidden');
+        });
+      });
+    }
+    attachOptionTriggers();
+
+    if (closeOptionsBtn) {
+      closeOptionsBtn.addEventListener('click', () => sheetOptions.classList.add('hidden'));
+    }
+    if (btnTriggerDelete) {
+      btnTriggerDelete.addEventListener('click', () => {
+        sheetOptions.classList.add('hidden');
+        deleteConfirmDialog.classList.remove('hidden');
+      });
+    }
+    if (btnCancelDel) {
+      btnCancelDel.addEventListener('click', () => deleteConfirmDialog.classList.add('hidden'));
+    }
+    if (btnConfirmDel) {
+      btnConfirmDel.addEventListener('click', () => {
+        deleteConfirmDialog.classList.add('hidden');
+        showToast('Schedule successfully removed.', true);
+      });
+    }
+
+    // Split menu popup trigger
+    const splitMenuBtn = document.getElementById('btnSplitMenu');
+    if (splitMenuBtn) {
+      splitMenuBtn.addEventListener('click', () => {
+        sheetOptions.classList.remove('hidden');
+      });
+    }
+
+    // P2P Status Indicator Action
+    const p2pBtn = document.getElementById('p2pSyncBtn');
+    if (p2pBtn) {
+      p2pBtn.addEventListener('click', () => {
+        showToast('Local P2P mesh connected with 3 peers.');
+      });
+    }
+  </script>
+</body></html>

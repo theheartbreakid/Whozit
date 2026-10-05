@@ -101,11 +101,11 @@ fun getShapesForPersonality(personality: String, variation: String): Shapes {
             extraLarge = RoundedCornerShape((24 * factor).dp)
         )
         else -> Shapes( // EXPRESSIVE
-            extraSmall = RoundedCornerShape((6 * factor).dp),
-            small = RoundedCornerShape((10 * factor).dp),
-            medium = RoundedCornerShape((16 * factor).dp),
-            large = RoundedCornerShape((24 * factor).dp),
-            extraLarge = RoundedCornerShape((32 * factor).dp)
+            extraSmall = RoundedCornerShape((8 * factor).dp),
+            small = RoundedCornerShape((16 * factor).dp),
+            medium = RoundedCornerShape((24 * factor).dp),
+            large = RoundedCornerShape((28 * factor).dp),
+            extraLarge = RoundedCornerShape((36 * factor).dp)
         )
     }
 }

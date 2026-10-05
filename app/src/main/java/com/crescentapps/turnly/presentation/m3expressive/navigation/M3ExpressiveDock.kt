@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.crescentapps.turnly.presentation.m3expressive.components.expressiveLightRay
 
+import androidx.compose.ui.layout.onSizeChanged
+
 enum class M3NavDestination(val route: String, val label: String, val icon: ImageVector) {
     HOME("home", "Today", Icons.Default.Home),
     CALENDAR("calendar", "Calendar", Icons.Default.DateRange),
@@ -57,11 +59,17 @@ fun M3ExpressiveDock(
     onNavigate: (M3NavDestination) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val dockSafeArea = com.crescentapps.turnly.presentation.theme.LocalDockSafeArea.current
+    val density = androidx.compose.ui.platform.LocalDensity.current
+
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .onSizeChanged { size ->
+                dockSafeArea.dockHeight = with(density) { size.height.toDp() }
+            }
             .navigationBarsPadding()
-            .padding(vertical = 12.dp),
+            .padding(vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {
         Surface(
@@ -72,13 +80,13 @@ fun M3ExpressiveDock(
                     clip = false
                 ),
             shape = CircleShape,
-            color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.95f),
+            color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.65f),
             contentColor = MaterialTheme.colorScheme.onSurface,
             tonalElevation = 6.dp
         ) {
             Row(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 6.dp)
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
                     .animateContentSize(animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -157,7 +165,7 @@ private fun M3DockItem(
                 selected = isSelected
                 contentDescription = destination.label
             }
-            .padding(horizontal = if (isSelected) 16.dp else 10.dp, vertical = 10.dp)
+            .padding(horizontal = if (isSelected) 14.dp else 10.dp, vertical = 8.dp)
             .animateContentSize(animationSpec = MaterialTheme.motionScheme.fastSpatialSpec()),
         contentAlignment = Alignment.Center
     ) {

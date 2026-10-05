@@ -18,6 +18,8 @@ import com.crescentapps.turnly.presentation.gaussianblur.backdrop.gaussianGlass
 import com.crescentapps.turnly.presentation.gaussianblur.theme.GaussianBlurTokens
 import com.crescentapps.turnly.presentation.gaussianblur.theme.LocalGaussianBlurColors
 
+import androidx.compose.ui.layout.onSizeChanged
+
 enum class GaussianNavDestination(val label: String, val icon: ImageVector) {
     TODAY("Today", Icons.Outlined.Today),
     CALENDAR("Calendar", Icons.Outlined.CalendarMonth),
@@ -50,14 +52,20 @@ fun GaussianDock(
 
     val destinations = GaussianNavDestination.entries
 
+    val dockSafeArea = com.crescentapps.turnly.presentation.theme.LocalDockSafeArea.current
+    val density = androidx.compose.ui.platform.LocalDensity.current
+
     FloatingTabBar(
         selectedTabKey = currentDestination,
         scrollConnection = scrollConnection,
         modifier = modifier
+            .fillMaxWidth()
+            .onSizeChanged { size ->
+                dockSafeArea.dockHeight = with(density) { size.height.toDp() }
+            }
             .navigationBarsPadding()
             .padding(horizontal = 12.dp)
-            .padding(bottom = 6.dp)
-            .fillMaxWidth(),
+            .padding(bottom = 6.dp),
         tabBarContentModifier = glassSurface,
         colors = FloatingTabBarDefaults.colors(
             backgroundColor = Color.Transparent,

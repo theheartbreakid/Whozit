@@ -33,10 +33,11 @@ import com.crescentapps.turnly.core.util.DateUtils
 import androidx.compose.material3.*
 import com.crescentapps.turnly.presentation.m3expressive.components.TurnlyExpressiveButton
 import com.crescentapps.turnly.presentation.screens.schedule.ScheduleDetailViewModel
-import com.crescentapps.turnly.presentation.catalog.utils.LocalBackdrop
-import com.crescentapps.turnly.presentation.components.ConfirmDialog
+import com.crescentapps.turnly.presentation.m3expressive.components.TurnlyExpressiveCard
+import com.crescentapps.turnly.presentation.m3expressive.components.TurnlyExpressiveDialog
 import com.crescentapps.turnly.presentation.components.LocalPrismalAdaptiveColor
 import com.crescentapps.turnly.presentation.components.ParticipantAvatar
+import com.crescentapps.turnly.presentation.catalog.utils.LocalBackdrop
 import com.crescentapps.turnly.presentation.screens.history.StatColumn
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 
@@ -104,10 +105,10 @@ fun M3ScheduleDetailScreen(
         ) {
             // Overview Card
             item {
-                androidx.compose.material3.Card(
-                    
+                TurnlyExpressiveCard(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(24.dp)
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
                 ) {
                     Column(modifier = Modifier.padding(18.dp)) {
                         Row(
@@ -171,10 +172,10 @@ fun M3ScheduleDetailScreen(
 
             // Statistics Card
             item {
-                androidx.compose.material3.Card(
-                    
+                TurnlyExpressiveCard(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(24.dp)
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
                 ) {
                     Column(modifier = Modifier.padding(18.dp)) {
                         Text(
@@ -209,10 +210,10 @@ fun M3ScheduleDetailScreen(
             }
 
             items(uiState.participants) { p ->
-                androidx.compose.material3.Card(
-                    
+                TurnlyExpressiveCard(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(18.dp)
+                    shape = RoundedCornerShape(18.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
                 ) {
                     Row(
                         modifier = Modifier
@@ -251,10 +252,10 @@ fun M3ScheduleDetailScreen(
             }
 
             items(uiState.upcomingTurns) { (p, date) ->
-                androidx.compose.material3.Card(
-                    
+                TurnlyExpressiveCard(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(18.dp)
+                    shape = RoundedCornerShape(18.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
                 ) {
                     Row(
                         modifier = Modifier
@@ -305,7 +306,7 @@ fun M3ScheduleDetailScreen(
     }
 
     if (showArchiveConfirm) {
-        ConfirmDialog(
+        TurnlyExpressiveDialog(
             title = "Archive Schedule?",
             message = "Archiving will hide this schedule from active rotations while preserving all completed historical data.",
             confirmText = "Archive",
@@ -313,12 +314,12 @@ fun M3ScheduleDetailScreen(
                 viewModel.archiveSchedule()
                 onNavigateBack()
             },
-            onDismiss = { showArchiveConfirm = false }
+            onDismissRequest = { showArchiveConfirm = false }
         )
     }
 
     if (showDeleteConfirm) {
-        ConfirmDialog(
+        TurnlyExpressiveDialog(
             title = "Permanently Delete Schedule?",
             message = "This will permanently remove '' and all its rotation records. If you want to keep history, choose Archive instead.",
             confirmText = "Delete Permanently",
@@ -327,7 +328,7 @@ fun M3ScheduleDetailScreen(
                 viewModel.deletePermanently()
                 onNavigateBack()
             },
-            onDismiss = { showDeleteConfirm = false }
+            onDismissRequest = { showDeleteConfirm = false }
         )
     }
 }

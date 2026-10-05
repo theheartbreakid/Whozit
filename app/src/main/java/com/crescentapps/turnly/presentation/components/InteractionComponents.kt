@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Undo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +39,8 @@ import com.crescentapps.turnly.core.util.DateUtils
 import com.crescentapps.turnly.presentation.catalog.utils.LocalBackdrop
 import com.crescentapps.turnly.presentation.components.liquid.LiquidButton
 import com.crescentapps.turnly.presentation.components.liquid.LiquidCard
+import com.crescentapps.turnly.presentation.m3expressive.components.TurnlyExpressiveCard
+import com.crescentapps.turnly.presentation.m3expressive.components.TurnlyExpressiveButton
 import com.crescentapps.turnly.presentation.components.liquid.LiquidChip
 import com.crescentapps.turnly.presentation.components.liquid.LiquidDialog
 import com.crescentapps.turnly.presentation.theme.LiquidColors
@@ -52,6 +55,7 @@ fun TurnCard(
     resolvedTurn: ResolvedTurn,
     onMarkDone: (Long, Double?) -> Unit,
     onSkip: (Long) -> Unit,
+    onUndo: (Long) -> Unit = {},
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -64,6 +68,7 @@ fun TurnCard(
     
     val backdrop = LocalBackdrop.current ?: rememberLayerBackdrop()
     val adaptiveColor = LocalPrismalAdaptiveColor.current
+    val tokens = LocalTurnlyColors.current
 
     LiquidCard(
         backdrop = backdrop,
@@ -140,54 +145,77 @@ fun TurnCard(
                 }
             }
 
-            // Action Buttons Row (Mark Done / Skip)
-            if (isPending) {
+            // Action Buttons Row (Mark Done / Skip / Undo)
+            if (isPending || isDone) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    val tokens = TurnlyThemeTokens.colors
-                    LiquidButton(
-                        onClick = { onSkip(schedule.id) },
-                        backdrop = backdrop,
-                        modifier = Modifier.weight(0.4f),
-                        surfaceColor = tokens.glassCard
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.FastForward,
-                            contentDescription = "Skip",
-                            modifier = Modifier.size(15.dp),
-                            tint = adaptiveColor.copy(alpha = 0.85f)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "Skip",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = adaptiveColor.copy(alpha = 0.85f)
-                        )
-                    }
+                    if (isPending) {
+                        LiquidButton(
+                            onClick = { onSkip(schedule.id) },
+                            backdrop = backdrop,
+                            modifier = Modifier.weight(0.4f),
+                            surfaceColor = tokens.glassCard
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.FastForward,
+                                contentDescription = "Skip",
+                                modifier = Modifier.size(15.dp),
+                                tint = adaptiveColor.copy(alpha = 0.85f)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Skip",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = adaptiveColor.copy(alpha = 0.85f)
+                            )
+                        }
 
-                    LiquidButton(
-                        onClick = { onMarkDone(schedule.id, null) },
-                        backdrop = backdrop,
-                        modifier = Modifier.weight(0.6f),
-                        tint = tokens.statusCompleted.copy(alpha = 0.35f),
-                        surfaceColor = tokens.statusCompleted.copy(alpha = 0.25f)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = "Done",
-                            modifier = Modifier.size(16.dp),
-                            tint = tokens.statusCompleted
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "Mark Done",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = tokens.statusCompleted
-                        )
+                        LiquidButton(
+                            onClick = { onMarkDone(schedule.id, null) },
+                            backdrop = backdrop,
+                            modifier = Modifier.weight(0.6f),
+                            tint = tokens.statusCompleted.copy(alpha = 0.35f),
+                            surfaceColor = tokens.statusCompleted.copy(alpha = 0.25f)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "Done",
+                                modifier = Modifier.size(16.dp),
+                                tint = tokens.statusCompleted
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Mark Done",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = tokens.statusCompleted
+                            )
+                        }
+                    } else if (isDone) {
+                        LiquidButton(
+                            onClick = { onUndo(schedule.id) },
+                            backdrop = backdrop,
+                            modifier = Modifier.fillMaxWidth(),
+                            tint = adaptiveColor.copy(alpha = 0.2f),
+                            surfaceColor = tokens.glassCard
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Undo,
+                                contentDescription = "Undo Done",
+                                modifier = Modifier.size(16.dp),
+                                tint = adaptiveColor.copy(alpha = 0.85f)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Undo Done",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = adaptiveColor.copy(alpha = 0.85f)
+                            )
+                        }
                     }
                 }
             }
@@ -239,13 +267,16 @@ fun EmptyTurnState(
 ) {
     val backdrop = LocalBackdrop.current ?: rememberLayerBackdrop()
     val adaptiveColor = LocalPrismalAdaptiveColor.current
+    val tokens = LocalTurnlyColors.current
 
-    LiquidCard(
-        backdrop = backdrop,
+    TurnlyExpressiveCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 12.dp),
-        shape = RoundedCornerShape(28.dp)
+        shape = RoundedCornerShape(28.dp),
+        colors = androidx.compose.material3.CardDefaults.cardColors(
+            containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceContainerLowest
+        )
     ) {
         Column(
             modifier = Modifier
@@ -284,19 +315,11 @@ fun EmptyTurnState(
                 textAlign = TextAlign.Center
             )
 
-            LiquidButton(
+            TurnlyExpressiveButton(
                 onClick = onAction,
-                backdrop = backdrop,
-                tint = LocalTurnlyColors.current.accent.copy(alpha = 0.35f),
-                surfaceColor = LocalTurnlyColors.current.accent.copy(alpha = 0.25f)
-) {
-                Text(
-                    text = actionText,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp,
-                    color = adaptiveColor
-                )
-            }
+                text = actionText,
+                isPrimary = false
+            )
         }
     }
 }

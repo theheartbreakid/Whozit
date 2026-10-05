@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Undo
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +45,7 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
     val backdrop = LocalBackdrop.current ?: rememberLayerBackdrop()
     val adaptiveColor = LocalPrismalAdaptiveColor.current
+    val colors = LocalTurnlyColors.current
 
     var turnForAmountDialog by remember { mutableStateOf<ResolvedTurn?>(null) }
     var enteredAmount by remember { mutableStateOf("") }
@@ -75,21 +78,20 @@ fun HomeScreen(
             }
 
             if (uiState.todayTurns.isNotEmpty()) {
-                val colors = LocalTurnlyColors.current
                 LiquidButton(
                     onClick = onCreateSchedule,
                     backdrop = backdrop,
-                    surfaceColor = LocalTurnlyColors.current.accent.copy(alpha = 0.2f),
-                    tint = LocalTurnlyColors.current.accent.copy(alpha = 0.35f)
+                    surfaceColor = colors.accent.copy(alpha = 0.2f),
+                    tint = colors.accent.copy(alpha = 0.35f)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "New Schedule",
                         modifier = Modifier.size(18.dp),
-                        tint = colors.primary
+                        tint = colors.accent
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("New", fontWeight = FontWeight.Bold, color = colors.primary)
+                    Text("New", fontWeight = FontWeight.Bold, color = colors.accent)
                 }
             }
         }
@@ -186,31 +188,74 @@ fun HomeScreen(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                                 ) {
+                                    if (firstPending.status == OccurrenceStatus.COMPLETED) {
+                                        LiquidButton(
+                                            onClick = { viewModel.undoCompletion(firstPending) },
+                                            backdrop = backdrop,
+                                            modifier = Modifier.weight(1f),
+                                            surfaceColor = colors.surface.copy(alpha = 0.2f),
+                                            tint = adaptiveColor.copy(alpha = 0.4f)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Undo,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(16.dp),
+                                                tint = LocalPrismalAdaptiveColor.current
+                                            )
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(
+                                                text = "Undo Done",
+                                                fontWeight = FontWeight.Bold,
+                                                color = LocalPrismalAdaptiveColor.current
+                                            )
+                                        }
+                                    } else {
+                                        LiquidButton(
+                                            onClick = {
+                                                if (firstPending.schedule.type == ScheduleType.MONEY) {
+                                                    turnForAmountDialog = firstPending
+                                                    enteredAmount = firstPending.schedule.defaultAmount?.toString() ?: ""
+                                                } else {
+                                                    viewModel.markTurnComplete(firstPending)
+                                                }
+                                            },
+                                            backdrop = backdrop,
+                                            modifier = Modifier.weight(1f),
+                                            surfaceColor = LocalTurnlyColors.current.accent.copy(alpha = 0.25f),
+                                            tint = LocalTurnlyColors.current.accent.copy(alpha = 0.4f)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(16.dp),
+                                                tint = LocalPrismalAdaptiveColor.current
+                                            )
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(
+                                                text = if (firstPending.schedule.type == ScheduleType.MONEY) "Record & Done" else "Mark as Done",
+                                                fontWeight = FontWeight.Bold,
+                                                color = LocalPrismalAdaptiveColor.current
+                                            )
+                                        }
+                                    }
                                     LiquidButton(
-                                        onClick = {
-                                            if (firstPending.schedule.type == ScheduleType.MONEY) {
-                                                turnForAmountDialog = firstPending
-                                                enteredAmount = firstPending.schedule.defaultAmount?.toString() ?: ""
-                                            } else {
-                                                viewModel.markTurnComplete(firstPending)
-                                            }
-                                        },
+                                        onClick = { viewModel.skipTurn(firstPending) },
                                         backdrop = backdrop,
                                         modifier = Modifier.weight(1f),
-                                        surfaceColor = LocalTurnlyColors.current.accent.copy(alpha = 0.25f),
-                                        tint = LocalTurnlyColors.current.accent.copy(alpha = 0.4f)
+                                        surfaceColor = colors.surface.copy(alpha = 0.1f),
+                                        tint = adaptiveColor.copy(alpha = 0.5f)
                                     ) {
                                         Icon(
-                                            imageVector = Icons.Default.Add,
+                                            imageVector = Icons.Default.SwapHoriz,
                                             contentDescription = null,
                                             modifier = Modifier.size(16.dp),
-                                            tint = LocalPrismalAdaptiveColor.current
+                                            tint = adaptiveColor
                                         )
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Text(
-                                            text = if (firstPending.schedule.type == ScheduleType.MONEY) "Record & Done" else "Mark as Done",
+                                            text = "Swap",
                                             fontWeight = FontWeight.Bold,
-                                            color = LocalPrismalAdaptiveColor.current
+                                            color = adaptiveColor
                                         )
                                     }
                                 }
@@ -284,7 +329,8 @@ fun HomeScreen(
                                 viewModel.markTurnComplete(turn)
                             }
                         },
-                        onSkip = { sId ->  },
+                        onSkip = { sId -> viewModel.skipTurn(turn) },
+                        onUndo = { sId -> viewModel.undoCompletion(turn) },
                         onClick = { onScheduleClick(turn.schedule.id) }
                     )
                 }
