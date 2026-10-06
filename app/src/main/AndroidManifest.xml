@@ -16,7 +16,7 @@
         android:required="false" />
 
     <application
-        android:name=".TurnlyApplication"
+        android:name=".WhozitApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -24,13 +24,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Turnly">
+        android:theme="@style/Theme.Whozit">
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Turnly"
+            android:theme="@style/Theme.Whozit"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -43,7 +43,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="turnly" android:host="room" />
+                <data android:scheme="whozit" android:host="room" />
             </intent-filter>
         </activity>
 
@@ -51,7 +51,7 @@
             android:name=".core.notification.TurnActionReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.crescentapps.turnly.ACTION_MARK_DONE" />
+                <action android:name="com.crescentapps.whozit.ACTION_MARK_DONE" />
             </intent-filter>
         </receiver>
 
@@ -65,7 +65,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.crescentapps.turnly.fileprovider"
+            android:authorities="com.crescentapps.whozit.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

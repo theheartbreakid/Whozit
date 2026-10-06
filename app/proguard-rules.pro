@@ -1,4 +1,4 @@
-# Turnly Proguard / R8 Rules
+# Whozit Proguard / R8 Rules
 
 # KotlinX Serialization
 -keepattributes *Annotation*, InnerClasses

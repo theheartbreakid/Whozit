@@ -23,5 +23,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Turnly"
+rootProject.name = "Whozit"
 include(":app")

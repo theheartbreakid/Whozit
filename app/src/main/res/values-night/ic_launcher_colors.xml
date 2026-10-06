@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Turnly launcher icon palette (night: slightly lifted for contrast on dark surfaces). Self-contained; not used by the app theme. -->
+<!-- Whozit launcher icon palette (night: slightly lifted for contrast on dark surfaces). Self-contained; not used by the app theme. -->
 <resources>
     <color name="ic_launcher_background_start">#2A2D4E</color>
     <color name="ic_launcher_background_end">#13142A</color>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Turnly launcher foreground: three rotating segments + three "people" nodes.
+  Whozit launcher foreground: three rotating segments + three "people" nodes.
   108x108dp adaptive layer. All artwork sits inside a ~29dp radius of the centre
   (adaptive safe zone = 33dp radius / 66dp circle), so no launcher mask can clip it.
 -->
