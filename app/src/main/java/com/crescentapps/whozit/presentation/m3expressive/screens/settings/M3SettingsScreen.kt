@@ -24,6 +24,12 @@ import com.crescentapps.whozit.presentation.m3expressive.components.WhozitExpres
 import com.crescentapps.whozit.presentation.m3expressive.components.WhozitExpressiveLivePreview
 import com.crescentapps.whozit.presentation.m3expressive.theme.ExpressiveTokens
 import com.crescentapps.whozit.presentation.screens.settings.SettingsViewModel
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.SystemUpdate
+import com.crescentapps.whozit.core.update.model.UpdateState
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,6 +37,9 @@ fun M3SettingsScreen(viewModel: SettingsViewModel) {
     val prefs by viewModel.preferences.collectAsState(
         initial = com.crescentapps.whozit.data.preferences.UserPreferences()
     )
+    val updateState by viewModel.updateState.collectAsState()
+    var showAboutDialog by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -42,6 +51,11 @@ fun M3SettingsScreen(viewModel: SettingsViewModel) {
                         "Settings",
                         style = MaterialTheme.typography.headlineLarge
                     ) 
+                },
+                actions = {
+                    IconButton(onClick = { showAboutDialog = true }) {
+                        Icon(Icons.Outlined.Info, contentDescription = "About Whozit")
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
@@ -65,6 +79,65 @@ fun M3SettingsScreen(viewModel: SettingsViewModel) {
             // Live Preview Card
             item {
                 WhozitExpressiveLivePreview()
+            }
+
+            // Updates Section
+            item {
+                WhozitExpressiveCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
+                    )
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        val lastCheckedText = if (prefs.lastUpdateCheckTimestamp > 0) {
+                            val sdf = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
+                            "Last checked: " + sdf.format(Date(prefs.lastUpdateCheckTimestamp))
+                        } else {
+                            "Not checked yet"
+                        }
+
+                        val checkingSubtitle = when (updateState) {
+                            is UpdateState.Checking -> "Checking for updates..."
+                            is UpdateState.UpToDate -> "You're up to date · $lastCheckedText"
+                            is UpdateState.UpdateAvailable -> "Update available! · $lastCheckedText"
+                            is UpdateState.Downloading -> "Downloading update..."
+                            else -> lastCheckedText
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                if (updateState is UpdateState.Checking) {
+                                    CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.5.dp)
+                                } else {
+                                    Icon(Icons.Outlined.SystemUpdate, null, modifier = Modifier.size(24.dp))
+                                }
+                                Column {
+                                    Text("Check for Updates", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                                    Text(checkingSubtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+                            
+                            FilledTonalButton(
+                                onClick = { viewModel.checkForUpdates() }
+                            ) {
+                                Text(
+                                    if (updateState is UpdateState.Checking) "Checking..." else "Check Now",
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
             }
 
             // UI Style Selector
@@ -866,5 +939,126 @@ fun M3SettingsScreen(viewModel: SettingsViewModel) {
                 }
             }
         }
+    }
+
+    if (showAboutDialog) {
+        M3AboutDialog(
+            onDismiss = { showAboutDialog = false }
+        )
+    }
+
+    when (val state = updateState) {
+        is UpdateState.UpToDate -> {
+            AlertDialog(
+                onDismissRequest = { viewModel.dismissUpdateDialog() },
+                title = { Text("Up to Date") },
+                text = { Text("You're already using the latest version of Whozit.") },
+                confirmButton = {
+                    TextButton(onClick = { viewModel.dismissUpdateDialog() }) {
+                        Text("OK")
+                    }
+                }
+            )
+        }
+        is UpdateState.UpdateAvailable -> {
+            AlertDialog(
+                onDismissRequest = { viewModel.dismissUpdateDialog() },
+                title = { Text("Update Available") },
+                text = { Text("A new version of Whozit is available.\n\nVersion: ${state.updateInfo.versionName}\n\n${state.updateInfo.releaseNotes}") },
+                confirmButton = {
+                    Button(onClick = { viewModel.startDownload(state.updateInfo) }) {
+                        Text("Download & Install")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { viewModel.dismissUpdateDialog() }) {
+                        Text("Later")
+                    }
+                }
+            )
+        }
+        is UpdateState.Downloading -> {
+            val progressPercent = (state.progress * 100).toInt()
+            val downloadedMb = state.downloadedBytes / (1024f * 1024f)
+            val totalMb = state.totalBytes / (1024f * 1024f)
+            AlertDialog(
+                onDismissRequest = { },
+                title = { Text("Downloading Update...") },
+                text = { Text("Progress: $progressPercent%\n%.2f MB / %.2f MB".format(downloadedMb, totalMb)) },
+                confirmButton = {
+                    TextButton(onClick = { viewModel.cancelDownload() }) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
+        is UpdateState.WaitingForInstallPermission -> {
+            AlertDialog(
+                onDismissRequest = { viewModel.dismissUpdateDialog() },
+                title = { Text("Install Permission Required") },
+                text = { Text("Whozit downloaded the update, but Android requires you to allow Whozit to install applications from this source.\n\nEnable 'Allow from this source' for Whozit to continue the update.") },
+                confirmButton = {
+                    Button(onClick = {
+                        val intent = viewModel.createManageUnknownAppSourcesIntent()
+                        if (intent != null) {
+                            try {
+                                context.startActivity(intent)
+                            } catch (_: Exception) {}
+                        }
+                    }) {
+                        Text("Open Settings")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { viewModel.dismissUpdateDialog() }) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
+        is UpdateState.ReadyToInstall -> {
+            val updateManager = remember { com.crescentapps.whozit.core.update.UpdateManager.getInstance(context) }
+            AlertDialog(
+                onDismissRequest = { viewModel.dismissUpdateDialog() },
+                title = { Text("Update Downloaded") },
+                text = { Text("The update is ready to be installed. Tap 'Install' to continue.") },
+                confirmButton = {
+                    Button(onClick = { updateManager.installApk(state.apkFile, state.updateInfo) }) {
+                        Text("Install")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { viewModel.dismissUpdateDialog() }) {
+                        Text("Later")
+                    }
+                }
+            )
+        }
+        is UpdateState.Error -> {
+            AlertDialog(
+                onDismissRequest = { viewModel.dismissUpdateDialog() },
+                title = { Text("Update Error") },
+                text = { Text(state.message) },
+                confirmButton = {
+                    Button(onClick = {
+                        if (state.canRetry) {
+                            viewModel.checkForUpdates()
+                        } else {
+                            viewModel.dismissUpdateDialog()
+                        }
+                    }) {
+                        Text(if (state.canRetry) "Retry" else "OK")
+                    }
+                },
+                dismissButton = {
+                    if (state.canRetry) {
+                        TextButton(onClick = { viewModel.dismissUpdateDialog() }) {
+                            Text("Cancel")
+                        }
+                    }
+                }
+            )
+        }
+        else -> {}
     }
 }

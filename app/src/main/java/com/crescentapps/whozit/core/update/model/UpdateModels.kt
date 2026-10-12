@@ -6,7 +6,7 @@ import java.io.File
 
 /**
  * GitHub Releases API data models.
- * API: https://api.github.com/repos/theheartbreakid/Turnly/releases/latest
+ * API: https://api.github.com/repos/theheartbreakid/Whozit/releases/latest
  */
 @Serializable
 data class GitHubRelease(

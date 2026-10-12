@@ -25,7 +25,7 @@ import java.net.URL
  * UpdateManager handles GitHub release querying, APK download, pre-installation verification,
  * and system package installer launching for Whozit.
  *
- * Source of truth: https://github.com/theheartbreakid/Turnly
+ * Source of truth: https://github.com/theheartbreakid/Whozit
  */
 class UpdateManager(
     private val context: Context,
@@ -70,24 +70,6 @@ class UpdateManager(
             "1.0"
         }
 
-    val currentVersionCode: Long
-        get() = try {
-            val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0))
-            } else {
-                @Suppress("DEPRECATION")
-                context.packageManager.getPackageInfo(context.packageName, 0)
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                packageInfo.longVersionCode
-            } else {
-                @Suppress("DEPRECATION")
-                packageInfo.versionCode.toLong()
-            }
-        } catch (e: Exception) {
-            1L
-        }
-
     fun isNetworkAvailable(): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return false
         val activeNetwork = connectivityManager.activeNetwork ?: return false
@@ -115,7 +97,7 @@ class UpdateManager(
             val connection = (url.openConnection() as HttpURLConnection).apply {
                 requestMethod = "GET"
                 setRequestProperty("Accept", "application/vnd.github.v3+json")
-                setRequestProperty("User-Agent", "Turnly-Android-App")
+                setRequestProperty("User-Agent", "Whozit-Android-App")
                 connectTimeout = 15000
                 readTimeout = 15000
                 instanceFollowRedirects = true
@@ -233,7 +215,7 @@ class UpdateManager(
                 while (redirects < 5) {
                     connection = (URL(currentUrl).openConnection() as HttpURLConnection).apply {
                         requestMethod = "GET"
-                        setRequestProperty("User-Agent", "Turnly-Android-App")
+                        setRequestProperty("User-Agent", "Whozit-Android-App")
                         connectTimeout = 20000
                         readTimeout = 20000
                         instanceFollowRedirects = false
@@ -356,17 +338,9 @@ class UpdateManager(
             )
         }
 
-        // 2. Verify version code
-        val apkVersionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            archiveInfo.longVersionCode
-        } else {
-            @Suppress("DEPRECATION")
-            archiveInfo.versionCode.toLong()
-        }
-
-        // Verify version is newer or equal to expected release
+        // 2. Verify version
         val apkVersionName = archiveInfo.versionName ?: ""
-        if (!SemVer.isNewer(apkVersionName, currentVersionName) && apkVersionCode <= currentVersionCode) {
+        if (!SemVer.isNewer(apkVersionName, currentVersionName)) {
             return UpdateState.Error(
                 "Downloaded APK (v$apkVersionName) is not newer than currently installed Whozit (v$currentVersionName).",
                 UpdateErrorType.VERIFICATION_FAILED
@@ -493,7 +467,7 @@ class UpdateManager(
 
     private fun getDownloadedApkFile(versionName: String): File {
         val updatesDir = File(context.cacheDir, "updates").apply { mkdirs() }
-        return File(updatesDir, "Turnly-$versionName.apk")
+        return File(updatesDir, "Whozit-$versionName.apk")
     }
 
     private fun cleanOldApksExcept(activeFile: File?) {

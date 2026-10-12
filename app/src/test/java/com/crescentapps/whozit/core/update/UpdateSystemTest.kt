@@ -33,34 +33,34 @@ class UpdateSystemTest {
     @Test
     fun releaseAssetSelector_filtersOutInvalidFiles() {
         val assets = listOf(
-            GitHubReleaseAsset(name = "Turnly-v1.2.0-debug.apk", browserDownloadUrl = "http://test/debug.apk"),
+            GitHubReleaseAsset(name = "Whozit-v1.2.0-debug.apk", browserDownloadUrl = "http://test/debug.apk"),
             GitHubReleaseAsset(name = "mapping.txt", browserDownloadUrl = "http://test/mapping.txt"),
             GitHubReleaseAsset(name = "source-code.zip", browserDownloadUrl = "http://test/source.zip"),
             GitHubReleaseAsset(name = "checksums.sha256", browserDownloadUrl = "http://test/sha.txt"),
-            GitHubReleaseAsset(name = "Turnly-v1.2.0-universal.apk", browserDownloadUrl = "http://test/universal.apk")
+            GitHubReleaseAsset(name = "Whozit-v1.2.0-universal.apk", browserDownloadUrl = "http://test/universal.apk")
         )
 
         val selected = ReleaseAssetSelector.selectBestApk(assets)
         assertNotNull(selected)
-        assertEquals("Turnly-v1.2.0-universal.apk", selected?.name)
+        assertEquals("Whozit-v1.2.0-universal.apk", selected?.name)
     }
 
     @Test
     fun releaseAssetSelector_selectsSingleValidApk() {
         val assets = listOf(
-            GitHubReleaseAsset(name = "Turnly-v1.2.0.apk", browserDownloadUrl = "http://test/app.apk"),
+            GitHubReleaseAsset(name = "Whozit-v1.2.0.apk", browserDownloadUrl = "http://test/app.apk"),
             GitHubReleaseAsset(name = "notes.txt", browserDownloadUrl = "http://test/notes.txt")
         )
 
         val selected = ReleaseAssetSelector.selectBestApk(assets)
         assertNotNull(selected)
-        assertEquals("Turnly-v1.2.0.apk", selected?.name)
+        assertEquals("Whozit-v1.2.0.apk", selected?.name)
     }
 
     @Test
     fun releaseAssetSelector_noValidApk_returnsNull() {
         val assets = listOf(
-            GitHubReleaseAsset(name = "Turnly-debug.apk", browserDownloadUrl = "http://test/debug.apk"),
+            GitHubReleaseAsset(name = "Whozit-debug.apk", browserDownloadUrl = "http://test/debug.apk"),
             GitHubReleaseAsset(name = "source.tar.gz", browserDownloadUrl = "http://test/source.tar.gz")
         )
 

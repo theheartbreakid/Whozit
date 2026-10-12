@@ -11,7 +11,7 @@ import com.crescentapps.whozit.core.update.model.GitHubReleaseAsset
  * 1. Must be an .apk file.
  * 2. Reject debug, test, mapping, checksum, and source archives.
  * 3. Match device ABI (arm64-v8a, armeabi-v7a, x86_64) if ABI-specific APKs exist.
- * 4. Fallback to universal or general release APK (e.g. Turnly-release.apk, Turnly-universal.apk, app-release.apk).
+ * 4. Fallback to universal or general release APK (e.g. Whozit-release.apk, Whozit-universal.apk, app-release.apk).
  */
 object ReleaseAssetSelector {
 

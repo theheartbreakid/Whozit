@@ -50,7 +50,7 @@ class UpdateCheckWorker(
     }
 
     companion object {
-        const val UNIQUE_WORK_NAME = "turnly_update_check"
+        const val UNIQUE_WORK_NAME = "whozit_update_check"
 
         fun schedule(context: Context, frequency: UpdateFrequency) {
             val workManager = WorkManager.getInstance(context)

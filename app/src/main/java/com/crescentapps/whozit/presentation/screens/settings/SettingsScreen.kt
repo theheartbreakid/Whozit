@@ -56,7 +56,9 @@ import com.crescentapps.whozit.presentation.components.LocalGlassSettings
 import com.crescentapps.whozit.presentation.components.LocalPrismalAdaptiveColor
 import com.crescentapps.whozit.presentation.components.LocalScrollInProgress
 import com.crescentapps.whozit.presentation.components.PrismalCard
+import com.crescentapps.whozit.presentation.components.liquid.LiquidIconButton
 import com.crescentapps.whozit.presentation.components.liquid.LiquidButton
+import com.crescentapps.whozit.presentation.screens.settings.LiquidAboutDialog
 import com.crescentapps.whozit.presentation.components.liquid.LiquidCard
 import com.crescentapps.whozit.presentation.components.liquid.LiquidDialog
 import com.crescentapps.whozit.presentation.components.liquid.LiquidSlider
@@ -96,6 +98,7 @@ fun SettingsScreen(
     var showResetAllSettingsDialog by remember { mutableStateOf(false) }
     var showResetDataDialog by remember { mutableStateOf(false) }
     var showFrequencyDialog by remember { mutableStateOf(false) }
+    var showAboutDialog by remember { mutableStateOf(false) }
 
     val updateState by viewModel.updateState.collectAsState()
 
@@ -134,13 +137,31 @@ fun SettingsScreen(
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
             item(key = "title_settings") {
-                Text(
-                    text = "Settings",
-                    style = TextStyle(fontSize = 28.sp, fontWeight = FontWeight.Bold),
-                    fontWeight = FontWeight.Black,
-                    color = adaptiveColor,
-                    modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(start = 4.dp, bottom = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Settings",
+                        style = TextStyle(fontSize = 28.sp, fontWeight = FontWeight.Bold),
+                        fontWeight = FontWeight.Black,
+                        color = adaptiveColor
+                    )
+                    
+                    LiquidIconButton(
+                        onClick = { showAboutDialog = true },
+                        backdrop = backdrop,
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(
+                            Icons.Outlined.Info,
+                            contentDescription = "About Whozit",
+                            tint = adaptiveColor,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
             }
 
             // LIVE PRISMAL GLASS PREVIEW SHOWCASE
@@ -1300,6 +1321,14 @@ fun SettingsScreen(
                 }
             }
         }
+    }
+
+    // ABOUT DIALOG
+    if (showAboutDialog) {
+        LiquidAboutDialog(
+            onDismiss = { showAboutDialog = false },
+            backdrop = backdrop
+        )
     }
 
     // UPDATE LIFECYCLE DIALOGS (LIQUID STYLED)

@@ -33,6 +33,10 @@ import com.crescentapps.whozit.presentation.components.Text
 import com.crescentapps.whozit.presentation.gaussianblur.components.*
 import com.crescentapps.whozit.presentation.gaussianblur.theme.LocalGaussianBlurColors
 import com.crescentapps.whozit.presentation.screens.settings.SettingsViewModel
+import java.util.Date
+import com.crescentapps.whozit.core.update.model.UpdateState
+import androidx.compose.material3.CircularProgressIndicator
+import java.text.SimpleDateFormat
 import java.util.Locale
 
 import com.crescentapps.whozit.presentation.gaussianblur.theme.GaussianOptics
@@ -53,6 +57,9 @@ fun GaussianSettingsScreen(
     var showUiSystemDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
     var showFirstDayDialog by remember { mutableStateOf(false) }
+    var showAboutDialog by remember { mutableStateOf(false) }
+
+    val updateState by viewModel.updateState.collectAsState()
     var showResetAllSettingsDialog by remember { mutableStateOf(false) }
     var showResetDataDialog by remember { mutableStateOf(false) }
 
@@ -104,13 +111,29 @@ fun GaussianSettingsScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item(key = "title_settings") {
-                Text(
-                    text = "Settings",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Black,
-                    color = colors.textPrimary,
-                    modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(start = 4.dp, bottom = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Settings",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Black,
+                        color = colors.textPrimary
+                    )
+                    
+                    GaussianIconButton(
+                        onClick = { showAboutDialog = true }
+                    ) {
+                        Icon(
+                            Icons.Outlined.Info,
+                            contentDescription = "About Whozit",
+                            tint = colors.textPrimary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
             }
 
             // LIVE GAUSSIAN GLASS OPTICS PREVIEW SHOWCASE
@@ -268,6 +291,66 @@ fun GaussianSettingsScreen(
             }
 
             // APPEARANCE SECTION
+            item(key = "header_updates") { GaussianSettingsSectionHeader("Updates") }
+            item(key = "card_updates") {
+                GaussianCard {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 20.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        val lastCheckedText = if (prefs.lastUpdateCheckTimestamp > 0) {
+                            val sdf = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
+                            "Last checked: " + sdf.format(Date(prefs.lastUpdateCheckTimestamp))
+                        } else {
+                            "Not checked yet"
+                        }
+
+                        val checkingSubtitle = when (updateState) {
+                            is UpdateState.Checking -> "Checking for updates..."
+                            is UpdateState.UpToDate -> "You're up to date · $lastCheckedText"
+                            is UpdateState.UpdateAvailable -> "Update available! · $lastCheckedText"
+                            is UpdateState.Downloading -> "Downloading update..."
+                            else -> lastCheckedText
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                if (updateState is UpdateState.Checking) {
+                                    CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.5.dp, color = colors.textPrimary)
+                                } else {
+                                    Icon(Icons.Outlined.SystemUpdate, null, tint = colors.textPrimary, modifier = Modifier.size(24.dp))
+                                }
+                                Column {
+                                    Text("Check for Updates", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
+                                    Text(checkingSubtitle, fontSize = 12.sp, color = colors.textSecondary)
+                                }
+                            }
+
+                            GaussianButton(
+                                onClick = { viewModel.checkForUpdates() }
+                            ) {
+                                Text(
+                                    if (updateState is UpdateState.Checking) "Checking..." else "Check Now",
+                                    color = colors.textPrimary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            
             item(key = "header_appearance") { GaussianSettingsSectionHeader("Appearance") }
             item(key = "card_appearance") {
                 GaussianCard(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp)) {
@@ -587,6 +670,94 @@ fun GaussianSettingsScreen(
                 showResetDataDialog = false
             }
         )
+    }
+    
+    if (showAboutDialog) {
+        GaussianAboutDialog(
+            onDismiss = { showAboutDialog = false }
+        )
+    }
+
+    // UPDATE LIFECYCLE DIALOGS
+    when (val state = updateState) {
+        is UpdateState.UpToDate -> {
+            GaussianDialog(
+                onDismissRequest = { viewModel.dismissUpdateDialog() },
+                title = "Up to Date",
+                message = "You're already using the latest version of Whozit.",
+                positiveText = "OK",
+                negativeText = null,
+                onPositive = { viewModel.dismissUpdateDialog() }
+            )
+        }
+        is UpdateState.UpdateAvailable -> {
+            GaussianDialog(
+                onDismissRequest = { viewModel.dismissUpdateDialog() },
+                title = "Update Available",
+                message = "A new version of Whozit is available.\n\nVersion: ${state.updateInfo.versionName}\n\n${state.updateInfo.releaseNotes}",
+                positiveText = "Download & Install",
+                negativeText = "Later",
+                onPositive = { viewModel.startDownload(state.updateInfo) }
+            )
+        }
+        is UpdateState.Downloading -> {
+            val progressPercent = (state.progress * 100).toInt()
+            val downloadedMb = state.downloadedBytes / (1024f * 1024f)
+            val totalMb = state.totalBytes / (1024f * 1024f)
+            GaussianDialog(
+                onDismissRequest = { },
+                title = "Downloading Update...",
+                message = "Progress: $progressPercent%\n%.2f MB / %.2f MB".format(downloadedMb, totalMb),
+                positiveText = "Cancel",
+                negativeText = null,
+                onPositive = { viewModel.cancelDownload() }
+            )
+        }
+        is UpdateState.WaitingForInstallPermission -> {
+            GaussianDialog(
+                onDismissRequest = { viewModel.dismissUpdateDialog() },
+                title = "Install Permission Required",
+                message = "Whozit downloaded the update, but Android requires you to allow Whozit to install applications from this source.\n\nEnable 'Allow from this source' for Whozit to continue the update.",
+                positiveText = "Open Settings",
+                negativeText = "Cancel",
+                onPositive = {
+                    val intent = viewModel.createManageUnknownAppSourcesIntent()
+                    if (intent != null) {
+                        try {
+                            context.startActivity(intent)
+                        } catch (_: Exception) {}
+                    }
+                }
+            )
+        }
+        is UpdateState.ReadyToInstall -> {
+            val updateManager = remember { com.crescentapps.whozit.core.update.UpdateManager.getInstance(context) }
+            GaussianDialog(
+                onDismissRequest = { viewModel.dismissUpdateDialog() },
+                title = "Update Downloaded",
+                message = "The update is ready to be installed. Tap 'Install' to continue.",
+                positiveText = "Install",
+                negativeText = "Later",
+                onPositive = { updateManager.installApk(state.apkFile, state.updateInfo) }
+            )
+        }
+        is UpdateState.Error -> {
+            GaussianDialog(
+                onDismissRequest = { viewModel.dismissUpdateDialog() },
+                title = "Update Error",
+                message = state.message,
+                positiveText = if (state.canRetry) "Retry" else "OK",
+                negativeText = if (state.canRetry) "Cancel" else null,
+                onPositive = {
+                    if (state.canRetry) {
+                        viewModel.checkForUpdates()
+                    } else {
+                        viewModel.dismissUpdateDialog()
+                    }
+                }
+            )
+        }
+        else -> {}
     }
 }
 
