@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/app_icon.png" alt="Whozit App Icon" width="112" style="border-radius: 26px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);" />
+<img src="./assets/app_icon.png" alt="Whozit App Icon" width="112" style="border-radius: 26px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);" />
 
 # Whozit
 
@@ -16,7 +16,7 @@
 <br/>
 
 <a href="#-screenshots--visual-showcase">
-  <img src="assets/LiquidUi/LiquidUi.Collage.jpg" alt="Whozit Liquid Glass Interface Overview" width="90%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
+  <img src="./assets/LiquidUi/LiquidUi.Collage.webp" alt="Whozit Liquid Glass Interface Overview" width="90%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
 </a>
 
 <p align="center">
@@ -42,10 +42,14 @@ When households, roommates, project partners, or teams share recurring responsib
 
 ## 🎬 In Action
 
-<div align="center">
-  <img src="assets/LiquidUi/LiquidUi.Demo.gif" alt="Whozit Liquid UI Interactive Demo" width="340" style="border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);" />
-  <p><em>Turn progression, quick completion actions, and routine switching in fluid Liquid Glass motion.</em></p>
-</div>
+<details>
+  <summary><b>🎥 Click to view Interactive Motion Demo (Liquid UI)</b></summary>
+  <br/>
+  <div align="center">
+    <img src="./assets/LiquidUi/LiquidUi.Demo.webp" alt="Whozit Liquid UI Interactive Demo" width="340" style="border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);" />
+    <p><em>Turn progression, quick completion actions, and routine switching in fluid Liquid Glass motion.</em></p>
+  </div>
+</details>
 
 ---
 
@@ -82,7 +86,7 @@ Whozit features three fully realized design systems switchable on the fly from *
 
 | 💎 Liquid Glass (Flagship Experience) | 🎨 Material 3 Expressive | 🌫️ Gaussian Blur |
 | :---: | :---: | :---: |
-| <img src="assets/LiquidUi/LiquidUi.Dashboard.jpg" width="220" /> | <img src="assets/M3E/M3E.Dashboard.jpg" width="220" /> | <img src="assets/Gaussian/Gaussian.Dashboard.jpg" width="220" /> |
+| <img src="./assets/LiquidUi/LiquidUi.Dashboard.webp" width="220" /> | <img src="./assets/M3E/M3E.Dashboard.webp" width="220" /> | <img src="./assets/Gaussian/Gaussian.Dashboard.webp" width="220" /> |
 | Native real-time AGSL shader refraction, specular highlights, dynamic chromatic aberrations, and reactive wallpaper backgrounds. | Google M3E design tokens with dynamic fluid shapes, expressive typography, and spring physics. | Soft multi-layered Gaussian depth, translucent glass card elevations, and custom wallpaper tinting. |
 
 ---
@@ -90,81 +94,81 @@ Whozit features three fully realized design systems switchable on the fly from *
 ## 📸 Screenshots & Visual Showcase
 
 ### 💎 Liquid UI Showcase & Motion Demonstrations
-<details open>
-<summary><b>Expand Liquid Glass Screens & Motion Demos (Flagship)</b></summary>
+<details>
+<summary><b>🔍 Click to view Liquid Glass Screens & Motion Demos (Flagship)</b></summary>
 <br/>
 
 <div align="center">
-  <img src="assets/LiquidUi/LiquidUi.Collage.jpg" alt="Liquid UI Collage" width="90%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
+  <img src="./assets/LiquidUi/LiquidUi.Collage.webp" alt="Liquid UI Collage" width="90%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
 </div>
 
 <br/>
 
 | Interactive Liquid Navigation | Dynamic Background Customization |
 | :---: | :---: |
-| <img src="assets/LiquidUi/LiquidUi.Demo.gif" width="320" alt="Liquid UI Demo" /> | <img src="assets/LiquidUi/LiquidUi.BgChange.Demo.gif" width="320" alt="Background Customization Demo" /> |
+| <img src="./assets/LiquidUi/LiquidUi.Demo.webp" width="320" alt="Liquid UI Demo" /> | <img src="./assets/LiquidUi/LiquidUi.BgChange.Demo.webp" width="320" alt="Background Customization Demo" /> |
 
 <br/>
 
 | Dashboard | Calendar | Schedules |
 | :---: | :---: | :---: |
-| <img src="assets/LiquidUi/LiquidUi.Dashboard.jpg" width="260" alt="Liquid Dashboard" /> | <img src="assets/LiquidUi/LiquidUi.Calendar.jpg" width="260" alt="Liquid Calendar" /> | <img src="assets/LiquidUi/LiquidUi.Schedules.jpg" width="260" alt="Liquid Schedules" /> |
+| <img src="./assets/LiquidUi/LiquidUi.Dashboard.webp" width="260" alt="Liquid Dashboard" /> | <img src="./assets/LiquidUi/LiquidUi.Calendar.webp" width="260" alt="Liquid Calendar" /> | <img src="./assets/LiquidUi/LiquidUi.Schedules.webp" width="260" alt="Liquid Schedules" /> |
 
 | History | Rooms | Settings |
 | :---: | :---: | :---: |
-| <img src="assets/LiquidUi/LiquidUi.History.jpg" width="260" alt="Liquid History" /> | <img src="assets/LiquidUi/LiquidUi.Rooms.jpg" width="260" alt="Liquid Rooms" /> | <img src="assets/LiquidUi/LiquidUi.Settings.jpg" width="260" alt="Liquid Settings" /> |
+| <img src="./assets/LiquidUi/LiquidUi.History.webp" width="260" alt="Liquid History" /> | <img src="./assets/LiquidUi/LiquidUi.Rooms.webp" width="260" alt="Liquid Rooms" /> | <img src="./assets/LiquidUi/LiquidUi.Settings.webp" width="260" alt="Liquid Settings" /> |
 
 </details>
 
 ### 🎨 Material 3 Expressive Showcase
 <details>
-<summary><b>Expand Material 3 Expressive Screens & Motion Demo</b></summary>
+<summary><b>🔍 Click to view Material 3 Expressive Screens & Motion Demo</b></summary>
 <br/>
 
 <div align="center">
-  <img src="assets/M3E/M3E.Collage.jpg" alt="Material 3 Expressive Collage" width="90%" style="border-radius: 12px;" />
+  <img src="./assets/M3E/M3E.Collage.webp" alt="Material 3 Expressive Collage" width="90%" style="border-radius: 12px;" />
 </div>
 
 <br/>
 
 <div align="center">
-  <img src="assets/M3E/M3E.Demo.gif" width="320" alt="M3E Demo" />
+  <img src="./assets/M3E/M3E.Demo.webp" width="320" alt="M3E Demo" />
   <p><em>Google Material 3 Expressive token-driven animations and fluid interactions.</em></p>
 </div>
 
 | Dashboard | Calendar | Schedules |
 | :---: | :---: | :---: |
-| <img src="assets/M3E/M3E.Dashboard.jpg" width="260" alt="M3E Dashboard" /> | <img src="assets/M3E/M3E.Calendar.jpg" width="260" alt="M3E Calendar" /> | <img src="assets/M3E/M3E.Schedules.jpg" width="260" alt="M3E Schedules" /> |
+| <img src="./assets/M3E/M3E.Dashboard.webp" width="260" alt="M3E Dashboard" /> | <img src="./assets/M3E/M3E.Calendar.webp" width="260" alt="M3E Calendar" /> | <img src="./assets/M3E/M3E.Schedules.webp" width="260" alt="M3E Schedules" /> |
 
 | History | Rooms | Settings |
 | :---: | :---: | :---: |
-| <img src="assets/M3E/M3E.History.jpg" width="260" alt="M3E History" /> | <img src="assets/M3E/M3E.Rooms.jpg" width="260" alt="M3E Rooms" /> | <img src="assets/M3E/M3E.Settings.jpg" width="260" alt="M3E Settings" /> |
+| <img src="./assets/M3E/M3E.History.webp" width="260" alt="M3E History" /> | <img src="./assets/M3E/M3E.Rooms.webp" width="260" alt="M3E Rooms" /> | <img src="./assets/M3E/M3E.Settings.webp" width="260" alt="M3E Settings" /> |
 
 </details>
 
 ### 🌫️ Gaussian Blur Showcase
 <details>
-<summary><b>Expand Gaussian Blur Screens & Motion Demo</b></summary>
+<summary><b>🔍 Click to view Gaussian Blur Screens & Motion Demo</b></summary>
 <br/>
 
 <div align="center">
-  <img src="assets/Gaussian/Gaussian.Collage.jpg" alt="Gaussian Blur Collage" width="90%" style="border-radius: 12px;" />
+  <img src="./assets/Gaussian/Gaussian.Collage.webp" alt="Gaussian Blur Collage" width="90%" style="border-radius: 12px;" />
 </div>
 
 <br/>
 
 <div align="center">
-  <img src="assets/Gaussian/Gaussian.Demo.gif" width="320" alt="Gaussian Blur Demo" />
+  <img src="./assets/Gaussian/Gaussian.Demo.webp" width="320" alt="Gaussian Blur Demo" />
   <p><em>Gaussian depth filtering with adaptive contrast adjustments.</em></p>
 </div>
 
 | Dashboard | Calendar | Schedules |
 | :---: | :---: | :---: |
-| <img src="assets/Gaussian/Gaussian.Dashboard.jpg" width="260" alt="Gaussian Dashboard" /> | <img src="assets/Gaussian/Gaussian.Calendar.jpg" width="260" alt="Gaussian Calendar" /> | <img src="assets/Gaussian/Gaussian.Schedules.jpg" width="260" alt="Gaussian Schedules" /> |
+| <img src="./assets/Gaussian/Gaussian.Dashboard.webp" width="260" alt="Gaussian Dashboard" /> | <img src="./assets/Gaussian/Gaussian.Calendar.webp" width="260" alt="Gaussian Calendar" /> | <img src="./assets/Gaussian/Gaussian.Schedules.webp" width="260" alt="Gaussian Schedules" /> |
 
 | History | Rooms | Settings |
 | :---: | :---: | :---: |
-| <img src="assets/Gaussian/Gaussian.History.jpg" width="260" alt="Gaussian History" /> | <img src="assets/Gaussian/Gaussian.Rooms.jpg" width="260" alt="Gaussian Rooms" /> | <img src="assets/Gaussian/Gaussian.Settings.jpg" width="260" alt="Gaussian Settings" /> |
+| <img src="./assets/Gaussian/Gaussian.History.webp" width="260" alt="Gaussian History" /> | <img src="./assets/Gaussian/Gaussian.Rooms.webp" width="260" alt="Gaussian Rooms" /> | <img src="./assets/Gaussian/Gaussian.Settings.webp" width="260" alt="Gaussian Settings" /> |
 
 </details>
 
