@@ -3,6 +3,7 @@ package com.crescentapps.whozit.presentation.gaussianblur.theme
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 
 @Immutable
 data class GaussianBlurColors(
@@ -27,7 +28,15 @@ data class GaussianBlurColors(
     val statusSkipped: Color,
     val statusMissed: Color,
     val statusAttention: Color
-)
+) {
+    fun resolveForeground(color: Color?): Color {
+        val baseText = if (isDark) Color(0xFFF8FAFC) else Color(0xFF0F172A)
+        return if (color == null || color == Color.Transparent) baseText else {
+            val bgLum = color.luminance()
+            if (bgLum > 0.45f) Color(0xFF0F172A) else Color(0xFFF8FAFC)
+        }
+    }
+}
 
 val DarkGaussianBlurColors = GaussianBlurColors(
     isDark = true,

@@ -400,7 +400,8 @@ fun GaussianCalendarDayDetailPane(
                                         accentTint = colors.accent,
                                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                                     ) {
-                                        Text("Mark Done", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = colors.textOnAccent)
+                                        val resolvedColor = colors.resolveForeground(colors.accent)
+                                        Text("Mark Done", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = resolvedColor)
                                     }
                                 }
                                 GaussianButton(

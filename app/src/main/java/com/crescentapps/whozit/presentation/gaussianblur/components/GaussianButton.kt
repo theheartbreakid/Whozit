@@ -126,3 +126,33 @@ fun GaussianButton(
         }
     }
 }
+
+@Composable
+fun GaussianButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: CornerBasedShape = GaussianBlurTokens.ShapeButton,
+    accentTint: Color? = null,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 20.dp, vertical = 12.dp)
+) {
+    GaussianButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        shape = shape,
+        accentTint = accentTint,
+        contentPadding = contentPadding
+    ) {
+        val colors = LocalGaussianBlurColors.current
+        val resolvedColor = remember(accentTint, colors) {
+            colors.resolveForeground(accentTint ?: Color.Transparent)
+        }
+        androidx.compose.material3.Text(
+            text = text,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+            color = resolvedColor
+        )
+    }
+}

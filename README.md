@@ -1,8 +1,10 @@
 <div align="center">
 
+<img src="assets/app_icon.png" alt="Whozit App Icon" width="112" style="border-radius: 26px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);" />
+
 # Whozit
 
-### A shared turn and schedule manager for keeping everyday routines organized.
+### A shared turn and schedule manager featuring fluid Liquid Glass UI for keeping everyday routines organized.
 
 [![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white)](https://www.android.com/)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.2.10-7F52FF?style=flat-square&logo=kotlin&logoColor=white)](https://kotlinlang.org/)
@@ -14,11 +16,11 @@
 <br/>
 
 <a href="#-screenshots--visual-showcase">
-  <img src="assets/M3E/M3E.Collage.jpg" alt="Whozit Material 3 Expressive Interface Overview" width="90%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
+  <img src="assets/LiquidUi/LiquidUi.Collage.jpg" alt="Whozit Liquid Glass Interface Overview" width="90%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
 </a>
 
 <p align="center">
-  <em>Managing shared routines, turn rotations, and schedule coordination across three distinct UI experiences.</em>
+  <em>Managing shared routines, turn rotations, and schedule coordination across three distinct UI experiences, spearheaded by fluid Liquid Glass.</em>
 </p>
 
 </div>
@@ -34,15 +36,15 @@ When households, roommates, project partners, or teams share recurring responsib
 - **What is coming up?** An interactive multi-schedule calendar and turn projection timeline.
 - **What has already been completed?** Comprehensive historical logs with skip/swap audit trails and expense tracking.
 - **How do groups stay synchronized?** Lightweight shared rooms with QR-code and room-code joining.
-- **What fits your visual style?** Three distinct switchable presentation engines — **Material 3 Expressive**, **Liquid Glass**, and **Gaussian Blur**.
+- **What fits your visual style?** Three distinct switchable presentation engines — spearheaded by **Liquid Glass (iOS-Style Refraction)**, alongside **Material 3 Expressive** and **Gaussian Blur**.
 
 ---
 
 ## 🎬 In Action
 
 <div align="center">
-  <img src="assets/M3E/M3E.Demo.gif" alt="Whozit Interactive Demo" width="340" style="border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);" />
-  <p><em>Turn progression, quick completion actions, and routine switching in action.</em></p>
+  <img src="assets/LiquidUi/LiquidUi.Demo.gif" alt="Whozit Liquid UI Interactive Demo" width="340" style="border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);" />
+  <p><em>Turn progression, quick completion actions, and routine switching in fluid Liquid Glass motion.</em></p>
 </div>
 
 ---
@@ -78,19 +80,57 @@ When households, roommates, project partners, or teams share recurring responsib
 
 Whozit features three fully realized design systems switchable on the fly from **Settings → Appearance**:
 
-| Material 3 Expressive (Default) | Liquid Glass (iOS-Style Refraction) | Gaussian Blur (Translucent Backdrop) |
+| 💎 Liquid Glass (Flagship Experience) | 🎨 Material 3 Expressive | 🌫️ Gaussian Blur |
 | :---: | :---: | :---: |
-| <img src="assets/M3E/M3E.Dashboard.jpg" width="220" /> | <img src="assets/LiquidUi/LiquidUi.Dashboard.jpg" width="220" /> | <img src="assets/Gaussian/Gaussian.Dashboard.jpg" width="220" /> |
-| Google M3E design tokens with dynamic fluid shapes, responsive typography, and spring physics. | Native real-time AGSL shader refraction, specular highlights, and chromatic aberrations. | Soft multi-layered Gaussian depth, glass card elevations, and custom wallpaper backgrounds. |
+| <img src="assets/LiquidUi/LiquidUi.Dashboard.jpg" width="220" /> | <img src="assets/M3E/M3E.Dashboard.jpg" width="220" /> | <img src="assets/Gaussian/Gaussian.Dashboard.jpg" width="220" /> |
+| Native real-time AGSL shader refraction, specular highlights, dynamic chromatic aberrations, and reactive wallpaper backgrounds. | Google M3E design tokens with dynamic fluid shapes, expressive typography, and spring physics. | Soft multi-layered Gaussian depth, translucent glass card elevations, and custom wallpaper tinting. |
 
 ---
 
 ## 📸 Screenshots & Visual Showcase
 
-### Material 3 Expressive Showcase
+### 💎 Liquid UI Showcase & Motion Demonstrations
 <details open>
-<summary><b>Expand Material 3 Expressive Screens</b></summary>
+<summary><b>Expand Liquid Glass Screens & Motion Demos (Flagship)</b></summary>
 <br/>
+
+<div align="center">
+  <img src="assets/LiquidUi/LiquidUi.Collage.jpg" alt="Liquid UI Collage" width="90%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
+</div>
+
+<br/>
+
+| Interactive Liquid Navigation | Dynamic Background Customization |
+| :---: | :---: |
+| <img src="assets/LiquidUi/LiquidUi.Demo.gif" width="320" alt="Liquid UI Demo" /> | <img src="assets/LiquidUi/LiquidUi.BgChange.Demo.gif" width="320" alt="Background Customization Demo" /> |
+
+<br/>
+
+| Dashboard | Calendar | Schedules |
+| :---: | :---: | :---: |
+| <img src="assets/LiquidUi/LiquidUi.Dashboard.jpg" width="260" alt="Liquid Dashboard" /> | <img src="assets/LiquidUi/LiquidUi.Calendar.jpg" width="260" alt="Liquid Calendar" /> | <img src="assets/LiquidUi/LiquidUi.Schedules.jpg" width="260" alt="Liquid Schedules" /> |
+
+| History | Rooms | Settings |
+| :---: | :---: | :---: |
+| <img src="assets/LiquidUi/LiquidUi.History.jpg" width="260" alt="Liquid History" /> | <img src="assets/LiquidUi/LiquidUi.Rooms.jpg" width="260" alt="Liquid Rooms" /> | <img src="assets/LiquidUi/LiquidUi.Settings.jpg" width="260" alt="Liquid Settings" /> |
+
+</details>
+
+### 🎨 Material 3 Expressive Showcase
+<details>
+<summary><b>Expand Material 3 Expressive Screens & Motion Demo</b></summary>
+<br/>
+
+<div align="center">
+  <img src="assets/M3E/M3E.Collage.jpg" alt="Material 3 Expressive Collage" width="90%" style="border-radius: 12px;" />
+</div>
+
+<br/>
+
+<div align="center">
+  <img src="assets/M3E/M3E.Demo.gif" width="320" alt="M3E Demo" />
+  <p><em>Google Material 3 Expressive token-driven animations and fluid interactions.</em></p>
+</div>
 
 | Dashboard | Calendar | Schedules |
 | :---: | :---: | :---: |
@@ -102,30 +142,9 @@ Whozit features three fully realized design systems switchable on the fly from *
 
 </details>
 
-### Liquid UI Showcase & Demonstrations
+### 🌫️ Gaussian Blur Showcase
 <details>
-<summary><b>Expand Liquid Glass Screens & Motion Demos</b></summary>
-<br/>
-
-<div align="center">
-  <img src="assets/LiquidUi/LiquidUi.Collage.jpg" alt="Liquid UI Collage" width="90%" style="border-radius: 12px;" />
-</div>
-
-<br/>
-
-| Interactive Liquid Navigation | Dynamic Background Customization |
-| :---: | :---: |
-| <img src="assets/LiquidUi/LiquidUi.Demo.gif" width="320" alt="Liquid UI Demo" /> | <img src="assets/LiquidUi/LiquidUi.BgChange.Demo.gif" width="320" alt="Background Customization Demo" /> |
-
-| Dashboard | Calendar | Schedules | History |
-| :---: | :---: | :---: | :---: |
-| <img src="assets/LiquidUi/LiquidUi.Dashboard.jpg" width="200" alt="Liquid Dashboard" /> | <img src="assets/LiquidUi/LiquidUi.Calendar.jpg" width="200" alt="Liquid Calendar" /> | <img src="assets/LiquidUi/LiquidUi.Schedules.jpg" width="200" alt="Liquid Schedules" /> | <img src="assets/LiquidUi/LiquidUi.History.jpg" width="200" alt="Liquid History" /> |
-
-</details>
-
-### Gaussian Blur Showcase
-<details>
-<summary><b>Expand Gaussian Blur Screens & Demo</b></summary>
+<summary><b>Expand Gaussian Blur Screens & Motion Demo</b></summary>
 <br/>
 
 <div align="center">
@@ -139,9 +158,13 @@ Whozit features three fully realized design systems switchable on the fly from *
   <p><em>Gaussian depth filtering with adaptive contrast adjustments.</em></p>
 </div>
 
-| Dashboard | Calendar | Schedules | Rooms |
-| :---: | :---: | :---: | :---: |
-| <img src="assets/Gaussian/Gaussian.Dashboard.jpg" width="200" alt="Gaussian Dashboard" /> | <img src="assets/Gaussian/Gaussian.Calendar.jpg" width="200" alt="Gaussian Calendar" /> | <img src="assets/Gaussian/Gaussian.Schedules.jpg" width="200" alt="Gaussian Schedules" /> | <img src="assets/Gaussian/Gaussian.Rooms.jpg" width="200" alt="Gaussian Rooms" /> |
+| Dashboard | Calendar | Schedules |
+| :---: | :---: | :---: |
+| <img src="assets/Gaussian/Gaussian.Dashboard.jpg" width="260" alt="Gaussian Dashboard" /> | <img src="assets/Gaussian/Gaussian.Calendar.jpg" width="260" alt="Gaussian Calendar" /> | <img src="assets/Gaussian/Gaussian.Schedules.jpg" width="260" alt="Gaussian Schedules" /> |
+
+| History | Rooms | Settings |
+| :---: | :---: | :---: |
+| <img src="assets/Gaussian/Gaussian.History.jpg" width="260" alt="Gaussian History" /> | <img src="assets/Gaussian/Gaussian.Rooms.jpg" width="260" alt="Gaussian Rooms" /> | <img src="assets/Gaussian/Gaussian.Settings.jpg" width="260" alt="Gaussian Settings" /> |
 
 </details>
 

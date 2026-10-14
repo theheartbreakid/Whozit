@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bg_gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="45%" stop-color="#F5F8FE" />
+      <stop offset="100%" stop-color="#E1ECFA" />
+    </linearGradient>
+
+    <!-- Foreground Element Gradients -->
+    <linearGradient id="arc_ul" x1="31.96" y1="33.35" x2="47.54" y2="57.65" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#48C6FF" />
+      <stop offset="100%" stop-color="#4270F6" />
+    </linearGradient>
+    <linearGradient id="arc_ur" x1="59.35" y1="33.59" x2="77.15" y2="57.66" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4A6CFF" />
+      <stop offset="100%" stop-color="#7446E4" />
+    </linearGradient>
+    <linearGradient id="arc_bot" x1="40.04" y1="69.04" x2="67.71" y2="77.22" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4A90FF" />
+      <stop offset="100%" stop-color="#7A44E6" />
+    </linearGradient>
+    <linearGradient id="dot_top" x1="54" y1="26" x2="54" y2="39.5" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4CC2FF" />
+      <stop offset="100%" stop-color="#2B84FF" />
+    </linearGradient>
+    <linearGradient id="dot_left" x1="30.68" y1="60.12" x2="38.33" y2="72.88" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#40AAFF" />
+      <stop offset="100%" stop-color="#2C7BFF" />
+    </linearGradient>
+    <linearGradient id="dot_right" x1="69.04" y1="60.12" x2="77.96" y2="72.88" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#B187F6" />
+      <stop offset="100%" stop-color="#7B44DA" />
+    </linearGradient>
+
+    <!-- Outer Drop Shadow -->
+    <filter id="app_shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#0F1E36" flood-opacity="0.18" />
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0F1E36" flood-opacity="0.08" />
+    </filter>
+
+    <!-- Inner highlight stroke -->
+    <linearGradient id="stroke_highlight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.25" />
+    </linearGradient>
+  </defs>
+
+  <!-- App Icon Squircle Container -->
+  <rect x="36" y="32" width="440" height="440" rx="104" fill="url(#bg_gradient)" filter="url(#app_shadow)" stroke="url(#stroke_highlight)" stroke-width="2" />
+
+  <!-- Centered Artwork Scaled from 108 to ~360 -->
+  <g transform="translate(256, 252) scale(4.4) translate(-54, -54)">
+    <path d="M28.8,57.48A25.3,25.3 0 0 1 43.51,32.18Q44.34,31.82 44.3,32.72A9.7,9.7 0 0 0 49.83,41.46Q50.66,41.81 50.79,42.33L50.82,42.45Q50.95,42.97 50.09,43.22A12.6,12.6 0 0 0 41.67,57.8Q41.89,58.67 41.16,58.88L40.99,58.93Q40.26,59.14 39.01,58.31A9.3,9.3 0 0 0 30.26,58.18Q28.98,58.97 28.8,57.48Z" fill="url(#arc_ul)" />
+    <path d="M65.03,32.43A25.3,25.3 0 0 1 79.14,58.08Q79.02,58.97 78.27,58.47A9.3,9.3 0 0 0 68.47,58.62Q67.74,59.14 67.01,58.93L66.84,58.88Q66.11,58.67 66.33,57.8A12.6,12.6 0 0 0 57.91,43.22Q57.05,42.97 57.18,42.45L57.21,42.33Q57.34,41.81 58.7,41.18A9.7,9.7 0 0 0 63.68,33.32Q63.66,31.82 65.03,32.43Z" fill="url(#arc_ur)" />
+    <path d="M68.58,75.88A25.3,25.3 0 0 1 38.94,75.53Q38.22,74.98 39.03,74.58A9.3,9.3 0 0 0 43.8,66.02Q43.72,65.13 44.27,64.6L44.39,64.48Q44.94,63.95 45.58,64.58A12.6,12.6 0 0 0 62.42,64.58Q63.06,63.95 63.61,64.48L63.73,64.6Q64.28,65.13 64.19,66.62A9.3,9.3 0 0 0 68.46,74.27Q69.78,74.98 68.58,75.88Z" fill="url(#arc_bot)" />
+    <path d="M47.3,32.7a6.7,6.7 0 1 1 13.4,0a6.7,6.7 0 1 1 -13.4,0Z" fill="url(#dot_top)" />
+    <path d="M28.21,66.45a6.3,6.3 0 1 1 12.6,0a6.3,6.3 0 1 1 -12.6,0Z" fill="url(#dot_left)" />
+    <path d="M67.19,66.45a6.3,6.3 0 1 1 12.6,0a6.3,6.3 0 1 1 -12.6,0Z" fill="url(#dot_right)" />
+  </g>
+</svg>

@@ -180,18 +180,19 @@ fun TurnCard(
                             tint = tokens.statusCompleted.copy(alpha = 0.35f),
                             surfaceColor = tokens.statusCompleted.copy(alpha = 0.25f)
                         ) {
+                            val resolvedColor = tokens.resolveForeground(tokens.statusCompleted)
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = "Done",
                                 modifier = Modifier.size(16.dp),
-                                tint = tokens.statusCompleted
+                                tint = resolvedColor
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = "Mark Done",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = tokens.statusCompleted
+                                color = resolvedColor
                             )
                         }
                     } else if (isDone) {

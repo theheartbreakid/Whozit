@@ -68,6 +68,7 @@ import com.crescentapps.whozit.presentation.theme.AppleFontWeight
 import com.kyant.backdrop.Backdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import java.util.Locale
+import com.crescentapps.whozit.presentation.theme.withDockPadding
 
 /**
  * COMPLETE WHOZIT SETTINGS SCREEN
@@ -133,7 +134,7 @@ fun SettingsScreen(
                     .fillMaxHeight()
                     .widthIn(max = 700.dp)
                     .fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = if (isWide) 48.dp else 24.dp, vertical = 24.dp),
+                contentPadding = PaddingValues(horizontal = if (isWide) 48.dp else 24.dp, vertical = 24.dp).withDockPadding(),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
             item(key = "title_settings") {
@@ -921,9 +922,10 @@ fun SettingsScreen(
                             tint = tokens.statusAttention,
                             backdrop = backdrop
                         ) {
-                            Icon(Icons.Outlined.RestartAlt, null, modifier = Modifier.size(20.dp), tint = tokens.statusAttention)
+                            val resolvedColor = tokens.resolveForeground(tokens.statusAttentionContainer)
+                            Icon(Icons.Outlined.RestartAlt, null, modifier = Modifier.size(20.dp), tint = resolvedColor)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Reset Appearance Settings", color = tokens.statusAttention, fontWeight = FontWeight.Bold)
+                            Text("Reset Appearance Settings", color = resolvedColor, fontWeight = FontWeight.Bold)
                         }
 
                         LiquidButton(
@@ -933,9 +935,10 @@ fun SettingsScreen(
                             tint = tokens.statusMissed,
                             backdrop = backdrop
                         ) {
-                            Icon(Icons.Outlined.SettingsBackupRestore, null, modifier = Modifier.size(20.dp), tint = tokens.statusMissed)
+                            val resolvedColor = tokens.resolveForeground(tokens.statusMissedContainer)
+                            Icon(Icons.Outlined.SettingsBackupRestore, null, modifier = Modifier.size(20.dp), tint = resolvedColor)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Reset All Preferences", color = tokens.statusMissed, fontWeight = FontWeight.Bold)
+                            Text("Reset All Preferences", color = resolvedColor, fontWeight = FontWeight.Bold)
                         }
 
                         LiquidButton(
@@ -945,9 +948,10 @@ fun SettingsScreen(
                             tint = tokens.statusMissed,
                             backdrop = backdrop
                         ) {
-                            Icon(Icons.Outlined.DeleteForever, null, modifier = Modifier.size(20.dp), tint = tokens.statusMissed)
+                            val resolvedColor = tokens.resolveForeground(tokens.statusMissed.copy(alpha = 0.22f))
+                            Icon(Icons.Outlined.DeleteForever, null, modifier = Modifier.size(20.dp), tint = resolvedColor)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Reset Database", color = tokens.statusMissed, fontWeight = FontWeight.Bold)
+                            Text("Reset Database", color = resolvedColor, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -1503,7 +1507,7 @@ fun SettingsToggleItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+        Row(modifier = Modifier.weight(1f).padding(end = 16.dp), verticalAlignment = Alignment.CenterVertically) {
             AdaptiveIcon(icon, modifier = Modifier.size(24.dp), tint = adaptiveColor.copy(alpha = 0.7f))
             Spacer(Modifier.width(16.dp))
             Column {
@@ -1513,11 +1517,11 @@ fun SettingsToggleItem(
                 }
             }
         }
-        Spacer(Modifier.width(8.dp))
         LiquidToggle(selected = { checked }, onSelect = onCheckedChange, backdrop = backdrop)
     }
 }
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun SettingsNavigationItem(
     title: String,
@@ -1526,15 +1530,15 @@ fun SettingsNavigationItem(
     onClick: () -> Unit
 ) {
     val adaptiveColor = LocalPrismalAdaptiveColor.current
-    Row(
+    androidx.compose.foundation.layout.FlowRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(20.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(end = 16.dp)) {
             AdaptiveIcon(icon, modifier = Modifier.size(24.dp), tint = adaptiveColor.copy(alpha = 0.7f))
             Spacer(Modifier.width(16.dp))
             Text(title, style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Normal), color = adaptiveColor, fontWeight = FontWeight.SemiBold)
@@ -1569,7 +1573,7 @@ fun GlassEffectSlider(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f).padding(end = 16.dp)) {
                 Text(title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal), color = adaptiveColor, fontWeight = FontWeight.Bold)
                 if (defaultValue != null && value != defaultValue) {
                     Spacer(Modifier.width(8.dp))

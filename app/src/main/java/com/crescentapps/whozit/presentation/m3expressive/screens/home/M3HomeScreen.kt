@@ -432,7 +432,7 @@ fun HeroTurnCard(
                         ) {
                             Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Mark Done", fontWeight = FontWeight.Bold)
+                            Text("Mark Done", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
                         }
                     }
 

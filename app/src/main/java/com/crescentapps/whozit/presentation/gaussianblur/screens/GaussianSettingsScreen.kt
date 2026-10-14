@@ -42,6 +42,7 @@ import java.util.Locale
 import com.crescentapps.whozit.presentation.gaussianblur.theme.GaussianOptics
 import com.crescentapps.whozit.presentation.gaussianblur.theme.LocalGaussianOptics
 import androidx.compose.runtime.CompositionLocalProvider
+import com.crescentapps.whozit.presentation.theme.withDockPadding
 
 
 @Composable
@@ -107,7 +108,7 @@ fun GaussianSettingsScreen(
                 .fillMaxHeight()
                 .widthIn(max = 700.dp)
                 .fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 24.dp),
+            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 24.dp).withDockPadding(),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item(key = "title_settings") {
@@ -510,20 +511,22 @@ fun GaussianSettingsScreen(
 
                         GaussianButton(
                             onClick = { showResetAllSettingsDialog = true },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            accentTint = colors.statusMissed
                         ) {
-                            Icon(Icons.Outlined.SettingsBackupRestore, null, modifier = Modifier.size(20.dp), tint = colors.statusMissed)
+                            Icon(Icons.Outlined.SettingsBackupRestore, null, modifier = Modifier.size(20.dp), tint = colors.textOnAccent)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Reset All Preferences", color = colors.statusMissed, fontWeight = FontWeight.Bold)
+                            Text("Reset All Preferences", color = colors.textOnAccent, fontWeight = FontWeight.Bold)
                         }
 
                         GaussianButton(
                             onClick = { showResetDataDialog = true },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            accentTint = colors.statusMissed
                         ) {
-                            Icon(Icons.Outlined.DeleteForever, null, modifier = Modifier.size(20.dp), tint = colors.statusMissed)
+                            Icon(Icons.Outlined.DeleteForever, null, modifier = Modifier.size(20.dp), tint = colors.textOnAccent)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Reset Database", color = colors.statusMissed, fontWeight = FontWeight.Bold)
+                            Text("Reset Database", color = colors.textOnAccent, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -790,7 +793,7 @@ fun GaussianOpticsSliderRow(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = colors.textPrimary)
+            Text(title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = colors.textPrimary, modifier = Modifier.weight(1f).padding(end = 16.dp))
             val displayValue = when (unit) {
                 "%" -> "${value.toInt()}%"
                 "dp" -> "${value.toInt()} dp"

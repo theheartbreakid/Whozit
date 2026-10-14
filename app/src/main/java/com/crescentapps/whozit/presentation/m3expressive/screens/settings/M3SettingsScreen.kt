@@ -30,6 +30,7 @@ import com.crescentapps.whozit.core.update.model.UpdateState
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.crescentapps.whozit.presentation.theme.withDockPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,7 +74,7 @@ fun M3SettingsScreen(viewModel: SettingsViewModel) {
                 end = ExpressiveTokens.spacing.normal,
                 top = ExpressiveTokens.spacing.small,
                 bottom = 24.dp
-            ),
+            ).withDockPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Live Preview Card
@@ -725,7 +726,10 @@ fun M3SettingsScreen(viewModel: SettingsViewModel) {
                         OutlinedButton(
                             onClick = { viewModel.resetAppearanceSettings() },
                             modifier = Modifier.fillMaxWidth(),
-                            shape = CircleShape
+                            shape = CircleShape,
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            )
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Refresh,

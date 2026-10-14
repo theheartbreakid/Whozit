@@ -202,17 +202,28 @@ fun LiquidButton(
         tint = tint,
         surfaceColor = surfaceColor
     ) {
+        val tokens = LocalWhozitColors.current
+        val resolvedColor = remember(surfaceColor, tint, tokens) {
+            when {
+                surfaceColor.isSpecified && surfaceColor != Color.Transparent -> tokens.resolveForeground(surfaceColor)
+                tint.isSpecified && tint != Color.Transparent -> tokens.resolveForeground(tint)
+                else -> Color.Unspecified
+            }
+        }
+
         if (icon != null) {
-            Image(
+            Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(18.dp),
+                tint = resolvedColor
             )
             Spacer(Modifier.width(8.dp))
         }
         Text(
             text = text,
             fontWeight = FontWeight.SemiBold,
+            color = resolvedColor,
             style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
         )
     }

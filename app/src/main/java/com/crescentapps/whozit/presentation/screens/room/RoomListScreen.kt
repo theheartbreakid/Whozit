@@ -177,12 +177,13 @@ fun RoomListScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         // Top Header
-        Row(
+        @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+        androidx.compose.foundation.layout.FlowRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.padding(end = 12.dp)) {
                 Text(
                     text = "Shared Schedules",
                     style = TextStyle(fontSize = 28.sp, fontWeight = FontWeight.Bold),
@@ -196,9 +197,10 @@ fun RoomListScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 LiquidButton(
                     text = "Join with Code",
                     onClick = onJoinRoom,

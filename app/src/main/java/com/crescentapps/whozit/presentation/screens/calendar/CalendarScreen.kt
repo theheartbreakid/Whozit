@@ -428,7 +428,8 @@ fun CalendarDayDetailPane(
                                         surfaceColor = LocalWhozitColors.current.accent.copy(alpha = 0.25f),
                                         tint = LocalWhozitColors.current.accent.copy(alpha = 0.35f)
                                     ) {
-                                        Text("Mark Done", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = tokens.primary)
+                                        val resolvedColor = tokens.resolveForeground(tokens.accent)
+                                        Text("Mark Done", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = resolvedColor)
                                     }
                                 }
                                 LiquidButton(

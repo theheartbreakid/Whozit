@@ -15,6 +15,7 @@ import com.crescentapps.whozit.presentation.components.Icon
 import com.crescentapps.whozit.presentation.components.Text
 import com.crescentapps.whozit.presentation.gaussianblur.theme.LocalGaussianBlurColors
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun GaussianSettingsNavRow(
     title: String,
@@ -25,17 +26,17 @@ fun GaussianSettingsNavRow(
 ) {
     val colors = LocalGaussianBlurColors.current
 
-    Row(
+    androidx.compose.foundation.layout.FlowRow(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(horizontal = 20.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.padding(end = 16.dp)
         ) {
             Icon(
                 imageVector = icon,
@@ -91,7 +92,7 @@ fun GaussianSettingsToggleRow(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f).padding(end = 16.dp)
         ) {
             Icon(
                 imageVector = icon,
@@ -117,8 +118,6 @@ fun GaussianSettingsToggleRow(
                 }
             }
         }
-
-        Spacer(Modifier.width(12.dp))
 
         GaussianSwitch(
             checked = checked,
