@@ -39,12 +39,14 @@ import com.crescentapps.whozit.presentation.theme.LocalWhozitColors
 import com.crescentapps.whozit.presentation.theme.withDockPadding
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 @Composable
 fun HistoryScreen(
     viewModel: HistoryViewModel,
     modifier: Modifier = Modifier
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val backdrop = LocalBackdrop.current ?: rememberLayerBackdrop()
     val adaptiveColor = LocalPrismalAdaptiveColor.current
 

@@ -44,13 +44,15 @@ import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import java.time.LocalDate
 import java.util.Locale
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 @Composable
 fun CalendarScreen(
     viewModel: CalendarViewModel,
     onScheduleClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val backdrop = LocalBackdrop.current ?: rememberLayerBackdrop()
     val adaptiveColor = LocalPrismalAdaptiveColor.current
     var overrideTurnTarget by remember { mutableStateOf<ResolvedTurn?>(null) }

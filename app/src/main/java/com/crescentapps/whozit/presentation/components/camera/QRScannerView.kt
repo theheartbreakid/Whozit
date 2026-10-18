@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.compose.ui.unit.IntOffset
+import kotlin.math.roundToInt
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.crescentapps.whozit.core.util.QRCodeUtils
 import com.google.zxing.BinaryBitmap
@@ -233,7 +235,7 @@ fun QRScannerView(
                             .fillMaxWidth(0.9f)
                             .height(2.dp)
                             .align(Alignment.TopCenter)
-                            .offset(y = (laserOffsetY * 240).dp)
+                            .offset { IntOffset(0, (laserOffsetY * 240.dp.toPx()).roundToInt()) }
                             .background(frameBorderColor)
                     )
                 }

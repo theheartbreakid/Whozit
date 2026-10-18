@@ -1,5 +1,7 @@
 package com.crescentapps.whozit
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -34,7 +36,6 @@ import com.crescentapps.whozit.presentation.catalog.utils.LocalBackdrop
 import com.crescentapps.whozit.presentation.components.*
 import com.crescentapps.whozit.presentation.navigation.Screen
 import com.crescentapps.whozit.presentation.navigation.WhozitLiquidDock
-import com.crescentapps.whozit.presentation.navigation.WhozitLiquidNavigationRail
 import com.crescentapps.whozit.presentation.screens.calendar.CalendarScreen
 import com.crescentapps.whozit.presentation.screens.calendar.CalendarViewModel
 import com.crescentapps.whozit.presentation.screens.history.HistoryScreen
@@ -74,10 +75,10 @@ class MainActivity : ComponentActivity() {
         handleIncomingIntent(intent)
 
         setContent {
-            val prefs by app.userPreferencesRepository.userPreferencesFlow.collectAsState(
-                initial = com.crescentapps.whozit.data.preferences.UserPreferences()
+            val prefs by app.userPreferencesRepository.userPreferencesFlow.collectAsStateWithLifecycle(
+                initialValue = com.crescentapps.whozit.data.preferences.UserPreferences()
             )
-            val deepLinkCode by incomingDeepLinkCode.collectAsState()
+            val deepLinkCode by incomingDeepLinkCode.collectAsStateWithLifecycle()
 
             com.crescentapps.whozit.presentation.WhozitApp(
                 app = app,

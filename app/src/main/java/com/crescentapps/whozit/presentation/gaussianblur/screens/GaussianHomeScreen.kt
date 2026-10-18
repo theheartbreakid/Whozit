@@ -1,5 +1,7 @@
 package com.crescentapps.whozit.presentation.gaussianblur.screens
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -37,7 +39,7 @@ fun GaussianHomeScreen(
     onScheduleClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val colors = LocalGaussianBlurColors.current
 
     var turnForAmountDialog by remember { mutableStateOf<ResolvedTurn?>(null) }

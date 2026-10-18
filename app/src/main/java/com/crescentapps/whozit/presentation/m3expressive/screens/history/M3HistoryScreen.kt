@@ -147,7 +147,7 @@ fun M3HistoryScreen(viewModel: HistoryViewModel) {
                     ),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(uiState.filteredItems) { item ->
+                    items(uiState.filteredItems, key = { "${it.occurrence.id}_${it.occurrence.date}" }) { item ->
                         WhozitExpressiveCard(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(20.dp),

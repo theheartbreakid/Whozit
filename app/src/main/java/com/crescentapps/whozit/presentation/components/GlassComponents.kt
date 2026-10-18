@@ -42,6 +42,9 @@ import androidx.compose.ui.window.DialogProperties
 import com.crescentapps.whozit.WhozitApplication
 import com.crescentapps.whozit.core.util.HapticManager
 import com.crescentapps.whozit.data.preferences.UserPreferences
+import android.graphics.Bitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import com.crescentapps.whozit.presentation.catalog.utils.scale
 import com.crescentapps.whozit.presentation.theme.LocalWhozitColors
 import com.matrix.prismal.DownsampleMode
@@ -171,8 +174,13 @@ fun AdaptiveLuminanceProvider(
                 if (!isScrollInProgress) {
                     try {
                         val imageBitmap = layer.toImageBitmap()
-                        val thumbnail = imageBitmap.scale(5, 5)
+                        val rawAndroidBitmap = imageBitmap.asAndroidBitmap()
+                        val scaledBitmap = Bitmap.createScaledBitmap(rawAndroidBitmap, 5, 5, true)
+                        val thumbnail = scaledBitmap.asImageBitmap()
                         thumbnail.readPixels(buffer)
+                        if (scaledBitmap != rawAndroidBitmap) {
+                            scaledBitmap.recycle()
+                        }
 
                         var luminanceSum = 0.0
                         for (argb in buffer) {
@@ -190,7 +198,7 @@ fun AdaptiveLuminanceProvider(
                         // Layer not yet drawn/ready; retain current contrast-safe color
                     }
                 }
-                delay(refreshInterval.toLong())
+                delay(refreshInterval.toLong().coerceAtLeast(500L))
             }
         } else if (!globalEnabled) {
             // FALLBACK PATH (Adaptive Luminance OFF)
@@ -199,8 +207,13 @@ fun AdaptiveLuminanceProvider(
                     if (!isScrollInProgress) {
                         try {
                             val imageBitmap = layer.toImageBitmap()
-                            val thumbnail = imageBitmap.scale(5, 5)
+                            val rawAndroidBitmap = imageBitmap.asAndroidBitmap()
+                            val scaledBitmap = Bitmap.createScaledBitmap(rawAndroidBitmap, 5, 5, true)
+                            val thumbnail = scaledBitmap.asImageBitmap()
                             thumbnail.readPixels(buffer)
+                            if (scaledBitmap != rawAndroidBitmap) {
+                                scaledBitmap.recycle()
+                            }
 
                             var rSum = 0f; var gSum = 0f; var bSum = 0f
                             buffer.forEach { argb ->
@@ -221,7 +234,7 @@ fun AdaptiveLuminanceProvider(
                             }
                         }
                     }
-                    delay(refreshInterval.toLong().coerceAtLeast(300L))
+                    delay(refreshInterval.toLong().coerceAtLeast(500L))
                 }
             } else {
                 val baseColor = if (fallbackMode == 1) Color(paletteColor) else Color(customColor)
@@ -230,8 +243,13 @@ fun AdaptiveLuminanceProvider(
                         if (!isScrollInProgress) {
                             try {
                                 val imageBitmap = layer.toImageBitmap()
-                                val thumbnail = imageBitmap.scale(1, 1)
+                                val rawAndroidBitmap = imageBitmap.asAndroidBitmap()
+                                val scaledBitmap = Bitmap.createScaledBitmap(rawAndroidBitmap, 1, 1, true)
+                                val thumbnail = scaledBitmap.asImageBitmap()
                                 thumbnail.readPixels(buffer)
+                                if (scaledBitmap != rawAndroidBitmap) {
+                                    scaledBitmap.recycle()
+                                }
                                 val argb = buffer[0]
                                 val bgLuminance = (0.2126f * (argb shr 16 and 0xFF) + 0.7152f * (argb shr 8 and 0xFF) + 0.0722f * (argb and 0xFF)) / 255f
                                 val contrastColor = ensureContrast(baseColor, bgLuminance)
@@ -244,7 +262,7 @@ fun AdaptiveLuminanceProvider(
                                 }
                             }
                         }
-                        delay(refreshInterval.toLong().coerceAtLeast(300L))
+                        delay(refreshInterval.toLong().coerceAtLeast(500L))
                     }
                 } else {
                     contentColorAnimation.animateTo(baseColor, tween(200))
@@ -455,20 +473,49 @@ fun PrismalSurface(
                         tonalColor?.let { setGlassColor(it.toArgb()) }
                         setCornerRadius(cornerRadiusPx)
                         if (onClick != null) { setOnClickWithAnimationListener { onClick() } }
+                        appliedGlassState = AppliedGlassState(
+                            settings = glassSettings,
+                            density = density.density,
+                            rim = rim,
+                            specular = specular,
+                            glassIntensity = glassIntensity,
+                            thickness = thickness,
+                            blurRadius = blurRadius,
+                            tonalColorArgb = tonalColor?.toArgb(),
+                            cornerRadiusPx = cornerRadiusPx,
+                            captureHost = captureHost,
+                            hasOnClick = onClick != null
+                        )
                     }
                 },
                 update = { view ->
-                    view.setCaptureHost(captureHost)
-                    applyCalibratedSettings(view, glassSettings, density, rim, specular, glassIntensity)
-                    thickness?.let { view.setThickness(density.run { it.dp.toPx() }) }
-                    blurRadius?.let { view.setBlurRadius(density.run { it.dp.toPx() }) }
-                    tonalColor?.let { view.setGlassColor(it.toArgb()) }
-                    view.setCornerRadius(cornerRadiusPx)
-                    if (onClick != null) {
-                        view.setOnClickWithAnimationListener { onClick() }
-                    } else {
-                        view.setOnClickListener(null)
-                        view.isClickable = false
+                    val newGlassState = AppliedGlassState(
+                        settings = glassSettings,
+                        density = density.density,
+                        rim = rim,
+                        specular = specular,
+                        glassIntensity = glassIntensity,
+                        thickness = thickness,
+                        blurRadius = blurRadius,
+                        tonalColorArgb = tonalColor?.toArgb(),
+                        cornerRadiusPx = cornerRadiusPx,
+                        captureHost = captureHost,
+                        hasOnClick = onClick != null
+                    )
+                    if (view.appliedGlassState != newGlassState) {
+                        view.setCaptureHost(captureHost)
+                        applyCalibratedSettings(view, glassSettings, density, rim, specular, glassIntensity)
+                        thickness?.let { view.setThickness(density.run { it.dp.toPx() }) }
+                        blurRadius?.let { view.setBlurRadius(density.run { it.dp.toPx() }) }
+                        tonalColor?.let { view.setGlassColor(it.toArgb()) }
+                        view.setCornerRadius(cornerRadiusPx)
+                        if (onClick != null) {
+                            view.setOnClickWithAnimationListener { onClick() }
+                        } else {
+                            view.setOnClickListener(null)
+                            view.isClickable = false
+                        }
+                        view.appliedGlassState = newGlassState
                     }
                 }
             )
@@ -498,7 +545,23 @@ fun PrismalSurface(
  * renderer is never less than 16.0f (safe well above the 4.92f threshold), and seeds the initial
  * glass size so that the first draw frame before layout pass has a guaranteed valid dimension range.
  */
+data class AppliedGlassState(
+    val settings: GlassSettings,
+    val density: Float,
+    val rim: Float,
+    val specular: Float,
+    val glassIntensity: Float,
+    val thickness: Float?,
+    val blurRadius: Float?,
+    val tonalColorArgb: Int?,
+    val cornerRadiusPx: Float,
+    val captureHost: ViewGroup?,
+    val hasOnClick: Boolean
+)
+
 class SafePrismalFrameLayout(context: android.content.Context) : PrismalFrameLayout(context) {
+
+    var appliedGlassState: AppliedGlassState? = null
 
     companion object {
         const val SAFE_MIN_DIM = 24.0f
@@ -789,7 +852,7 @@ private fun applyCalibratedSettings(
     // STABILITY PASS: Explicitly sanitize and clamp all values to prevent library internal coerceIn failures.
     val d = if (density.density.isFinite() && density.density > 0.1f) density.density else 1.0f
     val safeIntensity = if (intensityScale.isFinite() && intensityScale >= 0f) intensityScale else 1.0f
-    
+
     val safeIor = if (settings.ior.isFinite()) settings.ior.coerceIn(1.0f, 2.5f) else 1.52f
     view.setIOR(safeIor)
     

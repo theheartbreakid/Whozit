@@ -60,6 +60,9 @@ fun Material3ExpressiveApp(
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
+        val config = androidx.compose.ui.platform.LocalConfiguration.current
+        val isExpanded = config.screenWidthDp >= 600
+
         // Main top-level routes that show the floating dock
         val mainRoutes = listOf(
             Screen.Home.route,
@@ -69,9 +72,13 @@ fun Material3ExpressiveApp(
             Screen.History.route,
             Screen.Settings.route
         )
-        val showDock = currentRoute in mainRoutes
+        val showDock = !isExpanded && currentRoute in mainRoutes
         
-        val dockState = remember(showDock) { com.crescentapps.whozit.presentation.theme.DockSafeAreaState().apply { dockHeight = if (showDock) 90.dp else 0.dp } }
+        val dockState = remember(showDock) {
+            com.crescentapps.whozit.presentation.theme.DockSafeAreaState().apply {
+                dockHeight = if (showDock) 90.dp else 0.dp
+            }
+        }
 
         CompositionLocalProvider(
             com.crescentapps.whozit.presentation.theme.LocalDockSafeArea provides dockState
@@ -79,42 +86,58 @@ fun Material3ExpressiveApp(
             Scaffold(
                 containerColor = Color.Transparent
             ) { paddingValues ->
-            Box(modifier = Modifier.fillMaxSize()) {
-                WhozitBackdropBackground(
-                    backdrop = backdrop,
-                    isDark = isDark,
-                    isAmoled = prefs.isAmoled,
-                    isReduceMotion = prefs.isReduceMotion
-                )
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = androidx.compose.ui.Alignment.TopCenter
-                ) {
-                    NavHost(
-                        navController = navController,
-                        startDestination = Screen.Home.route,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .widthIn(max = 840.dp)
-                            .padding(top = paddingValues.calculateTopPadding()),
-                    enterTransition = { androidx.compose.animation.slideInHorizontally(
-                        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f),
-                        initialOffsetX = { fullWidth -> fullWidth / 8 }
-                    ) + androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f)) },
-                    exitTransition = { androidx.compose.animation.slideOutHorizontally(
-                        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f),
-                        targetOffsetX = { fullWidth -> -fullWidth / 8 }
-                    ) + androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f)) },
-                    popEnterTransition = { androidx.compose.animation.slideInHorizontally(
-                        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f),
-                        initialOffsetX = { fullWidth -> -fullWidth / 8 }
-                    ) + androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f)) },
-                    popExitTransition = { androidx.compose.animation.slideOutHorizontally(
-                        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f),
-                        targetOffsetX = { fullWidth -> fullWidth / 8 }
-                    ) + androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f)) }
-                ) {
-                    composable(Screen.Home.route) {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    if (isExpanded && currentRoute in mainRoutes) {
+                        com.crescentapps.whozit.presentation.m3expressive.navigation.M3ExpressiveNavigationRail(
+                            currentRoute = currentRoute,
+                            onNavigate = { destination ->
+                                navController.navigate(destination.route) {
+                                    popUpTo(Screen.Home.route) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        )
+                    }
+
+                    Box(modifier = Modifier.weight(1f).fillMaxSize()) {
+                        WhozitBackdropBackground(
+                            backdrop = backdrop,
+                            isDark = isDark,
+                            isAmoled = prefs.isAmoled,
+                            isReduceMotion = prefs.isReduceMotion
+                        )
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = androidx.compose.ui.Alignment.TopCenter
+                        ) {
+                            NavHost(
+                                navController = navController,
+                                startDestination = Screen.Home.route,
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .widthIn(max = 840.dp)
+                                    .padding(top = paddingValues.calculateTopPadding()),
+                                enterTransition = { androidx.compose.animation.slideInHorizontally(
+                                    animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f),
+                                    initialOffsetX = { fullWidth -> fullWidth / 8 }
+                                ) + androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f)) },
+                                exitTransition = { androidx.compose.animation.slideOutHorizontally(
+                                    animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f),
+                                    targetOffsetX = { fullWidth -> -fullWidth / 8 }
+                                ) + androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f)) },
+                                popEnterTransition = { androidx.compose.animation.slideInHorizontally(
+                                    animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f),
+                                    initialOffsetX = { fullWidth -> -fullWidth / 8 }
+                                ) + androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f)) },
+                                popExitTransition = { androidx.compose.animation.slideOutHorizontally(
+                                    animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f),
+                                    targetOffsetX = { fullWidth -> fullWidth / 8 }
+                                ) + androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 300f)) }
+                            ) {
+                                composable(Screen.Home.route) {
                         val homeViewModel: HomeViewModel = viewModel { HomeViewModel(app.repository, app.roomRepository) }
                         M3HomeScreen(
                             viewModel = homeViewModel,
@@ -279,6 +302,7 @@ fun Material3ExpressiveApp(
                     )
                 }
             } // End of Box
+            } // End of Row
         } // End of Scaffold
         } // End of CompositionLocalProvider
     } // End of WhozitExpressiveTheme

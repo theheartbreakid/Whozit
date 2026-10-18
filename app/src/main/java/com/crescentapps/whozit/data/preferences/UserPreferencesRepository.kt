@@ -140,7 +140,7 @@ data class UserPreferences(
     val lastUpdateCheckTimestamp: Long = 0L
 )
 
-class UserPreferencesRepository(private val context: Context) {
+open class UserPreferencesRepository(private val context: Context? = null) {
 
     object Defaults {
         const val DEFAULT_GLASS_CORNER_RADIUS = 28f
@@ -292,7 +292,7 @@ class UserPreferencesRepository(private val context: Context) {
         val LAST_UPDATE_CHECK_TIMESTAMP = longPreferencesKey("last_update_check_timestamp")
     }
 
-    val userPreferencesFlow: Flow<UserPreferences> = context.dataStore.data.map { preferences ->
+    open val userPreferencesFlow: Flow<UserPreferences> = (context?.dataStore?.data ?: kotlinx.coroutines.flow.emptyFlow()).map { preferences ->
         val uiSystemStr = preferences[PreferencesKeys.UI_SYSTEM_MODE] ?: UiSystemMode.GAUSSIAN_BLUR.name
         val uiSystem = runCatching { UiSystemMode.valueOf(uiSystemStr) }.getOrDefault(UiSystemMode.GAUSSIAN_BLUR)
 
@@ -420,378 +420,378 @@ class UserPreferencesRepository(private val context: Context) {
         )
     }
 
-    suspend fun setUiSystemMode(mode: UiSystemMode) {
-        context.dataStore.edit { it[PreferencesKeys.UI_SYSTEM_MODE] = mode.name }
+    open suspend fun setUiSystemMode(mode: UiSystemMode) {
+        context?.dataStore?.edit { it[PreferencesKeys.UI_SYSTEM_MODE] = mode.name }
     }
 
     suspend fun setLiquidGlassEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.IS_LIQUID_GLASS_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.IS_LIQUID_GLASS_ENABLED] = enabled }
     }
 
     suspend fun setGaussianBlurRadius(radius: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GAUSSIAN_BLUR_RADIUS] = radius.coerceIn(0f, 100f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GAUSSIAN_BLUR_RADIUS] = radius.coerceIn(0f, 100f) }
     }
 
     suspend fun setGaussianSurfaceOpacity(opacity: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GAUSSIAN_SURFACE_OPACITY] = opacity.coerceIn(0f, 1f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GAUSSIAN_SURFACE_OPACITY] = opacity.coerceIn(0f, 1f) }
     }
 
     suspend fun setGaussianRefractionEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.GAUSSIAN_REFRACTION_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.GAUSSIAN_REFRACTION_ENABLED] = enabled }
     }
 
     suspend fun setGaussianRefractionStrength(strength: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GAUSSIAN_REFRACTION_STRENGTH] = strength.coerceIn(0f, 2f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GAUSSIAN_REFRACTION_STRENGTH] = strength.coerceIn(0f, 2f) }
     }
 
     suspend fun setGaussianDynamicHighlightsEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.GAUSSIAN_DYNAMIC_HIGHLIGHTS_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.GAUSSIAN_DYNAMIC_HIGHLIGHTS_ENABLED] = enabled }
     }
 
     suspend fun setGaussianDynamicHighlightsIntensity(intensity: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GAUSSIAN_DYNAMIC_HIGHLIGHTS_INTENSITY] = intensity.coerceIn(0f, 2f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GAUSSIAN_DYNAMIC_HIGHLIGHTS_INTENSITY] = intensity.coerceIn(0f, 2f) }
     }
 
     suspend fun setGaussianSpecularEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.GAUSSIAN_SPECULAR_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.GAUSSIAN_SPECULAR_ENABLED] = enabled }
     }
 
     suspend fun setGaussianSpecularIntensity(intensity: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GAUSSIAN_SPECULAR_INTENSITY] = intensity.coerceIn(0f, 2f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GAUSSIAN_SPECULAR_INTENSITY] = intensity.coerceIn(0f, 2f) }
     }
 
     suspend fun setGaussianCondensedLightEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.GAUSSIAN_CONDENSED_LIGHT_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.GAUSSIAN_CONDENSED_LIGHT_ENABLED] = enabled }
     }
 
     suspend fun setGaussianCondensedLightRadius(radius: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GAUSSIAN_CONDENSED_LIGHT_RADIUS] = radius.coerceIn(10f, 200f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GAUSSIAN_CONDENSED_LIGHT_RADIUS] = radius.coerceIn(10f, 200f) }
     }
 
     suspend fun setGaussianColorProjectionEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.GAUSSIAN_COLOR_PROJECTION_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.GAUSSIAN_COLOR_PROJECTION_ENABLED] = enabled }
     }
 
     suspend fun setGaussianContactDepthEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.GAUSSIAN_CONTACT_DEPTH_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.GAUSSIAN_CONTACT_DEPTH_ENABLED] = enabled }
     }
 
     suspend fun setGaussianProgressiveBlurEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.GAUSSIAN_PROGRESSIVE_BLUR_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.GAUSSIAN_PROGRESSIVE_BLUR_ENABLED] = enabled }
     }
 
     suspend fun setGaussianMorphingEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.GAUSSIAN_MORPHING_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.GAUSSIAN_MORPHING_ENABLED] = enabled }
     }
 
     suspend fun setGaussianGuidingLightEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.GAUSSIAN_GUIDING_LIGHT_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.GAUSSIAN_GUIDING_LIGHT_ENABLED] = enabled }
     }
 
     suspend fun setGaussianVisualQuality(quality: String) {
-        context.dataStore.edit { it[PreferencesKeys.GAUSSIAN_VISUAL_QUALITY] = quality }
+        context?.dataStore?.edit { it[PreferencesKeys.GAUSSIAN_VISUAL_QUALITY] = quality }
     }
 
     suspend fun setHasAcceptedLiquidWarning(accepted: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.HAS_ACCEPTED_LIQUID_WARNING] = accepted }
+        context?.dataStore?.edit { it[PreferencesKeys.HAS_ACCEPTED_LIQUID_WARNING] = accepted }
     }
 
-    suspend fun setThemeMode(mode: ThemeMode) {
-        context.dataStore.edit { it[PreferencesKeys.THEME_MODE] = mode.name }
+    open suspend fun setThemeMode(mode: ThemeMode) {
+        context?.dataStore?.edit { it[PreferencesKeys.THEME_MODE] = mode.name }
     }
 
     suspend fun setAmoled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.IS_AMOLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.IS_AMOLED] = enabled }
     }
 
     suspend fun setAdaptiveLuminance(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.ADAPTIVE_LUMINANCE] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.ADAPTIVE_LUMINANCE] = enabled }
     }
 
     suspend fun setAdaptiveLuminanceInterval(interval: Int) {
-        context.dataStore.edit { it[PreferencesKeys.ADAPTIVE_LUMINANCE_INTERVAL] = interval.coerceIn(100, 3000) }
+        context?.dataStore?.edit { it[PreferencesKeys.ADAPTIVE_LUMINANCE_INTERVAL] = interval.coerceIn(100, 3000) }
     }
 
     suspend fun setFontTintFallbackMode(mode: Int) {
-        context.dataStore.edit { it[PreferencesKeys.FONT_TINT_FALLBACK_MODE] = mode }
+        context?.dataStore?.edit { it[PreferencesKeys.FONT_TINT_FALLBACK_MODE] = mode }
     }
 
     suspend fun setFontTintPaletteColor(color: Int) {
-        context.dataStore.edit { it[PreferencesKeys.FONT_TINT_PALETTE_COLOR] = color }
+        context?.dataStore?.edit { it[PreferencesKeys.FONT_TINT_PALETTE_COLOR] = color }
     }
 
     suspend fun setFontTintCustomColor(color: Int) {
-        context.dataStore.edit { it[PreferencesKeys.FONT_TINT_CUSTOM_COLOR] = color }
+        context?.dataStore?.edit { it[PreferencesKeys.FONT_TINT_CUSTOM_COLOR] = color }
     }
 
     suspend fun setGlassIntensity(intensity: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_INTENSITY] = intensity.coerceIn(0f, 1f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_INTENSITY] = intensity.coerceIn(0f, 1f) }
     }
 
     suspend fun setReduceMotion(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.IS_REDUCE_MOTION] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.IS_REDUCE_MOTION] = enabled }
     }
 
     suspend fun setM3DynamicColor(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.M3_DYNAMIC_COLOR] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_DYNAMIC_COLOR] = enabled }
     }
 
     suspend fun setM3UseExpressiveMotion(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.M3_USE_EXPRESSIVE_MOTION] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_USE_EXPRESSIVE_MOTION] = enabled }
     }
 
     suspend fun setM3ColorPersonality(personality: String) {
-        context.dataStore.edit { it[PreferencesKeys.M3_COLOR_PERSONALITY] = personality }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_COLOR_PERSONALITY] = personality }
     }
 
     suspend fun setM3ColorIntensity(intensity: Float) {
-        context.dataStore.edit { it[PreferencesKeys.M3_COLOR_INTENSITY] = intensity.coerceIn(0f, 1f) }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_COLOR_INTENSITY] = intensity.coerceIn(0f, 1f) }
     }
 
     suspend fun setM3Contrast(contrast: String) {
-        context.dataStore.edit { it[PreferencesKeys.M3_CONTRAST] = contrast }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_CONTRAST] = contrast }
     }
 
     suspend fun setM3TypographyStyle(style: String) {
-        context.dataStore.edit { it[PreferencesKeys.M3_TYPOGRAPHY_STYLE] = style }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_TYPOGRAPHY_STYLE] = style }
     }
 
     suspend fun setM3TypographyEmphasis(emphasis: String) {
-        context.dataStore.edit { it[PreferencesKeys.M3_TYPOGRAPHY_EMPHASIS] = emphasis }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_TYPOGRAPHY_EMPHASIS] = emphasis }
     }
 
     suspend fun setM3Density(density: String) {
-        context.dataStore.edit { it[PreferencesKeys.M3_DENSITY] = density }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_DENSITY] = density }
     }
 
     suspend fun setM3ShapePersonality(personality: String) {
-        context.dataStore.edit { it[PreferencesKeys.M3_SHAPE_PERSONALITY] = personality }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_SHAPE_PERSONALITY] = personality }
     }
 
     suspend fun setM3ShapeVariation(variation: String) {
-        context.dataStore.edit { it[PreferencesKeys.M3_SHAPE_VARIATION] = variation }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_SHAPE_VARIATION] = variation }
     }
 
     suspend fun setM3LightRaysEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.M3_LIGHT_RAYS_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_LIGHT_RAYS_ENABLED] = enabled }
     }
 
     suspend fun setM3GradientX(x: Float) {
-        context.dataStore.edit { it[PreferencesKeys.M3_GRADIENT_X] = x.coerceIn(0f, 1f) }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_GRADIENT_X] = x.coerceIn(0f, 1f) }
     }
 
     suspend fun setM3GradientY(y: Float) {
-        context.dataStore.edit { it[PreferencesKeys.M3_GRADIENT_Y] = y.coerceIn(0f, 1f) }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_GRADIENT_Y] = y.coerceIn(0f, 1f) }
     }
 
     suspend fun setM3GradientAngle(angle: Float) {
-        context.dataStore.edit { it[PreferencesKeys.M3_GRADIENT_ANGLE] = angle.coerceIn(0f, 360f) }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_GRADIENT_ANGLE] = angle.coerceIn(0f, 360f) }
     }
 
     suspend fun setM3GradientWidth(width: Float) {
-        context.dataStore.edit { it[PreferencesKeys.M3_GRADIENT_WIDTH] = width.coerceIn(0f, 1f) }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_GRADIENT_WIDTH] = width.coerceIn(0f, 1f) }
     }
 
     suspend fun setM3GradientLength(length: Float) {
-        context.dataStore.edit { it[PreferencesKeys.M3_GRADIENT_LENGTH] = length.coerceIn(0f, 2f) }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_GRADIENT_LENGTH] = length.coerceIn(0f, 2f) }
     }
 
     suspend fun setM3GradientSoftness(softness: Float) {
-        context.dataStore.edit { it[PreferencesKeys.M3_GRADIENT_SOFTNESS] = softness.coerceIn(0f, 1f) }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_GRADIENT_SOFTNESS] = softness.coerceIn(0f, 1f) }
     }
 
     suspend fun setM3GradientIntensity(intensity: Float) {
-        context.dataStore.edit { it[PreferencesKeys.M3_GRADIENT_INTENSITY] = intensity.coerceIn(0f, 1f) }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_GRADIENT_INTENSITY] = intensity.coerceIn(0f, 1f) }
     }
 
     suspend fun setM3GradientColorSource(source: String) {
-        context.dataStore.edit { it[PreferencesKeys.M3_GRADIENT_COLOR_SOURCE] = source }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_GRADIENT_COLOR_SOURCE] = source }
     }
 
     suspend fun setM3ShapeMorphingEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.M3_SHAPE_MORPHING_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_SHAPE_MORPHING_ENABLED] = enabled }
     }
 
     suspend fun setM3DecorativeMotionEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.M3_DECORATIVE_MOTION_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.M3_DECORATIVE_MOTION_ENABLED] = enabled }
     }
 
     suspend fun setAppFontFamily(family: String) {
-        context.dataStore.edit { it[PreferencesKeys.APP_FONT_FAMILY] = family }
+        context?.dataStore?.edit { it[PreferencesKeys.APP_FONT_FAMILY] = family }
     }
 
     suspend fun setAppFontWeight(weight: String) {
-        context.dataStore.edit { it[PreferencesKeys.APP_FONT_WEIGHT] = weight }
+        context?.dataStore?.edit { it[PreferencesKeys.APP_FONT_WEIGHT] = weight }
     }
 
     suspend fun setAppFontTilt(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.APP_FONT_TILT] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.APP_FONT_TILT] = enabled }
     }
 
     suspend fun setGlassCornerRadius(radius: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_CORNER_RADIUS] = radius.coerceIn(0f, 100f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_CORNER_RADIUS] = radius.coerceIn(0f, 100f) }
     }
 
     suspend fun setGlassBlurRadius(radius: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_BLUR_RADIUS] = radius.coerceIn(0f, 100f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_BLUR_RADIUS] = radius.coerceIn(0f, 100f) }
     }
 
     suspend fun setGlassRefractionHeight(height: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_REFRACTION_HEIGHT] = height.coerceIn(0f, 100f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_REFRACTION_HEIGHT] = height.coerceIn(0f, 100f) }
     }
 
     suspend fun setGlassRefractionAmount(amount: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_REFRACTION_AMOUNT] = amount.coerceIn(0f, 100f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_REFRACTION_AMOUNT] = amount.coerceIn(0f, 100f) }
     }
 
     suspend fun setGlassChromaticAberration(aberration: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_CHROMATIC_ABERRATION] = aberration.coerceIn(0f, 1f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_CHROMATIC_ABERRATION] = aberration.coerceIn(0f, 1f) }
     }
 
     suspend fun setGlassIOR(ior: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_IOR] = ior.coerceIn(1f, 3f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_IOR] = ior.coerceIn(1f, 3f) }
     }
 
     suspend fun setGlassThickness(thickness: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_THICKNESS] = thickness.coerceIn(0f, 100f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_THICKNESS] = thickness.coerceIn(0f, 100f) }
     }
 
     suspend fun setGlassNormalStrength(strength: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_NORMAL_STRENGTH] = strength.coerceIn(0f, 5f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_NORMAL_STRENGTH] = strength.coerceIn(0f, 5f) }
     }
 
     suspend fun setGlassBrightness(brightness: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_BRIGHTNESS] = brightness.coerceIn(0f, 2f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_BRIGHTNESS] = brightness.coerceIn(0f, 2f) }
     }
 
     suspend fun setGlassRimIntensity(intensity: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_RIM_INTENSITY] = intensity.coerceIn(0f, 2f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_RIM_INTENSITY] = intensity.coerceIn(0f, 2f) }
     }
 
     suspend fun setGlassSpecularIntensity(intensity: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_SPECULAR_INTENSITY] = intensity.coerceIn(0f, 2f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_SPECULAR_INTENSITY] = intensity.coerceIn(0f, 2f) }
     }
 
     suspend fun setGlassShininess(shininess: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_SHININESS] = shininess.coerceIn(1f, 128f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_SHININESS] = shininess.coerceIn(1f, 128f) }
     }
 
     suspend fun setGlassDisplacementScale(scale: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_DISPLACEMENT_SCALE] = scale.coerceIn(0f, 2f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_DISPLACEMENT_SCALE] = scale.coerceIn(0f, 2f) }
     }
 
     suspend fun setGlassMinSmoothing(smoothing: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_MIN_SMOOTHING] = smoothing.coerceIn(0f, 10f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_MIN_SMOOTHING] = smoothing.coerceIn(0f, 10f) }
     }
 
     suspend fun setGlassHighlightWidth(width: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_HIGHLIGHT_WIDTH] = width.coerceIn(0f, 20f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_HIGHLIGHT_WIDTH] = width.coerceIn(0f, 20f) }
     }
 
     suspend fun setGlassCausticIntensity(intensity: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_CAUSTIC_INTENSITY] = intensity.coerceIn(0f, 2f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_CAUSTIC_INTENSITY] = intensity.coerceIn(0f, 2f) }
     }
 
     suspend fun setGlassLiquidDome(dome: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_LIQUID_DOME] = dome.coerceIn(0f, 2f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_LIQUID_DOME] = dome.coerceIn(0f, 2f) }
     }
 
     suspend fun setGlassTransmittance(transmittance: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_TRANSMITTANCE] = transmittance.coerceIn(0f, 1f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_TRANSMITTANCE] = transmittance.coerceIn(0f, 1f) }
     }
 
     suspend fun setGlassLightDirection(x: Float, y: Float) {
-        context.dataStore.edit {
+        context?.dataStore?.edit {
             it[PreferencesKeys.GLASS_LIGHT_DIR_X] = x.coerceIn(-1f, 1f)
             it[PreferencesKeys.GLASS_LIGHT_DIR_Y] = y.coerceIn(-1f, 1f)
         }
     }
 
     suspend fun setGlassShadowColor(color: Int) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_SHADOW_COLOR] = color }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_SHADOW_COLOR] = color }
     }
 
     suspend fun setGlassShadowIntensity(intensity: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_SHADOW_INTENSITY] = intensity.coerceIn(0f, 1f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_SHADOW_INTENSITY] = intensity.coerceIn(0f, 1f) }
     }
 
     suspend fun setGlassShadowSoftness(softness: Float) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_SHADOW_SOFTNESS] = softness.coerceIn(0f, 1f) }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_SHADOW_SOFTNESS] = softness.coerceIn(0f, 1f) }
     }
 
     suspend fun setGlassCaptureDownsample(mode: String) {
-        context.dataStore.edit { it[PreferencesKeys.GLASS_CAPTURE_DOWNSAMPLE] = mode }
+        context?.dataStore?.edit { it[PreferencesKeys.GLASS_CAPTURE_DOWNSAMPLE] = mode }
     }
 
     suspend fun setDockCornerRadius(radius: Float) {
-        context.dataStore.edit { it[PreferencesKeys.DOCK_CORNER_RADIUS] = radius.coerceIn(0f, 100f) }
+        context?.dataStore?.edit { it[PreferencesKeys.DOCK_CORNER_RADIUS] = radius.coerceIn(0f, 100f) }
     }
 
     suspend fun setDockBlurRadius(radius: Float) {
-        context.dataStore.edit { it[PreferencesKeys.DOCK_BLUR_RADIUS] = radius.coerceIn(0f, 100f) }
+        context?.dataStore?.edit { it[PreferencesKeys.DOCK_BLUR_RADIUS] = radius.coerceIn(0f, 100f) }
     }
 
     suspend fun setDockRefractionHeight(height: Float) {
-        context.dataStore.edit { it[PreferencesKeys.DOCK_REFRACTION_HEIGHT] = height.coerceIn(0f, 100f) }
+        context?.dataStore?.edit { it[PreferencesKeys.DOCK_REFRACTION_HEIGHT] = height.coerceIn(0f, 100f) }
     }
 
     suspend fun setDockRefractionAmount(amount: Float) {
-        context.dataStore.edit { it[PreferencesKeys.DOCK_REFRACTION_AMOUNT] = amount.coerceIn(0f, 100f) }
+        context?.dataStore?.edit { it[PreferencesKeys.DOCK_REFRACTION_AMOUNT] = amount.coerceIn(0f, 100f) }
     }
 
     suspend fun setDockChromaticAberration(aberration: Float) {
-        context.dataStore.edit { it[PreferencesKeys.DOCK_CHROMATIC_ABERRATION] = aberration.coerceIn(0f, 1f) }
+        context?.dataStore?.edit { it[PreferencesKeys.DOCK_CHROMATIC_ABERRATION] = aberration.coerceIn(0f, 1f) }
     }
 
     suspend fun setSoundFeedbackEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.SOUND_FEEDBACK_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.SOUND_FEEDBACK_ENABLED] = enabled }
     }
 
     suspend fun setHapticFeedbackEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.HAPTIC_FEEDBACK_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.HAPTIC_FEEDBACK_ENABLED] = enabled }
     }
 
     suspend fun setHapticIntensity(intensity: Float) {
-        context.dataStore.edit { it[PreferencesKeys.HAPTIC_INTENSITY] = intensity.coerceIn(0f, 1f) }
+        context?.dataStore?.edit { it[PreferencesKeys.HAPTIC_INTENSITY] = intensity.coerceIn(0f, 1f) }
     }
 
     suspend fun setBackgroundImageUri(uri: String) {
-        context.dataStore.edit { it[PreferencesKeys.BACKGROUND_IMAGE_URI] = uri }
+        context?.dataStore?.edit { it[PreferencesKeys.BACKGROUND_IMAGE_URI] = uri }
     }
 
     suspend fun setMasterNotificationsEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.NOTIFICATIONS_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.NOTIFICATIONS_ENABLED] = enabled }
     }
 
     suspend fun setDefaultNotificationTime(hour: Int, minute: Int) {
-        context.dataStore.edit {
+        context?.dataStore?.edit {
             it[PreferencesKeys.NOTIFY_HOUR] = hour
             it[PreferencesKeys.NOTIFY_MINUTE] = minute
         }
     }
 
     suspend fun setFirstDayOfWeek(day: FirstDayOfWeek) {
-        context.dataStore.edit { it[PreferencesKeys.FIRST_DAY_OF_WEEK] = day.name }
+        context?.dataStore?.edit { it[PreferencesKeys.FIRST_DAY_OF_WEEK] = day.name }
     }
 
     suspend fun setOnboardingCompleted(completed: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.ONBOARDING_COMPLETED] = completed }
+        context?.dataStore?.edit { it[PreferencesKeys.ONBOARDING_COMPLETED] = completed }
     }
 
     suspend fun setUserDisplayName(name: String) {
-        context.dataStore.edit { it[PreferencesKeys.USER_DISPLAY_NAME] = name }
+        context?.dataStore?.edit { it[PreferencesKeys.USER_DISPLAY_NAME] = name }
     }
 
     suspend fun setSyncOverMobileData(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.SYNC_OVER_MOBILE] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.SYNC_OVER_MOBILE] = enabled }
     }
 
     suspend fun setOnlineSyncEnabled(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.ONLINE_SYNC_ENABLED] = enabled }
+        context?.dataStore?.edit { it[PreferencesKeys.ONLINE_SYNC_ENABLED] = enabled }
     }
 
     suspend fun resetAppearanceSettings() {
-        context.dataStore.edit {
+        context?.dataStore?.edit {
             it.remove(PreferencesKeys.GLASS_CORNER_RADIUS)
             it.remove(PreferencesKeys.GLASS_BLUR_RADIUS)
             it.remove(PreferencesKeys.GLASS_REFRACTION_HEIGHT)
@@ -837,7 +837,7 @@ class UserPreferencesRepository(private val context: Context) {
 
     suspend fun resetAllSettings() {
         resetAppearanceSettings()
-        context.dataStore.edit {
+        context?.dataStore?.edit {
             it.remove(PreferencesKeys.THEME_MODE)
             it.remove(PreferencesKeys.IS_AMOLED)
             it.remove(PreferencesKeys.IS_REDUCE_MOTION)
@@ -856,10 +856,10 @@ class UserPreferencesRepository(private val context: Context) {
     }
 
     suspend fun setUpdateCheckFrequency(frequency: UpdateFrequency) {
-        context.dataStore.edit { it[PreferencesKeys.UPDATE_CHECK_FREQUENCY] = frequency.name }
+        context?.dataStore?.edit { it[PreferencesKeys.UPDATE_CHECK_FREQUENCY] = frequency.name }
     }
 
     suspend fun setLastUpdateCheckTimestamp(timestamp: Long) {
-        context.dataStore.edit { it[PreferencesKeys.LAST_UPDATE_CHECK_TIMESTAMP] = timestamp }
+        context?.dataStore?.edit { it[PreferencesKeys.LAST_UPDATE_CHECK_TIMESTAMP] = timestamp }
     }
 }

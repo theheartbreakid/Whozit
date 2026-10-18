@@ -1,5 +1,6 @@
 package com.crescentapps.whozit.presentation.screens.room
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -163,7 +164,7 @@ fun RoomListScreen(
     onRoomClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val backdrop = LocalBackdrop.current
     val colors = com.crescentapps.whozit.presentation.theme.LocalWhozitColors.current
     val adaptiveColor = com.crescentapps.whozit.presentation.components.LocalPrismalAdaptiveColor.current

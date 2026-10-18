@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.crescentapps.whozit.presentation.gaussianblur.backdrop.LocalAppBackdrop
 import com.crescentapps.whozit.presentation.gaussianblur.backdrop.gaussianGlass
@@ -79,7 +80,7 @@ fun GaussianSwitch(
         // Thumb
         Box(
             modifier = Modifier
-                .offset(x = thumbOffset)
+                .offset { IntOffset(thumbOffset.roundToPx(), 0) }
                 .size(thumbSize)
                 .clip(CircleShape)
                 .background(

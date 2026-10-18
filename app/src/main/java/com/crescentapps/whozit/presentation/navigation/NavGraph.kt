@@ -33,6 +33,8 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.crescentapps.whozit.presentation.components.AppWindowWidthSizeClass
+import com.crescentapps.whozit.presentation.components.AppWindowHeightSizeClass
 import com.crescentapps.whozit.presentation.components.LocalAppWindowSizeDetails
 import com.crescentapps.whozit.presentation.components.LocalPrismalAdaptiveColor
 import com.crescentapps.whozit.presentation.components.liquid.LiquidBottomTab
@@ -92,7 +94,10 @@ fun WhozitLiquidDock(
 ) {
     val selectedIndex = mainScreens.indexOfFirst { it.route == currentRoute }.coerceAtLeast(0)
     val sizeDetails = LocalAppWindowSizeDetails.current
-    val isCompact = sizeDetails.widthDp < 400
+    val isCompact = sizeDetails.widthClass == AppWindowWidthSizeClass.COMPACT ||
+                    sizeDetails.heightClass == AppWindowHeightSizeClass.COMPACT ||
+                    sizeDetails.isLandscape ||
+                    sizeDetails.heightDp < 500
 
     LiquidBottomTabs(
         selectedTabIndex = { selectedIndex },
@@ -124,7 +129,7 @@ fun WhozitLiquidDock(
                 Image(
                     imageVector = if (isSelected) screen.selectedIcon else screen.unselectedIcon,
                     contentDescription = screen.title,
-                    modifier = Modifier.size(if (isCompact) 18.dp else 22.dp),
+                    modifier = Modifier.size(if (isCompact) 20.dp else 22.dp),
                     colorFilter = ColorFilter.tint(if (isSelected) selectedColor else adaptiveColor)
                 )
                 if (!isCompact) {
@@ -143,7 +148,7 @@ fun WhozitLiquidDock(
 }
 
 /**
- * Responsive Navigation Rail using DhikrCounter Liquid styling for Expanded/Tablet viewports
+ * DhikrCounter Liquid Glass Navigation Rail for Expanded / Tablet Layouts
  */
 @Composable
 fun WhozitLiquidNavigationRail(
@@ -153,53 +158,36 @@ fun WhozitLiquidNavigationRail(
     modifier: Modifier = Modifier
 ) {
     val whozitColors = LocalWhozitColors.current
-    val mainScreens = listOf(
-        Screen.Home,
-        Screen.Calendar,
-        Screen.Schedules,
-        Screen.Rooms,
-        Screen.History,
-        Screen.Settings
-    )
+    val adaptiveColor = LocalPrismalAdaptiveColor.current
 
-    LiquidBottomTabs(
-        selectedTabIndex = {
-            val idx = mainScreens.indexOfFirst { it.route == currentRoute }
-            if (idx >= 0) idx else 0
-        },
-        onTabSelected = { index ->
-            onNavigate(mainScreens[index])
-        },
-        backdrop = backdrop,
-        tabsCount = mainScreens.size,
-        accentColor = whozitColors.accent,
+    com.crescentapps.whozit.presentation.components.liquid.LiquidSurface(
         modifier = modifier
             .fillMaxHeight()
             .width(80.dp)
+            .padding(vertical = 16.dp, horizontal = 8.dp),
+        backdrop = backdrop,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(32.dp)
     ) {
         Column(
             modifier = Modifier
-                .fillMaxHeight()
-                .padding(vertical = 20.dp),
+                .fillMaxSize()
+                .padding(vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
         ) {
             mainScreens.forEach { screen ->
                 val isSelected = currentRoute == screen.route
-                val adaptiveColor = LocalPrismalAdaptiveColor.current
-
-                val isDarkDockSurface = adaptiveColor.luminance() > 0.5f
-                val selectedColor = if (isDarkDockSurface) {
+                val selectedColor = if (adaptiveColor.luminance() > 0.5f) {
                     if (whozitColors.accent.luminance() < 0.4f) Color.White else whozitColors.accent
                 } else {
                     if (whozitColors.accent.luminance() > 0.65f) whozitColors.textPrimary else whozitColors.accent
                 }
 
-                com.crescentapps.whozit.presentation.components.liquid.LiquidIconButton(
-                    onClick = { onNavigate(screen) },
-                    backdrop = backdrop,
-                    iconSize = 44.dp,
-                    tint = if (isSelected) selectedColor.copy(alpha = 0.25f) else Color.Transparent
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clickable { onNavigate(screen) },
+                    contentAlignment = Alignment.Center
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -208,13 +196,14 @@ fun WhozitLiquidNavigationRail(
                         Image(
                             imageVector = if (isSelected) screen.selectedIcon else screen.unselectedIcon,
                             contentDescription = screen.title,
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(22.dp),
                             colorFilter = ColorFilter.tint(if (isSelected) selectedColor else adaptiveColor)
                         )
+                        Spacer(Modifier.height(4.dp))
                         BasicText(
                             text = screen.title,
                             style = TextStyle(
-                                fontSize = 8.sp,
+                                fontSize = 10.sp,
                                 color = if (isSelected) selectedColor else adaptiveColor.copy(alpha = 0.7f)
                             ),
                             maxLines = 1
@@ -225,3 +214,4 @@ fun WhozitLiquidNavigationRail(
         }
     }
 }
+

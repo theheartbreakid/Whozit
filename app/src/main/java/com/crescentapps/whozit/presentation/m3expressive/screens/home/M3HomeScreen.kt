@@ -1,5 +1,7 @@
 package com.crescentapps.whozit.presentation.m3expressive.screens.home
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -49,7 +51,7 @@ fun M3HomeScreen(
     onCreateSchedule: () -> Unit,
     onScheduleClick: (Long) -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var turnForAmountDialog by remember { mutableStateOf<ResolvedTurn?>(null) }
     var enteredAmount by remember { mutableStateOf("") }
 

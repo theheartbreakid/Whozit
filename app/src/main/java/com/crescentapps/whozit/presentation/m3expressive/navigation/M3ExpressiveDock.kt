@@ -107,6 +107,48 @@ fun M3ExpressiveDock(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
+fun M3ExpressiveNavigationRail(
+    currentRoute: String?,
+    onNavigate: (M3NavDestination) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    NavigationRail(
+        modifier = modifier
+            .fillMaxHeight()
+            .padding(vertical = 16.dp, horizontal = 8.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.65f),
+        contentColor = MaterialTheme.colorScheme.onSurface
+    ) {
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            M3NavDestination.entries.forEach { destination ->
+                val isSelected = currentRoute == destination.route
+                NavigationRailItem(
+                    selected = isSelected,
+                    onClick = { onNavigate(destination) },
+                    icon = {
+                        Icon(
+                            imageVector = destination.icon,
+                            contentDescription = destination.label
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = destination.label,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
 private fun M3DockItem(
     destination: M3NavDestination,
     isSelected: Boolean,

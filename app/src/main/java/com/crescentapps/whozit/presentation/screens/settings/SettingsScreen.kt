@@ -1,5 +1,7 @@
 package com.crescentapps.whozit.presentation.screens.settings
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 import android.app.TimePickerDialog
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -79,7 +81,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     modifier: Modifier = Modifier
 ) {
-    val prefs by viewModel.effectivePreferences.collectAsState()
+    val prefs by viewModel.effectivePreferences.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val backdrop = LocalBackdrop.current ?: rememberLayerBackdrop()
     val adaptiveColor = LocalPrismalAdaptiveColor.current
@@ -101,7 +103,7 @@ fun SettingsScreen(
     var showFrequencyDialog by remember { mutableStateOf(false) }
     var showAboutDialog by remember { mutableStateOf(false) }
 
-    val updateState by viewModel.updateState.collectAsState()
+    val updateState by viewModel.updateState.collectAsStateWithLifecycle()
 
     val backgroundLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()

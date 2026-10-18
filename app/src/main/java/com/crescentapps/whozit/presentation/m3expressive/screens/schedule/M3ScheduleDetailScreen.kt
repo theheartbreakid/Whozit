@@ -210,7 +210,7 @@ fun M3ScheduleDetailScreen(
                 )
             }
 
-            items(uiState.participants) { p ->
+            items(uiState.participants, key = { it.id }) { p ->
                 WhozitExpressiveCard(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(18.dp),

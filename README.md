@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./assets/app_icon.png" alt="Whozit App Icon" width="112" style="border-radius: 26px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);" />
+<img src="https://github.com/user-attachments/assets/0a46a8c6-7ffc-4bfd-b672-472c8d67a160" alt="Whozit App Icon" width="112" style="border-radius: 26px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);" />
 
 # Whozit
 
@@ -16,7 +16,7 @@
 <br/>
 
 <a href="#-screenshots--visual-showcase">
-  <img src="./assets/LiquidUi/LiquidUi.Collage.webp" alt="Whozit Liquid Glass Interface Overview" width="90%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
+  <img src="https://github.com/user-attachments/assets/855836b1-8bfb-42f5-a9ef-f9a855d9e17d" alt="Whozit Liquid Glass Interface Overview" width="90%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
 </a>
 
 <p align="center">
@@ -46,7 +46,7 @@ When households, roommates, project partners, or teams share recurring responsib
   <summary><b>🎥 Click to view Interactive Motion Demo (Liquid UI)</b></summary>
   <br/>
   <div align="center">
-    <img src="./assets/LiquidUi/LiquidUi.Demo.webp" alt="Whozit Liquid UI Interactive Demo" width="340" style="border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);" />
+    <video src="https://github.com/user-attachments/assets/ccb304f0-ed69-44ed-9fbe-5f66b68f51b7" autoplay loop muted playsinline width="340" style="border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);"></video>
     <p><em>Turn progression, quick completion actions, and routine switching in fluid Liquid Glass motion.</em></p>
   </div>
 </details>
@@ -86,7 +86,7 @@ Whozit features three fully realized design systems switchable on the fly from *
 
 | 💎 Liquid Glass (Flagship Experience) | 🎨 Material 3 Expressive | 🌫️ Gaussian Blur |
 | :---: | :---: | :---: |
-| <img src="./assets/LiquidUi/LiquidUi.Dashboard.webp" width="220" /> | <img src="./assets/M3E/M3E.Dashboard.webp" width="220" /> | <img src="./assets/Gaussian/Gaussian.Dashboard.webp" width="220" /> |
+| <img src="https://github.com/user-attachments/assets/1c589cae-bf0b-47d4-a3bc-2f5e5e9d287b" width="220" /> | <img src="https://github.com/user-attachments/assets/7a72d616-cb16-4d92-ba8e-ae8e0d20061e" width="220" /> | <img src="https://github.com/user-attachments/assets/b8c394c6-3280-431e-ada7-d9bd15d04049" width="220" /> |
 | Native real-time AGSL shader refraction, specular highlights, dynamic chromatic aberrations, and reactive wallpaper backgrounds. | Google M3E design tokens with dynamic fluid shapes, expressive typography, and spring physics. | Soft multi-layered Gaussian depth, translucent glass card elevations, and custom wallpaper tinting. |
 
 ---
@@ -99,24 +99,24 @@ Whozit features three fully realized design systems switchable on the fly from *
 <br/>
 
 <div align="center">
-  <img src="./assets/LiquidUi/LiquidUi.Collage.webp" alt="Liquid UI Collage" width="90%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
+  <img src="https://github.com/user-attachments/assets/855836b1-8bfb-42f5-a9ef-f9a855d9e17d" alt="Liquid UI Collage" width="90%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
 </div>
 
 <br/>
 
 | Interactive Liquid Navigation | Dynamic Background Customization |
 | :---: | :---: |
-| <img src="./assets/LiquidUi/LiquidUi.Demo.webp" width="320" alt="Liquid UI Demo" /> | <img src="./assets/LiquidUi/LiquidUi.BgChange.Demo.webp" width="320" alt="Background Customization Demo" /> |
+| <video src="https://github.com/user-attachments/assets/ccb304f0-ed69-44ed-9fbe-5f66b68f51b7" autoplay loop muted playsinline width="320" style="border-radius: 12px;"></video> | <video src="https://github.com/user-attachments/assets/454d4174-53df-48ad-8492-91d6ddc49d38" autoplay loop muted playsinline width="320" style="border-radius: 12px;"></video> |
 
 <br/>
 
 | Dashboard | Calendar | Schedules |
 | :---: | :---: | :---: |
-| <img src="./assets/LiquidUi/LiquidUi.Dashboard.webp" width="260" alt="Liquid Dashboard" /> | <img src="./assets/LiquidUi/LiquidUi.Calendar.webp" width="260" alt="Liquid Calendar" /> | <img src="./assets/LiquidUi/LiquidUi.Schedules.webp" width="260" alt="Liquid Schedules" /> |
+| <img src="https://github.com/user-attachments/assets/1c589cae-bf0b-47d4-a3bc-2f5e5e9d287b" width="260" alt="Liquid Dashboard" /> | <img src="https://github.com/user-attachments/assets/36dcfba9-576a-4b92-b343-2776272a9422" width="260" alt="Liquid Calendar" /> | <img src="https://github.com/user-attachments/assets/66c84187-fd03-42ce-a5b2-9c1cdc9bd4d4" width="260" alt="Liquid Schedules" /> |
 
 | History | Rooms | Settings |
 | :---: | :---: | :---: |
-| <img src="./assets/LiquidUi/LiquidUi.History.webp" width="260" alt="Liquid History" /> | <img src="./assets/LiquidUi/LiquidUi.Rooms.webp" width="260" alt="Liquid Rooms" /> | <img src="./assets/LiquidUi/LiquidUi.Settings.webp" width="260" alt="Liquid Settings" /> |
+| <img src="https://github.com/user-attachments/assets/d3e17eb4-aec2-40db-a14a-7d92c14f1d92" width="260" alt="Liquid History" /> | <img src="https://github.com/user-attachments/assets/8207c8bb-b4ad-41ad-9290-6ff1a9b81fcf" width="260" alt="Liquid Rooms" /> | <img src="https://github.com/user-attachments/assets/966942e6-6b53-47e3-9409-1104c03fd0ed" width="260" alt="Liquid Settings" /> |
 
 </details>
 
@@ -126,23 +126,23 @@ Whozit features three fully realized design systems switchable on the fly from *
 <br/>
 
 <div align="center">
-  <img src="./assets/M3E/M3E.Collage.webp" alt="Material 3 Expressive Collage" width="90%" style="border-radius: 12px;" />
+  <img src="https://github.com/user-attachments/assets/4143bb73-8bb0-4890-b099-e58e5d541ba3" alt="Material 3 Expressive Collage" width="90%" style="border-radius: 12px;" />
 </div>
 
 <br/>
 
 <div align="center">
-  <img src="./assets/M3E/M3E.Demo.webp" width="320" alt="M3E Demo" />
+  <video src="https://github.com/user-attachments/assets/1dd11527-0fb8-41c5-89c3-c8f09d36bbcf" autoplay loop muted playsinline width="320" style="border-radius: 12px;"></video>
   <p><em>Google Material 3 Expressive token-driven animations and fluid interactions.</em></p>
 </div>
 
 | Dashboard | Calendar | Schedules |
 | :---: | :---: | :---: |
-| <img src="./assets/M3E/M3E.Dashboard.webp" width="260" alt="M3E Dashboard" /> | <img src="./assets/M3E/M3E.Calendar.webp" width="260" alt="M3E Calendar" /> | <img src="./assets/M3E/M3E.Schedules.webp" width="260" alt="M3E Schedules" /> |
+| <img src="https://github.com/user-attachments/assets/7a72d616-cb16-4d92-ba8e-ae8e0d20061e" width="260" alt="M3E Dashboard" /> | <img src="https://github.com/user-attachments/assets/94033e16-a5fa-4fba-a106-10049f469c63" width="260" alt="M3E Calendar" /> | <img src="https://github.com/user-attachments/assets/c286bf5a-cfe7-4492-9de9-73f9d16d504c" width="260" alt="M3E Schedules" /> |
 
 | History | Rooms | Settings |
 | :---: | :---: | :---: |
-| <img src="./assets/M3E/M3E.History.webp" width="260" alt="M3E History" /> | <img src="./assets/M3E/M3E.Rooms.webp" width="260" alt="M3E Rooms" /> | <img src="./assets/M3E/M3E.Settings.webp" width="260" alt="M3E Settings" /> |
+| <img src="https://github.com/user-attachments/assets/f80f2f80-e261-4900-8782-c9bbc2da6575" width="260" alt="M3E History" /> | <img src="https://github.com/user-attachments/assets/00ab33db-a543-4500-a73a-072e277c4ca7" width="260" alt="M3E Rooms" /> | <img src="https://github.com/user-attachments/assets/5212d01a-0bc0-41da-bf02-ba061ecc1f79" width="260" alt="M3E Settings" /> |
 
 </details>
 
@@ -152,23 +152,23 @@ Whozit features three fully realized design systems switchable on the fly from *
 <br/>
 
 <div align="center">
-  <img src="./assets/Gaussian/Gaussian.Collage.webp" alt="Gaussian Blur Collage" width="90%" style="border-radius: 12px;" />
+  <img src="https://github.com/user-attachments/assets/f784d0d6-cd80-47fb-9ab7-2dbe14ce5c94" alt="Gaussian Blur Collage" width="90%" style="border-radius: 12px;" />
 </div>
 
 <br/>
 
 <div align="center">
-  <img src="./assets/Gaussian/Gaussian.Demo.webp" width="320" alt="Gaussian Blur Demo" />
+  <video src="https://github.com/user-attachments/assets/a55d5be5-6f6b-463a-b2b2-ac398f8c7f76" autoplay loop muted playsinline width="320" style="border-radius: 12px;"></video>
   <p><em>Gaussian depth filtering with adaptive contrast adjustments.</em></p>
 </div>
 
 | Dashboard | Calendar | Schedules |
 | :---: | :---: | :---: |
-| <img src="./assets/Gaussian/Gaussian.Dashboard.webp" width="260" alt="Gaussian Dashboard" /> | <img src="./assets/Gaussian/Gaussian.Calendar.webp" width="260" alt="Gaussian Calendar" /> | <img src="./assets/Gaussian/Gaussian.Schedules.webp" width="260" alt="Gaussian Schedules" /> |
+| <img src="https://github.com/user-attachments/assets/b8c394c6-3280-431e-ada7-d9bd15d04049" width="260" alt="Gaussian Dashboard" /> | <img src="https://github.com/user-attachments/assets/ea280e40-83f0-4d75-933e-281b62cb3eb1" width="260" alt="Gaussian Calendar" /> | <img src="https://github.com/user-attachments/assets/a3eaa5de-d3ff-4cdf-84da-f0000f3fd1dc" width="260" alt="Gaussian Schedules" /> |
 
 | History | Rooms | Settings |
 | :---: | :---: | :---: |
-| <img src="./assets/Gaussian/Gaussian.History.webp" width="260" alt="Gaussian History" /> | <img src="./assets/Gaussian/Gaussian.Rooms.webp" width="260" alt="Gaussian Rooms" /> | <img src="./assets/Gaussian/Gaussian.Settings.webp" width="260" alt="Gaussian Settings" /> |
+| <img src="https://github.com/user-attachments/assets/bccf5b0c-73f7-4f34-b071-b1fcc82f84f5" width="260" alt="Gaussian History" /> | <img src="https://github.com/user-attachments/assets/546db990-f078-459a-84e7-ed8988490842" width="260" alt="Gaussian Rooms" /> | <img src="https://github.com/user-attachments/assets/7b8a30d3-db50-40a3-b9fd-34b3dd29f7b8" width="260" alt="Gaussian Settings" /> |
 
 </details>
 

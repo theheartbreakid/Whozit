@@ -241,7 +241,7 @@ fun LiquidApp(
                             Screen.Rooms.route, Screen.History.route, Screen.Settings.route
                         )
                         val dockState = remember(showDock) { com.crescentapps.whozit.presentation.theme.DockSafeAreaState().apply { dockHeight = if (showDock) 100.dp else 0.dp } }
-                        
+
                         CompositionLocalProvider(
                             com.crescentapps.whozit.presentation.theme.LocalDockSafeArea provides dockState
                         ) {

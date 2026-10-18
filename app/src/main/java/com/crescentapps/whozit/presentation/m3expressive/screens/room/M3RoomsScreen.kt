@@ -185,7 +185,7 @@ fun M3RoomsScreen(
                 ),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(uiState.rooms) { room ->
+                items(uiState.rooms, key = { it.id }) { room ->
                     WhozitExpressiveCard(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(24.dp),

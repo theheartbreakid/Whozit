@@ -62,9 +62,12 @@ fun GaussianBlurBackdropHost(
         }
     }
 
+    val rootAdaptiveColor = if (colors.isDark) Color.White else Color.Black
+
     CompositionLocalProvider(
         LocalAppBackdrop provides backdrop,
-        com.crescentapps.whozit.presentation.catalog.utils.LocalBackdrop provides backdrop
+        com.crescentapps.whozit.presentation.catalog.utils.LocalBackdrop provides backdrop,
+        com.crescentapps.whozit.presentation.components.LocalPrismalAdaptiveColor provides rootAdaptiveColor
     ) {
         Box(modifier = modifier.fillMaxSize()) {
             // Backdrop Source Layer — Captured by backdrop engine

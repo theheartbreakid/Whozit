@@ -1,5 +1,7 @@
 package com.crescentapps.whozit.presentation.gaussianblur.screens
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -50,7 +52,7 @@ fun GaussianRoomListScreen(
     onRoomClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val colors = LocalGaussianBlurColors.current
 
     Column(
@@ -248,7 +250,7 @@ fun GaussianCreateRoomScreen(
     onRoomCreated: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val colors = LocalGaussianBlurColors.current
 
@@ -577,7 +579,7 @@ fun GaussianJoinRoomScreen(
     onJoinedSuccessfully: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val colors = LocalGaussianBlurColors.current
 
     var roomCodeInput by remember { mutableStateOf(initialRoomCode.orEmpty()) }
@@ -768,7 +770,7 @@ fun GaussianRoomDetailScreen(
     onScheduleClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val colors = LocalGaussianBlurColors.current
     var showInviteDialog by remember { mutableStateOf(false) }
