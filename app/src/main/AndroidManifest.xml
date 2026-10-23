@@ -26,6 +26,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Whozit">
 
+        <profileable android:shell="true"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

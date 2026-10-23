@@ -21,6 +21,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -139,10 +140,16 @@ fun M3HomeScreen(
             val firstPending = pendingTurns.firstOrNull() ?: uiState.filteredTurns.firstOrNull()
             val remainingFiltered = uiState.filteredTurns.filter { it != firstPending }
 
+            val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+            androidx.compose.runtime.CompositionLocalProvider(
+                com.crescentapps.whozit.presentation.components.LocalScrollInProgress provides { listState.isScrollInProgress }
+            ) {
             LazyColumn(
+                state = listState,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding),
+                    .padding(padding)
+                    .testTag("today_list"),
                 contentPadding = PaddingValues(
                     start = ExpressiveTokens.spacing.normal,
                     end = ExpressiveTokens.spacing.normal,
@@ -227,6 +234,7 @@ fun M3HomeScreen(
                 }
             }
         }
+    }
     }
 
     if (turnForAmountDialog != null) {

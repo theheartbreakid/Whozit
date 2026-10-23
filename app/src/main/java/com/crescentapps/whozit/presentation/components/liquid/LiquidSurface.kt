@@ -48,20 +48,40 @@ fun LiquidSurface(
 
     val glassSettings = LocalGlassSettings.current
     val glassIntensity = LocalGlassIntensity.current
+    val density = androidx.compose.ui.platform.LocalDensity.current
+
     val actualShape = remember(shape, glassSettings.cornerRadius) {
         shape ?: RoundedCornerShape(glassSettings.cornerRadius.dp)
     }
     val isLuminanceRoot = !LocalAdaptiveLuminanceActive.current && adaptiveLuminance
     val layer = if (isLuminanceRoot) rememberGraphicsLayer() else null
 
-    val effectsBlock: BackdropEffectScope.() -> Unit = remember(glassSettings, glassIntensity) {
+    val blurPx = remember(density, glassSettings.blurRadius, glassIntensity) {
+        with(density) { glassSettings.blurRadius.dp.toPx() } * glassIntensity
+    }
+    val refractionHeightPx = remember(density, glassSettings.refractionHeight, glassIntensity) {
+        with(density) { glassSettings.refractionHeight.dp.toPx() } * glassIntensity
+    }
+    val refractionAmountPx = remember(density, glassSettings.refractionAmount, glassIntensity) {
+        with(density) { glassSettings.refractionAmount.dp.toPx() } * glassIntensity
+    }
+    val chromaticAberrationVal = remember(glassSettings.chromaticAberration, glassIntensity) {
+        glassSettings.chromaticAberration * glassIntensity
+    }
+
+    val effectsBlock: BackdropEffectScope.() -> Unit = remember(
+        blurPx,
+        refractionHeightPx,
+        refractionAmountPx,
+        chromaticAberrationVal
+    ) {
         {
             vibrancy()
-            blur(glassSettings.blurRadius.dp.toPx() * glassIntensity)
+            blur(blurPx)
             liquidLens(
-                refractionHeight = glassSettings.refractionHeight.dp.toPx() * glassIntensity,
-                refractionAmount = glassSettings.refractionAmount.dp.toPx() * glassIntensity,
-                chromaticAberration = glassSettings.chromaticAberration * glassIntensity
+                refractionHeight = refractionHeightPx,
+                refractionAmount = refractionAmountPx,
+                chromaticAberration = chromaticAberrationVal
             )
         }
     }

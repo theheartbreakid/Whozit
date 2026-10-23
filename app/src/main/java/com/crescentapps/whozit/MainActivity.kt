@@ -49,6 +49,8 @@ import com.crescentapps.whozit.presentation.screens.settings.SettingsViewModel
 import com.crescentapps.whozit.presentation.theme.WhozitAppTheme
 import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 
 class MainActivity : ComponentActivity() {
 
@@ -56,7 +58,8 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestPermission()
     ) { /* Permission result handled */ }
 
-    private val incomingDeepLinkCode = kotlinx.coroutines.flow.MutableStateFlow<String?>(null)
+    private val _incomingDeepLinkCode = kotlinx.coroutines.flow.MutableStateFlow<String?>(null)
+    private val incomingDeepLinkCode = _incomingDeepLinkCode.asStateFlow()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,14 +78,38 @@ class MainActivity : ComponentActivity() {
         handleIncomingIntent(intent)
 
         setContent {
-            val prefs by app.userPreferencesRepository.userPreferencesFlow.collectAsStateWithLifecycle(
+            val basePrefs by app.userPreferencesRepository.userPreferencesFlow.collectAsStateWithLifecycle(
                 initialValue = com.crescentapps.whozit.data.preferences.UserPreferences()
             )
             val deepLinkCode by incomingDeepLinkCode.collectAsStateWithLifecycle()
 
+            val benchmarkOverrideMode = remember(intent) {
+                getValidatedBenchmarkUiSystemMode(intent)
+            }
+            val effectivePrefs = remember(basePrefs, benchmarkOverrideMode) {
+                if (benchmarkOverrideMode != null) {
+                    basePrefs.copy(uiSystemMode = benchmarkOverrideMode)
+                } else {
+                    basePrefs
+                }
+            }
+
+            val shouldSeedDemoData = remember(intent) {
+                intent?.getBooleanExtra("seed_demo_data", false) == true || benchmarkOverrideMode != null
+            }
+
+            LaunchedEffect(shouldSeedDemoData) {
+                if (shouldSeedDemoData) {
+                    val currentSchedules = app.repository.allSchedules.firstOrNull()
+                    if (currentSchedules.isNullOrEmpty()) {
+                        seedBenchmarkDemoData(app.repository)
+                    }
+                }
+            }
+
             com.crescentapps.whozit.presentation.WhozitApp(
                 app = app,
-                prefs = prefs,
+                prefs = effectivePrefs,
                 deepLinkCode = deepLinkCode
             )
         }
@@ -94,12 +121,72 @@ class MainActivity : ComponentActivity() {
         handleIncomingIntent(intent)
     }
 
+    private fun getValidatedBenchmarkUiSystemMode(intent: android.content.Intent?): com.crescentapps.whozit.core.model.UiSystemMode? {
+        val rawMode = intent?.getStringExtra("benchmark_ui_system_mode")
+            ?: intent?.getStringExtra("ui_system_mode")
+            ?: return null
+        return when (rawMode.uppercase()) {
+            "LIQUID", "LIQUID_UI" -> com.crescentapps.whozit.core.model.UiSystemMode.LIQUID
+            "GAUSSIAN_BLUR", "GAUSSIAN", "GAUSSIAN_BLUR_UI" -> com.crescentapps.whozit.core.model.UiSystemMode.GAUSSIAN_BLUR
+            "MATERIAL_3_EXPRESSIVE", "MATERIAL_3", "EXPRESSIVE" -> com.crescentapps.whozit.core.model.UiSystemMode.MATERIAL_3_EXPRESSIVE
+            else -> null
+        }
+    }
+
+    private suspend fun seedBenchmarkDemoData(repository: com.crescentapps.whozit.data.repository.WhozitRepository) {
+        val p1Id = repository.saveParticipant(com.crescentapps.whozit.core.model.Participant(name = "Mohsin", colorHex = "#3B82F6"))
+        val p2Id = repository.saveParticipant(com.crescentapps.whozit.core.model.Participant(name = "Mom", colorHex = "#EC4899"))
+        val p3Id = repository.saveParticipant(com.crescentapps.whozit.core.model.Participant(name = "Dad", colorHex = "#10B981"))
+
+        val s1 = com.crescentapps.whozit.core.model.Schedule(
+            name = "Family Savings",
+            description = "Daily contribution rotation",
+            type = com.crescentapps.whozit.core.model.ScheduleType.MONEY,
+            currencyCode = "INR",
+            defaultAmount = 500.0,
+            frequencyType = com.crescentapps.whozit.core.model.FrequencyType.DAILY,
+            frequencyInterval = 1,
+            startDate = com.crescentapps.whozit.core.util.DateUtils.today().minusDays(3).let { com.crescentapps.whozit.core.util.DateUtils.format(it) }
+        )
+        repository.saveScheduleWithDetails(s1, listOf(p1Id, p2Id, p3Id), listOf(p1Id, p2Id, p3Id))
+
+        val s2 = com.crescentapps.whozit.core.model.Schedule(
+            name = "Kitchen Cleaning",
+            description = "Daily evening dishwashing & counter cleanup",
+            type = com.crescentapps.whozit.core.model.ScheduleType.TASK,
+            frequencyType = com.crescentapps.whozit.core.model.FrequencyType.DAILY,
+            frequencyInterval = 1,
+            startDate = com.crescentapps.whozit.core.util.DateUtils.today().minusDays(1).let { com.crescentapps.whozit.core.util.DateUtils.format(it) }
+        )
+        repository.saveScheduleWithDetails(s2, listOf(p1Id, p2Id, p3Id), listOf(p2Id, p3Id, p1Id))
+
+        val s3 = com.crescentapps.whozit.core.model.Schedule(
+            name = "Pet Duty & Feeding",
+            description = "Morning and evening pet care",
+            type = com.crescentapps.whozit.core.model.ScheduleType.RESPONSIBILITY,
+            frequencyType = com.crescentapps.whozit.core.model.FrequencyType.DAILY,
+            frequencyInterval = 1,
+            startDate = com.crescentapps.whozit.core.util.DateUtils.today().minusDays(2).let { com.crescentapps.whozit.core.util.DateUtils.format(it) }
+        )
+        repository.saveScheduleWithDetails(s3, listOf(p1Id, p2Id, p3Id), listOf(p3Id, p1Id, p2Id))
+
+        val s4 = com.crescentapps.whozit.core.model.Schedule(
+            name = "Grocery & Restock",
+            description = "Weekly household supplies",
+            type = com.crescentapps.whozit.core.model.ScheduleType.GENERAL,
+            frequencyType = com.crescentapps.whozit.core.model.FrequencyType.DAILY,
+            frequencyInterval = 1,
+            startDate = com.crescentapps.whozit.core.util.DateUtils.today().minusDays(4).let { com.crescentapps.whozit.core.util.DateUtils.format(it) }
+        )
+        repository.saveScheduleWithDetails(s4, listOf(p1Id, p2Id, p3Id), listOf(p1Id, p3Id, p2Id))
+    }
+
     private fun handleIncomingIntent(intent: android.content.Intent?) {
         val uri = intent?.data ?: return
         val rawUriString = uri.toString()
         val extractedCode = com.crescentapps.whozit.core.util.QRCodeUtils.extractRoomCode(rawUriString)
         if (!extractedCode.isNullOrBlank()) {
-            incomingDeepLinkCode.value = extractedCode
+            _incomingDeepLinkCode.value = extractedCode
         }
     }
 }

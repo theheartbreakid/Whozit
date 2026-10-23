@@ -63,7 +63,7 @@ val LocalPrismalSceneVersion = compositionLocalOf { 0L }
 val LocalAdaptiveLuminanceActive = compositionLocalOf { false }
 val LocalAdaptiveLuminanceEnabled = compositionLocalOf { true }
 val LocalAdaptiveLuminanceInterval = compositionLocalOf { 1000 }
-val LocalScrollInProgress = compositionLocalOf { false }
+val LocalScrollInProgress = compositionLocalOf<() -> Boolean> { { false } }
 val LocalGlassIntensity = compositionLocalOf { 1.0f }
 val LocalHapticIntensity = compositionLocalOf { 1.0f }
 val LocalHapticEnabled = compositionLocalOf { true }
@@ -166,12 +166,12 @@ fun AdaptiveLuminanceProvider(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    val isScrollInProgress = LocalScrollInProgress.current
+    val isScrollInProgressProvider = LocalScrollInProgress.current
 
-    LaunchedEffect(layer, globalEnabled, fallbackMode, paletteColor, customColor, sceneVersion, lastPosition, isAppVisible, isLightTheme, whozitColors, isScrollInProgress) {
+    LaunchedEffect(layer, globalEnabled, fallbackMode, paletteColor, customColor, sceneVersion, lastPosition, isAppVisible, isLightTheme, whozitColors) {
         if (globalEnabled && layer != null && isAppVisible) {
             while (true) {
-                if (!isScrollInProgress) {
+                if (!isScrollInProgressProvider()) {
                     try {
                         val imageBitmap = layer.toImageBitmap()
                         val rawAndroidBitmap = imageBitmap.asAndroidBitmap()
@@ -204,7 +204,7 @@ fun AdaptiveLuminanceProvider(
             // FALLBACK PATH (Adaptive Luminance OFF)
             if (fallbackMode == 0 && layer != null) { // AUTO
                 while (true) {
-                    if (!isScrollInProgress) {
+                    if (!isScrollInProgressProvider()) {
                         try {
                             val imageBitmap = layer.toImageBitmap()
                             val rawAndroidBitmap = imageBitmap.asAndroidBitmap()
@@ -240,7 +240,7 @@ fun AdaptiveLuminanceProvider(
                 val baseColor = if (fallbackMode == 1) Color(paletteColor) else Color(customColor)
                 if (layer != null) {
                     while (true) {
-                        if (!isScrollInProgress) {
+                        if (!isScrollInProgressProvider()) {
                             try {
                                 val imageBitmap = layer.toImageBitmap()
                                 val rawAndroidBitmap = imageBitmap.asAndroidBitmap()

@@ -1,3 +1,6 @@
+# Keep MainActivity for Macrobenchmark launch intents
+-keep class com.crescentapps.whozit.MainActivity
+
 # Whozit Proguard / R8 Rules
 
 # KotlinX Serialization

@@ -22,6 +22,9 @@ prismal = "1.0.5"
 camerax = "1.4.1"
 coil = "2.6.0"
 kyantBackdrop = "2.0.0"
+benchmarkMacroJunit4 = "1.5.0"
+uiautomator = "2.4.0"
+baselineprofile = "1.5.0"
 
 [libraries]
 androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "camerax" }
@@ -59,9 +62,13 @@ androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = 
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workManager" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmarkMacroJunit4" }
+androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+androidx-baselineprofile = { id = "androidx.baselineprofile", version.ref = "baselineprofile" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

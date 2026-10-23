@@ -61,14 +61,22 @@ fun Modifier.gaussianGlass(
     }
 
     val density = LocalDensity.current
-    val blurPx = with(density) { blurRadiusDp.dp.toPx() } * GaussianBlurTokens.GlassResolutionScale
-    val lensHeightPx = with(density) { refractionHeightDp.dp.toPx() } * GaussianBlurTokens.GlassResolutionScale
-    val lensAmountPx = with(density) { refractionAmountDp.dp.toPx() } * GaussianBlurTokens.GlassResolutionScale
+    val blurPx = androidx.compose.runtime.remember(density, blurRadiusDp) {
+        with(density) { blurRadiusDp.dp.toPx() } * GaussianBlurTokens.GlassResolutionScale
+    }
+    val lensHeightPx = androidx.compose.runtime.remember(density, refractionHeightDp) {
+        with(density) { refractionHeightDp.dp.toPx() } * GaussianBlurTokens.GlassResolutionScale
+    }
+    val lensAmountPx = androidx.compose.runtime.remember(density, refractionAmountDp) {
+        with(density) { refractionAmountDp.dp.toPx() } * GaussianBlurTokens.GlassResolutionScale
+    }
 
-    val surfaceTintColor = if (isDark) {
-        Color(0xFF121212)
-    } else {
-        Color(0xFFFAFAFA)
+    val surfaceTintColor = androidx.compose.runtime.remember(isDark) {
+        if (isDark) {
+            Color(0xFF121212)
+        } else {
+            Color(0xFFFAFAFA)
+        }
     }
 
     return drawBackdrop(

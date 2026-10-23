@@ -252,7 +252,7 @@ fun M3ScheduleDetailScreen(
                 )
             }
 
-            items(uiState.upcomingTurns) { (p, date) ->
+            items(uiState.upcomingTurns, key = { (p, date) -> "${p.id}_$date" }) { (p, date) ->
                 WhozitExpressiveCard(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(18.dp),

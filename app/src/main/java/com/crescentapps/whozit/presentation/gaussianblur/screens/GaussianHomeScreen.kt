@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Undo
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -100,8 +101,13 @@ fun GaussianHomeScreen(
                 onAction = onCreateSchedule
             )
         } else {
+            val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+            androidx.compose.runtime.CompositionLocalProvider(
+                com.crescentapps.whozit.presentation.components.LocalScrollInProgress provides { listState.isScrollInProgress }
+            ) {
             LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
+                state = listState,
+                modifier = Modifier.fillMaxWidth().testTag("today_list"),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(bottom = 24.dp).withDockPadding()
             ) {
@@ -312,6 +318,7 @@ fun GaussianHomeScreen(
                 }
             }
         }
+    }
     }
 
     // Expense Confirmation Dialog

@@ -25,3 +25,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Whozit"
 include(":app")
+include(":baselineprofile")

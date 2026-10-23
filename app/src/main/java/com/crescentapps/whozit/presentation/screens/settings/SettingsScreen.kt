@@ -126,7 +126,7 @@ fun SettingsScreen(
     }
 
     CompositionLocalProvider(
-        LocalScrollInProgress provides listState.isScrollInProgress,
+        LocalScrollInProgress provides { listState.isScrollInProgress },
         LocalGlassSettings provides liveGlassSettings
     ) {
         Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {

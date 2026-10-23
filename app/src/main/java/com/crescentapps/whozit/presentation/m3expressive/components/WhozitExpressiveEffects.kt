@@ -79,6 +79,9 @@ fun Modifier.expressiveLightRay(
             )
             
             val outline = shape.createOutline(size, layoutDirection, this)
+            val roundedPath = if (outline is Outline.Rounded) {
+                Path().apply { addRoundRect(outline.roundRect) }
+            } else null
             
             onDrawWithContent {
                 drawContent()
@@ -91,12 +94,13 @@ fun Modifier.expressiveLightRay(
                         )
                     }
                     is Outline.Rounded -> {
-                        val path = Path().apply { addRoundRect(outline.roundRect) }
-                        clipPath(path) {
-                            drawRect(
-                                brush = gradient,
-                                blendMode = BlendMode.Screen
-                            )
+                        if (roundedPath != null) {
+                            clipPath(roundedPath) {
+                                drawRect(
+                                    brush = gradient,
+                                    blendMode = BlendMode.Screen
+                                )
+                            }
                         }
                     }
                     is Outline.Generic -> {

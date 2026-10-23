@@ -63,6 +63,11 @@ fun WhozitBackdropBackground(
         )
     }
 
+    val blob1 = remember(isDark) { if (isDark) Color(0x556366F1) else Color(0x38818CF8) } // Indigo
+    val blob2 = remember(isDark) { if (isDark) Color(0x45A855F7) else Color(0x30C084FC) } // Purple
+    val blob3 = remember(isDark) { if (isDark) Color(0x4006B6D4) else Color(0x2E06B6D4) } // Cyan
+    val blob4 = remember(isDark) { if (isDark) Color(0x35EC4899) else Color(0x28F472B6) } // Pink
+
     Canvas(
         modifier = modifier
             .fillMaxSize()
@@ -72,11 +77,6 @@ fun WhozitBackdropBackground(
 
         val w = size.width
         val h = size.height
-
-        val blob1 = if (isDark) Color(0x556366F1) else Color(0x38818CF8) // Indigo
-        val blob2 = if (isDark) Color(0x45A855F7) else Color(0x30C084FC) // Purple
-        val blob3 = if (isDark) Color(0x4006B6D4) else Color(0x2E06B6D4) // Cyan
-        val blob4 = if (isDark) Color(0x35EC4899) else Color(0x28F472B6) // Pink
 
         // Fluid Blob 1 - Top Left
         val x1 = w * (0.28f + 0.10f * sin(phase.toDouble()).toFloat())
