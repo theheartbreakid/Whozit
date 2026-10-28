@@ -129,7 +129,7 @@ fun SettingsScreen(
         LocalScrollInProgress provides { listState.isScrollInProgress },
         LocalGlassSettings provides liveGlassSettings
     ) {
-        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        Box(modifier = modifier.fillMaxSize().statusBarsPadding(), contentAlignment = Alignment.TopCenter) {
             LazyColumn(
                 state = listState,
                 modifier = Modifier
@@ -266,6 +266,16 @@ fun SettingsScreen(
                             checked = prefs.adaptiveLuminance,
                             backdrop = backdrop
                         ) { viewModel.setAdaptiveLuminance(it) }
+
+                        HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp), color = adaptiveColor.copy(alpha = 0.05f))
+
+                        SettingsToggleItem(
+                            title = "Text Outline",
+                            subtitle = "Subtle contrasting border around text",
+                            icon = Icons.Outlined.Title,
+                            checked = prefs.isTextOutlineEnabled,
+                            backdrop = backdrop
+                        ) { viewModel.setTextOutlineEnabled(it) }
 
                         AnimatedVisibility(
                             visible = prefs.adaptiveLuminance,

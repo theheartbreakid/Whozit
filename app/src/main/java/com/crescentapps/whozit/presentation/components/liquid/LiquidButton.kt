@@ -89,6 +89,7 @@ fun LiquidButton(
     val glassSettings = LocalGlassSettings.current
     val isLuminanceRoot = !LocalAdaptiveLuminanceActive.current && adaptiveLuminance
     val layer = if (isLuminanceRoot) rememberGraphicsLayer() else null
+    val isScrollInProgressProvider = com.crescentapps.whozit.presentation.components.LocalScrollInProgress.current
 
     AdaptiveLuminanceProvider(layer = layer, enabled = isLuminanceRoot) {
         Row(
@@ -102,7 +103,7 @@ fun LiquidButton(
                         liquidLens(
                             refractionHeight = glassSettings.refractionHeight.dp.toPx(),
                             refractionAmount = glassSettings.refractionAmount.dp.toPx(),
-                            chromaticAberration = glassSettings.chromaticAberration
+                            chromaticAberration = if (isScrollInProgressProvider()) 0f else glassSettings.chromaticAberration
                         )
                     },
                     layerBlock = if (isInteractive) {
@@ -136,7 +137,7 @@ fun LiquidButton(
                         if (surfaceColor.isSpecified) {
                             drawRect(surfaceColor)
                         }
-                        if (isLuminanceRoot) {
+                        if (isLuminanceRoot && !isScrollInProgressProvider()) {
                             layer?.record(
                                 density = this,
                                 layoutDirection = layoutDirection,

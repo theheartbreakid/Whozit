@@ -170,40 +170,16 @@ fun AdaptiveLuminanceProvider(
 
     LaunchedEffect(layer, globalEnabled, fallbackMode, paletteColor, customColor, sceneVersion, lastPosition, isAppVisible, isLightTheme, whozitColors) {
         if (globalEnabled && layer != null && isAppVisible) {
+            var wasScrolling = false
             while (true) {
-                if (!isScrollInProgressProvider()) {
-                    try {
-                        val imageBitmap = layer.toImageBitmap()
-                        val rawAndroidBitmap = imageBitmap.asAndroidBitmap()
-                        val scaledBitmap = Bitmap.createScaledBitmap(rawAndroidBitmap, 5, 5, true)
-                        val thumbnail = scaledBitmap.asImageBitmap()
-                        thumbnail.readPixels(buffer)
-                        if (scaledBitmap != rawAndroidBitmap) {
-                            scaledBitmap.recycle()
-                        }
-
-                        var luminanceSum = 0.0
-                        for (argb in buffer) {
-                            val r = (argb shr 16 and 0xFF) / 255f
-                            val g = (argb shr 8 and 0xFF) / 255f
-                            val b = (argb and 0xFF) / 255f
-                            luminanceSum += 0.2126 * r + 0.7152 * g + 0.0722 * b
-                        }
-                        val averageLuminance = (luminanceSum / buffer.size).toFloat()
-                        val targetColor = if (averageLuminance > 0.45f) Color.Black else Color.White
-                        if (contentColorAnimation.targetValue != targetColor) {
-                            contentColorAnimation.animateTo(targetColor, tween(300, easing = LinearOutSlowInEasing))
-                        }
-                    } catch (e: Exception) {
-                        // Layer not yet drawn/ready; retain current contrast-safe color
+                val isScrolling = isScrollInProgressProvider()
+                if (isScrolling) {
+                    wasScrolling = true
+                } else {
+                    if (wasScrolling) {
+                        wasScrolling = false
+                        delay(150L) // Transition-aware post-scroll settling delay to allow GPU pipeline to clear
                     }
-                }
-                delay(refreshInterval.toLong().coerceAtLeast(500L))
-            }
-        } else if (!globalEnabled) {
-            // FALLBACK PATH (Adaptive Luminance OFF)
-            if (fallbackMode == 0 && layer != null) { // AUTO
-                while (true) {
                     if (!isScrollInProgressProvider()) {
                         try {
                             val imageBitmap = layer.toImageBitmap()
@@ -215,22 +191,66 @@ fun AdaptiveLuminanceProvider(
                                 scaledBitmap.recycle()
                             }
 
-                            var rSum = 0f; var gSum = 0f; var bSum = 0f
-                            buffer.forEach { argb ->
-                                rSum += (argb shr 16 and 0xFF) / 255f
-                                gSum += (argb shr 8 and 0xFF) / 255f
-                                bSum += (argb and 0xFF) / 255f
+                            var luminanceSum = 0.0
+                            for (argb in buffer) {
+                                val r = (argb shr 16 and 0xFF) / 255f
+                                val g = (argb shr 8 and 0xFF) / 255f
+                                val b = (argb and 0xFF) / 255f
+                                luminanceSum += 0.2126 * r + 0.7152 * g + 0.0722 * b
                             }
-                            val avgColor = Color(rSum / 25, gSum / 25, bSum / 25)
-                            val avgLuminance = 0.2126f * (rSum / 25) + 0.7152f * (gSum / 25) + 0.0722f * (bSum / 25)
-                            val result = deriveReadableColor(avgColor, avgLuminance)
-                            if (contentColorAnimation.targetValue != result) {
-                                contentColorAnimation.animateTo(result, tween(300))
+                            val averageLuminance = (luminanceSum / buffer.size).toFloat()
+                            val targetColor = if (averageLuminance > 0.45f) Color.Black else Color.White
+                            if (contentColorAnimation.targetValue != targetColor) {
+                                contentColorAnimation.animateTo(targetColor, tween(300, easing = LinearOutSlowInEasing))
                             }
                         } catch (e: Exception) {
-                            val defaultColor = whozitColors.resolveForeground(whozitColors.surface)
-                            if (contentColorAnimation.targetValue != defaultColor) {
-                                contentColorAnimation.animateTo(defaultColor, tween(200))
+                            // Layer not yet drawn/ready; retain current contrast-safe color
+                        }
+                    }
+                }
+                delay(refreshInterval.toLong().coerceAtLeast(500L))
+            }
+        } else if (!globalEnabled) {
+            // FALLBACK PATH (Adaptive Luminance OFF)
+            if (fallbackMode == 0 && layer != null) { // AUTO
+                var wasScrolling = false
+                while (true) {
+                    val isScrolling = isScrollInProgressProvider()
+                    if (isScrolling) {
+                        wasScrolling = true
+                    } else {
+                        if (wasScrolling) {
+                            wasScrolling = false
+                            delay(150L) // Transition-aware post-scroll settling delay
+                        }
+                        if (!isScrollInProgressProvider()) {
+                            try {
+                                val imageBitmap = layer.toImageBitmap()
+                                val rawAndroidBitmap = imageBitmap.asAndroidBitmap()
+                                val scaledBitmap = Bitmap.createScaledBitmap(rawAndroidBitmap, 5, 5, true)
+                                val thumbnail = scaledBitmap.asImageBitmap()
+                                thumbnail.readPixels(buffer)
+                                if (scaledBitmap != rawAndroidBitmap) {
+                                    scaledBitmap.recycle()
+                                }
+
+                                var rSum = 0f; var gSum = 0f; var bSum = 0f
+                                buffer.forEach { argb ->
+                                    rSum += (argb shr 16 and 0xFF) / 255f
+                                    gSum += (argb shr 8 and 0xFF) / 255f
+                                    bSum += (argb and 0xFF) / 255f
+                                }
+                                val avgColor = Color(rSum / 25, gSum / 25, bSum / 25)
+                                val avgLuminance = 0.2126f * (rSum / 25) + 0.7152f * (gSum / 25) + 0.0722f * (bSum / 25)
+                                val result = deriveReadableColor(avgColor, avgLuminance)
+                                if (contentColorAnimation.targetValue != result) {
+                                    contentColorAnimation.animateTo(result, tween(300))
+                                }
+                            } catch (e: Exception) {
+                                val defaultColor = whozitColors.resolveForeground(whozitColors.surface)
+                                if (contentColorAnimation.targetValue != defaultColor) {
+                                    contentColorAnimation.animateTo(defaultColor, tween(200))
+                                }
                             }
                         }
                     }

@@ -266,19 +266,12 @@ fun EmptyTurnState(
     actionText: String = "+ New Turn Schedule",
     onAction: () -> Unit
 ) {
-    val backdrop = LocalBackdrop.current ?: rememberLayerBackdrop()
+    val currentBackdrop = LocalBackdrop.current
+    val backdrop = currentBackdrop ?: rememberLayerBackdrop()
     val adaptiveColor = LocalPrismalAdaptiveColor.current
     val tokens = LocalWhozitColors.current
 
-    WhozitExpressiveCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp),
-        shape = RoundedCornerShape(28.dp),
-        colors = androidx.compose.material3.CardDefaults.cardColors(
-            containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceContainerLowest
-        )
-    ) {
+    val emptyContent = @Composable {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -290,13 +283,13 @@ fun EmptyTurnState(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(LocalWhozitColors.current.accent.copy(alpha = 0.15f)),
+                    .background(tokens.accent.copy(alpha = 0.15f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = null,
-                    tint = LocalWhozitColors.current.accent,
+                    tint = tokens.accent,
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -316,11 +309,46 @@ fun EmptyTurnState(
                 textAlign = TextAlign.Center
             )
 
-            WhozitExpressiveButton(
-                onClick = onAction,
-                text = actionText,
-                isPrimary = false
+            if (currentBackdrop != null) {
+                LiquidButton(
+                    onClick = onAction,
+                    backdrop = backdrop,
+                    surfaceColor = tokens.accent.copy(alpha = 0.2f),
+                    tint = tokens.accent.copy(alpha = 0.35f)
+                ) {
+                    Text(text = actionText, fontWeight = FontWeight.Bold, color = tokens.accent)
+                }
+            } else {
+                WhozitExpressiveButton(
+                    onClick = onAction,
+                    text = actionText,
+                    isPrimary = false
+                )
+            }
+        }
+    }
+
+    if (currentBackdrop != null) {
+        LiquidCard(
+            backdrop = backdrop,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp),
+            shape = RoundedCornerShape(28.dp)
+        ) {
+            emptyContent()
+        }
+    } else {
+        WhozitExpressiveCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp),
+            shape = RoundedCornerShape(28.dp),
+            colors = androidx.compose.material3.CardDefaults.cardColors(
+                containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceContainerLowest
             )
+        ) {
+            emptyContent()
         }
     }
 }

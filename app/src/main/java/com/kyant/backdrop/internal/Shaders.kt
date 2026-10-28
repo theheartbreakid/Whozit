@@ -117,6 +117,9 @@ half4 main(float2 coord) {
     float2 grad = normalize(gradSdRoundedRect(centeredCoord, halfSize, gradRadius) + depthEffect * normalize(centeredCoord));
     
     float2 refractedCoord = coord + d * grad;
+    if (chromaticAberration == 0.0) {
+        return content.eval(refractedCoord);
+    }
     float dispersionIntensity = chromaticAberration * ((centeredCoord.x * centeredCoord.y) / (halfSize.x * halfSize.y));
     float2 dispersedCoord = d * grad * dispersionIntensity;
     

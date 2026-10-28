@@ -57,7 +57,7 @@ fun CalendarScreen(
     val adaptiveColor = LocalPrismalAdaptiveColor.current
     var overrideTurnTarget by remember { mutableStateOf<ResolvedTurn?>(null) }
 
-    BoxWithConstraints(modifier = modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+    BoxWithConstraints(modifier = modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 16.dp)) {
         val isExpanded = maxWidth > 640.dp
 
         if (isExpanded) {

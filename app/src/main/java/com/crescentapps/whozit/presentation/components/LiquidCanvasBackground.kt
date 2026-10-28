@@ -48,8 +48,10 @@ fun WhozitBackdropBackground(
 
     // Dynamic fluid oscillation for refractive backdrop layers
     val infiniteTransition = rememberInfiniteTransition(label = "LiquidFlow")
+    val isScrollInProgressProvider = LocalScrollInProgress.current
+    val isScrollInProgress = isScrollInProgressProvider()
     
-    val phase by if (isReduceMotion || !isAppVisible) {
+    val phaseAnim by if (isReduceMotion || !isAppVisible) {
         remember { mutableFloatStateOf(0f) }
     } else {
         infiniteTransition.animateFloat(
@@ -61,6 +63,15 @@ fun WhozitBackdropBackground(
             ),
             label = "phase"
         )
+    }
+
+    // Freeze phase during active scroll flings to prevent 60 Hz invalidation of the backdrop Canvas
+    var frozenPhase by remember { mutableFloatStateOf(0f) }
+    val phase = if (isScrollInProgress) {
+        frozenPhase
+    } else {
+        frozenPhase = phaseAnim
+        phaseAnim
     }
 
     val blob1 = remember(isDark) { if (isDark) Color(0x556366F1) else Color(0x38818CF8) } // Indigo

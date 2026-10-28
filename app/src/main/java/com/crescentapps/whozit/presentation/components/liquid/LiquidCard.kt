@@ -63,27 +63,29 @@ fun LiquidCard(
     val layer = if (isLuminanceRoot) rememberGraphicsLayer() else null
     val haptic = rememberPrismalHaptic()
 
-    val effectsBlock: BackdropEffectScope.() -> Unit = remember(glassSettings, glassIntensity) {
+    val isScrollInProgressProvider = com.crescentapps.whozit.presentation.components.LocalScrollInProgress.current
+
+    val effectsBlock: BackdropEffectScope.() -> Unit = remember(glassSettings, glassIntensity, isScrollInProgressProvider) {
         val block: BackdropEffectScope.() -> Unit = {
             vibrancy()
             blur(glassSettings.blurRadius.dp.toPx() * glassIntensity)
             liquidLens(
                 refractionHeight = glassSettings.refractionHeight.dp.toPx(),
                 refractionAmount = glassSettings.refractionAmount.dp.toPx(),
-                chromaticAberration = glassSettings.chromaticAberration
+                chromaticAberration = if (isScrollInProgressProvider()) 0f else glassSettings.chromaticAberration
             )
         }
         block
     }
 
-    val onDrawBackdropBlock: DrawScope.(drawBackdrop: DrawScope.() -> Unit) -> Unit = remember(tint, isLuminanceRoot, layer) {
+    val onDrawBackdropBlock: DrawScope.(drawBackdrop: DrawScope.() -> Unit) -> Unit = remember(tint, isLuminanceRoot, layer, isScrollInProgressProvider) {
         val block: DrawScope.(drawBackdrop: DrawScope.() -> Unit) -> Unit = { drawBackdrop ->
             drawBackdrop()
             if (tint.isSpecified) {
                 drawRect(tint, blendMode = BlendMode.Hue)
                 drawRect(tint.copy(alpha = 0.05f))
             }
-            if (isLuminanceRoot) {
+            if (isLuminanceRoot && !isScrollInProgressProvider()) {
                 layer?.record(
                     density = this,
                     layoutDirection = layoutDirection,

@@ -53,6 +53,7 @@ data class UserPreferences(
     val fontTintCustomColor: Int = 0xFF6366F1.toInt(),
     val glassIntensity: Float = 1.0f,
     val isReduceMotion: Boolean = false,
+    val isTextOutlineEnabled: Boolean = false,
 
     // Material 3 Expressive Settings
     val m3DynamicColor: Boolean = true,
@@ -212,6 +213,7 @@ open class UserPreferencesRepository(private val context: Context? = null) {
         val FONT_TINT_CUSTOM_COLOR = intPreferencesKey("font_tint_custom_color")
         val GLASS_INTENSITY = floatPreferencesKey("glass_intensity")
         val IS_REDUCE_MOTION = booleanPreferencesKey("is_reduce_motion")
+        val IS_TEXT_OUTLINE_ENABLED = booleanPreferencesKey("is_text_outline_enabled")
 
         val M3_DYNAMIC_COLOR = booleanPreferencesKey("m3_dynamic_color")
         val M3_USE_EXPRESSIVE_MOTION = booleanPreferencesKey("m3_use_expressive_motion")
@@ -340,6 +342,7 @@ open class UserPreferencesRepository(private val context: Context? = null) {
             fontTintCustomColor = preferences[PreferencesKeys.FONT_TINT_CUSTOM_COLOR] ?: 0xFF6366F1.toInt(),
             glassIntensity = (preferences[PreferencesKeys.GLASS_INTENSITY] ?: Defaults.DEFAULT_GLASS_INTENSITY).coerceIn(0f, 1f),
             isReduceMotion = preferences[PreferencesKeys.IS_REDUCE_MOTION] ?: false,
+            isTextOutlineEnabled = preferences[PreferencesKeys.IS_TEXT_OUTLINE_ENABLED] ?: false,
 
             m3DynamicColor = preferences[PreferencesKeys.M3_DYNAMIC_COLOR] ?: true,
             m3UseExpressiveMotion = preferences[PreferencesKeys.M3_USE_EXPRESSIVE_MOTION] ?: true,
@@ -506,6 +509,10 @@ open class UserPreferencesRepository(private val context: Context? = null) {
 
     suspend fun setAdaptiveLuminance(enabled: Boolean) {
         context?.dataStore?.edit { it[PreferencesKeys.ADAPTIVE_LUMINANCE] = enabled }
+    }
+
+    suspend fun updateIsTextOutlineEnabled(enabled: Boolean) {
+        context?.dataStore?.edit { it[PreferencesKeys.IS_TEXT_OUTLINE_ENABLED] = enabled }
     }
 
     suspend fun setAdaptiveLuminanceInterval(interval: Int) {

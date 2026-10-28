@@ -190,7 +190,8 @@ fun LiquidApp(
                 LocalSoundFeedbackEnabled provides prefs.soundFeedbackEnabled,
                 LocalFontTintFallbackMode provides prefs.fontTintFallbackMode,
                 LocalFontTintPaletteColor provides prefs.fontTintPaletteColor,
-                LocalFontTintCustomColor provides prefs.fontTintCustomColor
+                LocalFontTintCustomColor provides prefs.fontTintCustomColor,
+                LocalTextOutlineEnabled provides prefs.isTextOutlineEnabled
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     if (prefs.backgroundImageUri.isNotBlank()) {
@@ -416,7 +417,8 @@ fun LiquidApp(
                                     Box(
                                         modifier = Modifier
                                             .fillMaxSize()
-                                            .padding(horizontal = 16.dp, vertical = 20.dp),
+                                            .windowInsetsPadding(WindowInsets.navigationBars)
+                                            .padding(horizontal = 16.dp, vertical = 12.dp),
                                         contentAlignment = Alignment.BottomCenter
                                     ) {
                                         WhozitLiquidDock(

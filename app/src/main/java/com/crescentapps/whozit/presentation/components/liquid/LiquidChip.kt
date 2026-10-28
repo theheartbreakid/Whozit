@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import com.crescentapps.whozit.presentation.components.Text
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,6 +66,7 @@ fun LiquidChip(
     val shape = RoundedCornerShape(16.dp)
     val isLuminanceRoot = !LocalAdaptiveLuminanceActive.current && adaptiveLuminance
     val layer = if (isLuminanceRoot) rememberGraphicsLayer() else null
+    val isScrollInProgressProvider = com.crescentapps.whozit.presentation.components.LocalScrollInProgress.current
 
     AdaptiveLuminanceProvider(layer = layer, enabled = isLuminanceRoot) {
         Box(
@@ -78,7 +80,7 @@ fun LiquidChip(
                         liquidLens(
                             refractionHeight = glassSettings.refractionHeight.dp.toPx() * 0.4f,
                             refractionAmount = glassSettings.refractionAmount.dp.toPx() * 0.4f,
-                            chromaticAberration = glassSettings.chromaticAberration * 0.4f
+                            chromaticAberration = if (isScrollInProgressProvider()) 0f else glassSettings.chromaticAberration * 0.4f
                         )
                     },
                     onDrawBackdrop = { drawBackdrop ->
@@ -90,7 +92,7 @@ fun LiquidChip(
                         if (surfaceColor.isSpecified) {
                             drawRect(surfaceColor)
                         }
-                        if (isLuminanceRoot) {
+                        if (isLuminanceRoot && !isScrollInProgressProvider()) {
                             layer?.record(
                                 density = this,
                                 layoutDirection = layoutDirection,

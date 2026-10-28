@@ -65,7 +65,9 @@ fun LiquidSurface(
     val refractionAmountPx = remember(density, glassSettings.refractionAmount, glassIntensity) {
         with(density) { glassSettings.refractionAmount.dp.toPx() } * glassIntensity
     }
-    val chromaticAberrationVal = remember(glassSettings.chromaticAberration, glassIntensity) {
+    val isScrollInProgressProvider = com.crescentapps.whozit.presentation.components.LocalScrollInProgress.current
+
+    val chromaticAberrationBase = remember(glassSettings.chromaticAberration, glassIntensity) {
         glassSettings.chromaticAberration * glassIntensity
     }
 
@@ -73,7 +75,8 @@ fun LiquidSurface(
         blurPx,
         refractionHeightPx,
         refractionAmountPx,
-        chromaticAberrationVal
+        chromaticAberrationBase,
+        isScrollInProgressProvider
     ) {
         {
             vibrancy()
@@ -81,19 +84,19 @@ fun LiquidSurface(
             liquidLens(
                 refractionHeight = refractionHeightPx,
                 refractionAmount = refractionAmountPx,
-                chromaticAberration = chromaticAberrationVal
+                chromaticAberration = if (isScrollInProgressProvider()) 0f else chromaticAberrationBase
             )
         }
     }
 
-    val onDrawBackdropBlock: DrawScope.(drawBackdrop: DrawScope.() -> Unit) -> Unit = remember(tint, isLuminanceRoot, layer) {
+    val onDrawBackdropBlock: DrawScope.(drawBackdrop: DrawScope.() -> Unit) -> Unit = remember(tint, isLuminanceRoot, layer, isScrollInProgressProvider) {
         val block: DrawScope.(drawBackdrop: DrawScope.() -> Unit) -> Unit = { drawBackdrop ->
             drawBackdrop()
             if (tint.isSpecified) {
                 drawRect(tint, blendMode = BlendMode.Hue)
                 drawRect(tint.copy(alpha = 0.1f))
             }
-            if (isLuminanceRoot) {
+            if (isLuminanceRoot && !isScrollInProgressProvider()) {
                 layer?.record(
                     density = this,
                     layoutDirection = layoutDirection,

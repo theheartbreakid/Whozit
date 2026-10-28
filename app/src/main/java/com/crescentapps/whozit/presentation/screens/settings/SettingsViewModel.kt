@@ -198,6 +198,10 @@ class SettingsViewModel(
         viewModelScope.launch { preferencesRepository.setReduceMotion(enabled) }
     }
 
+    fun setTextOutlineEnabled(enabled: Boolean) {
+        viewModelScope.launch { preferencesRepository.updateIsTextOutlineEnabled(enabled) }
+    }
+
     fun updateM3DynamicColor(enabled: Boolean) {
         viewModelScope.launch { preferencesRepository.setM3DynamicColor(enabled) }
     }
