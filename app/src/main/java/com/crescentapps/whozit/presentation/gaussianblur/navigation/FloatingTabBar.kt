@@ -24,6 +24,7 @@ import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -102,6 +103,7 @@ fun FloatingTabBar(
     selectedTabKey: Any?,
     scrollConnection: FloatingTabBarScrollConnection,
     modifier: Modifier = Modifier,
+    isVertical: Boolean = false,
     tabBarContentModifier: @Composable () -> Modifier = DefaultTabBarContentModifier,
     inlineAccessory: (@Composable SharedTransitionScope.(Modifier, AnimatedVisibilityScope) -> Unit)? = null,
     expandedAccessory: (@Composable SharedTransitionScope.(Modifier, AnimatedVisibilityScope) -> Unit)? = null,
@@ -141,6 +143,7 @@ fun FloatingTabBar(
                     selectedTabKey = selectedTabKey,
                     accessory = expandedAccessory,
                     isAccessoryShared = isAccessoryShared,
+                    isVertical = isVertical,
                     colors = colors,
                     shapes = shapes,
                     sizes = sizes,
@@ -452,6 +455,7 @@ private fun SharedTransitionScope.ExpandedBar(
     selectedTabKey: Any?,
     accessory: (@Composable SharedTransitionScope.(Modifier, AnimatedVisibilityScope) -> Unit)?,
     isAccessoryShared: Boolean,
+    isVertical: Boolean = false,
     colors: FloatingTabBarColors,
     shapes: FloatingTabBarShapes,
     sizes: FloatingTabBarSizes,
@@ -465,7 +469,7 @@ private fun SharedTransitionScope.ExpandedBar(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(sizes.componentSpacing),
-        modifier = Modifier.fillMaxWidth()
+        modifier = if (isVertical) Modifier.wrapContentWidth().fillMaxHeight() else Modifier.fillMaxWidth()
     ) {
         if (accessory != null) {
             ExpandedAccessory(
@@ -479,39 +483,63 @@ private fun SharedTransitionScope.ExpandedBar(
             )
         }
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(sizes.componentSpacing),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Max)
-        ) {
-            if (hasTabGroup) {
-                ExpandedTabs(
-                    scope = scope,
-                    selectedTabKey = selectedTabKey,
-                    shapes = shapes,
-                    sizes = sizes,
-                    colors = colors,
-                    elevations = elevations,
-                    animatedVisibilityScope = animatedVisibilityScope,
-                    tabBarContentModifier = tabBarContentModifier,
-                    modifier = Modifier.weight(1f)
-                )
+        if (isVertical) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(sizes.componentSpacing),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxHeight()
+            ) {
+                if (hasTabGroup) {
+                    ExpandedTabs(
+                        scope = scope,
+                        selectedTabKey = selectedTabKey,
+                        shapes = shapes,
+                        sizes = sizes,
+                        colors = colors,
+                        elevations = elevations,
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        tabBarContentModifier = tabBarContentModifier,
+                        isVertical = true,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
+        } else {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(sizes.componentSpacing),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Max)
+            ) {
+                if (hasTabGroup) {
+                    ExpandedTabs(
+                        scope = scope,
+                        selectedTabKey = selectedTabKey,
+                        shapes = shapes,
+                        sizes = sizes,
+                        colors = colors,
+                        elevations = elevations,
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        tabBarContentModifier = tabBarContentModifier,
+                        isVertical = false,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
 
-            if (standaloneTab != null) {
-                ExpandedStandaloneTab(
-                    standaloneTab = standaloneTab,
-                    shapes = shapes,
-                    colors = colors,
-                    elevations = elevations,
-                    animatedVisibilityScope = animatedVisibilityScope,
-                    tabBarContentModifier = tabBarContentModifier,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .aspectRatio(1f)
-                )
+                if (standaloneTab != null) {
+                    ExpandedStandaloneTab(
+                        standaloneTab = standaloneTab,
+                        shapes = shapes,
+                        colors = colors,
+                        elevations = elevations,
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        tabBarContentModifier = tabBarContentModifier,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .aspectRatio(1f)
+                    )
+                }
             }
         }
     }
@@ -562,7 +590,8 @@ private fun SharedTransitionScope.ExpandedTabs(
     elevations: FloatingTabBarElevations,
     animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier,
-    tabBarContentModifier: @Composable () -> Modifier
+    tabBarContentModifier: @Composable () -> Modifier,
+    isVertical: Boolean = false
 ) {
     val inlineTab = scope.getInlineTab(selectedTabKey)
     val selectedTabIndex = scope.tabs.indexOfFirst { it.key == selectedTabKey }
@@ -570,16 +599,18 @@ private fun SharedTransitionScope.ExpandedTabs(
     val haptics = LocalHapticFeedback.current
 
     var dragOffset by remember { mutableFloatStateOf(0f) }
-    var rowSize by remember { mutableStateOf(IntSize.Zero) }
+    var containerSize by remember { mutableStateOf(IntSize.Zero) }
     var lastHapticTab by remember { mutableIntStateOf(selectedTabIndex) }
     val density = LocalDensity.current
     val tabCount = scope.tabs.size
     val tabSpacingPx = with(density) { sizes.tabSpacing.toPx() }
-    val tabWidthPx = if (rowSize.width > 0 && tabCount > 0) {
-        (rowSize.width - tabSpacingPx * (tabCount - 1)) / tabCount
+    
+    val totalExtent = if (isVertical) containerSize.height.toFloat() else containerSize.width.toFloat()
+    val tabExtentPx = if (totalExtent > 0f && tabCount > 0) {
+        (totalExtent - tabSpacingPx * (tabCount - 1)) / tabCount
     } else 0f
-    val tabStepPx = if (rowSize.width > 0 && tabCount > 0) {
-        (rowSize.width + tabSpacingPx) / tabCount
+    val tabStepPx = if (totalExtent > 0f && tabCount > 0) {
+        (totalExtent + tabSpacingPx) / tabCount
     } else 0f
     val indicatorTargetPx = if (selectedTabIndex >= 0 && tabStepPx > 0f) {
         selectedTabIndex * tabStepPx + dragOffset
@@ -613,116 +644,228 @@ private fun SharedTransitionScope.ExpandedTabs(
             .padding(sizes.tabBarContentPadding)
             .animateContentSize()
     ) {
-        if (selectedTabIndex >= 0 && tabWidthPx > 0f) {
+        if (selectedTabIndex >= 0 && tabExtentPx > 0f) {
             Box(
-                modifier = Modifier
-                    .width(with(density) { tabWidthPx.toDp() })
-                    .height(with(density) { rowSize.height.toDp() })
-                    .graphicsLayer {
-                        translationX = animatedIndicatorOffset
-                        scaleX = 1f + lag * STRETCH
-                        scaleY = 1f - lag * STRETCH * SQUASH
-                    }
+                modifier = (if (isVertical) {
+                    Modifier
+                        .width(with(density) { containerSize.width.toDp() })
+                        .height(with(density) { tabExtentPx.toDp() })
+                        .graphicsLayer {
+                            translationY = animatedIndicatorOffset
+                            scaleY = 1f + lag * STRETCH
+                            scaleX = 1f - lag * STRETCH * SQUASH
+                        }
+                } else {
+                    Modifier
+                        .width(with(density) { tabExtentPx.toDp() })
+                        .height(with(density) { containerSize.height.toDp() })
+                        .graphicsLayer {
+                            translationX = animatedIndicatorOffset
+                            scaleX = 1f + lag * STRETCH
+                            scaleY = 1f - lag * STRETCH * SQUASH
+                        }
+                })
                     .clip(shapes.tabShape)
                     .background(colors.indicatorColor, shapes.tabShape)
             )
         }
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(sizes.tabSpacing),
-            modifier = Modifier
-                .fillMaxWidth()
-                .onSizeChanged { rowSize = it }
-                .pointerInput(tabCount, tabStepPx, currentSelectedTabIndex) {
-                    if (currentSelectedTabIndex < 0 || tabStepPx <= 0f) return@pointerInput
+        if (isVertical) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(sizes.tabSpacing),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .onSizeChanged { containerSize = it }
+                    .pointerInput(tabCount, tabStepPx, currentSelectedTabIndex) {
+                        if (currentSelectedTabIndex < 0 || tabStepPx <= 0f) return@pointerInput
 
-                    var totalDrag = 0f
-                    detectHorizontalDragGestures(
-                        onDragStart = { totalDrag = 0f },
-                        onDragCancel = { dragOffset = 0f },
-                        onDragEnd = {
-                            val ratio = totalDrag / tabStepPx
-                            val shift = when {
-                                ratio > 0.35f -> maxOf(1, ratio.roundToInt())
-                                ratio < -0.35f -> minOf(-1, ratio.roundToInt())
-                                else -> 0
-                            }
-                            val newIndex = (currentSelectedTabIndex + shift).coerceIn(0, scope.tabs.lastIndex)
-                            if (newIndex != currentSelectedTabIndex) {
-                                scope.tabs[newIndex].onClick()
-                            }
-                            dragOffset = 0f
-                        },
-                        onHorizontalDrag = { _, delta ->
-                            totalDrag += delta
-                            dragOffset = when {
-                                totalDrag > 0 && currentSelectedTabIndex == scope.tabs.lastIndex -> totalDrag * 0.25f
-                                totalDrag < 0 && currentSelectedTabIndex == 0 -> totalDrag * 0.25f
-                                else -> totalDrag
-                            }
+                        var totalDrag = 0f
+                        detectVerticalDragGestures(
+                            onDragStart = { totalDrag = 0f },
+                            onDragCancel = { dragOffset = 0f },
+                            onDragEnd = {
+                                val ratio = totalDrag / tabStepPx
+                                val shift = when {
+                                    ratio > 0.35f -> maxOf(1, ratio.roundToInt())
+                                    ratio < -0.35f -> minOf(-1, ratio.roundToInt())
+                                    else -> 0
+                                }
+                                val newIndex = (currentSelectedTabIndex + shift).coerceIn(0, scope.tabs.lastIndex)
+                                if (newIndex != currentSelectedTabIndex) {
+                                    scope.tabs[newIndex].onClick()
+                                }
+                                dragOffset = 0f
+                            },
+                            onVerticalDrag = { _, delta ->
+                                totalDrag += delta
+                                dragOffset = when {
+                                    totalDrag > 0 && currentSelectedTabIndex == scope.tabs.lastIndex -> totalDrag * 0.25f
+                                    totalDrag < 0 && currentSelectedTabIndex == 0 -> totalDrag * 0.25f
+                                    else -> totalDrag
+                                }
 
-                            val approximateTab = (currentSelectedTabIndex + dragOffset / tabStepPx)
-                                .coerceIn(0f, scope.tabs.lastIndex.toFloat())
-                                .roundToInt()
-                            if (approximateTab != lastHapticTab) {
-                                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                lastHapticTab = approximateTab
+                                val approximateTab = (currentSelectedTabIndex + dragOffset / tabStepPx)
+                                    .coerceIn(0f, scope.tabs.lastIndex.toFloat())
+                                    .roundToInt()
+                                if (approximateTab != lastHapticTab) {
+                                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    lastHapticTab = approximateTab
+                                }
                             }
-                        }
+                        )
+                    }
+            ) {
+                scope.tabs.forEach { tab ->
+                    val isSelected = tab.key == selectedTabKey
+                    val iconScale by animateFloatAsState(
+                        targetValue = if (isSelected) 1.08f else 1f,
+                        animationSpec = GlassSpring,
+                        label = "glassTabScale"
                     )
-                }
-        ) {
-            scope.tabs.forEach { tab ->
-                val isSelected = tab.key == selectedTabKey
-                val iconScale by animateFloatAsState(
-                    targetValue = if (isSelected) 1.08f else 1f,
-                    animationSpec = GlassSpring,
-                    label = "glassTabScale"
-                )
-                Tab(
-                    icon = {
-                        Box(
-                            modifier = (if (tab.key == inlineTab?.key) {
-                                Modifier.sharedElement(
-                                    sharedContentState = rememberSharedContentState("tab#${tab.key}-icon"),
-                                    animatedVisibilityScope = animatedVisibilityScope,
-                                    zIndexInOverlay = 1f
-                                )
-                            } else {
+                    Tab(
+                        icon = {
+                            Box(
+                                modifier = (if (tab.key == inlineTab?.key) {
+                                    Modifier.sharedElement(
+                                        sharedContentState = rememberSharedContentState("tab#${tab.key}-icon"),
+                                        animatedVisibilityScope = animatedVisibilityScope,
+                                        zIndexInOverlay = 1f
+                                    )
+                                } else {
+                                    Modifier.animateEnterExitTab(
+                                        sharedTransitionScope = this@ExpandedTabs,
+                                        animatedVisibilityScope = animatedVisibilityScope
+                                    )
+                                }).graphicsLayer {
+                                    scaleX = iconScale
+                                    scaleY = iconScale
+                                }
+                            ) {
+                                tab.icon()
+                            }
+                        },
+                        title = {
+                            Box(
                                 Modifier.animateEnterExitTab(
                                     sharedTransitionScope = this@ExpandedTabs,
                                     animatedVisibilityScope = animatedVisibilityScope
                                 )
-                            }).graphicsLayer {
-                                scaleX = iconScale
-                                scaleY = iconScale
+                            ) {
+                                tab.title()
                             }
-                        ) {
-                            tab.icon()
-                        }
-                    },
-                    title = {
-                        Box(
-                            Modifier.animateEnterExitTab(
-                                sharedTransitionScope = this@ExpandedTabs,
-                                animatedVisibilityScope = animatedVisibilityScope
+                        },
+                        isInline = false,
+                        modifier = Modifier
+                            .weight(1f)
+                            .skipToLookaheadSize()
+                            .clip(shapes.tabShape)
+                            .clickable(
+                                onClick = tab.onClick,
+                                indication = tab.indication?.invoke(),
+                                interactionSource = remember { MutableInteractionSource() }
                             )
-                        ) {
-                            tab.title()
-                        }
-                    },
-                    isInline = false,
-                    modifier = Modifier
-                        .weight(1f)
-                        .skipToLookaheadSize()
-                        .clip(shapes.tabShape)
-                        .clickable(
-                            onClick = tab.onClick,
-                            indication = tab.indication?.invoke(),
-                            interactionSource = remember { MutableInteractionSource() }
+                            .padding(sizes.tabExpandedContentPadding)
+                    )
+                }
+            }
+        } else {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(sizes.tabSpacing),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onSizeChanged { containerSize = it }
+                    .pointerInput(tabCount, tabStepPx, currentSelectedTabIndex) {
+                        if (currentSelectedTabIndex < 0 || tabStepPx <= 0f) return@pointerInput
+
+                        var totalDrag = 0f
+                        detectHorizontalDragGestures(
+                            onDragStart = { totalDrag = 0f },
+                            onDragCancel = { dragOffset = 0f },
+                            onDragEnd = {
+                                val ratio = totalDrag / tabStepPx
+                                val shift = when {
+                                    ratio > 0.35f -> maxOf(1, ratio.roundToInt())
+                                    ratio < -0.35f -> minOf(-1, ratio.roundToInt())
+                                    else -> 0
+                                }
+                                val newIndex = (currentSelectedTabIndex + shift).coerceIn(0, scope.tabs.lastIndex)
+                                if (newIndex != currentSelectedTabIndex) {
+                                    scope.tabs[newIndex].onClick()
+                                }
+                                dragOffset = 0f
+                            },
+                            onHorizontalDrag = { _, delta ->
+                                totalDrag += delta
+                                dragOffset = when {
+                                    totalDrag > 0 && currentSelectedTabIndex == scope.tabs.lastIndex -> totalDrag * 0.25f
+                                    totalDrag < 0 && currentSelectedTabIndex == 0 -> totalDrag * 0.25f
+                                    else -> totalDrag
+                                }
+
+                                val approximateTab = (currentSelectedTabIndex + dragOffset / tabStepPx)
+                                    .coerceIn(0f, scope.tabs.lastIndex.toFloat())
+                                    .roundToInt()
+                                if (approximateTab != lastHapticTab) {
+                                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    lastHapticTab = approximateTab
+                                }
+                            }
                         )
-                        .padding(sizes.tabExpandedContentPadding)
-                )
+                    }
+            ) {
+                scope.tabs.forEach { tab ->
+                    val isSelected = tab.key == selectedTabKey
+                    val iconScale by animateFloatAsState(
+                        targetValue = if (isSelected) 1.08f else 1f,
+                        animationSpec = GlassSpring,
+                        label = "glassTabScale"
+                    )
+                    Tab(
+                        icon = {
+                            Box(
+                                modifier = (if (tab.key == inlineTab?.key) {
+                                    Modifier.sharedElement(
+                                        sharedContentState = rememberSharedContentState("tab#${tab.key}-icon"),
+                                        animatedVisibilityScope = animatedVisibilityScope,
+                                        zIndexInOverlay = 1f
+                                    )
+                                } else {
+                                    Modifier.animateEnterExitTab(
+                                        sharedTransitionScope = this@ExpandedTabs,
+                                        animatedVisibilityScope = animatedVisibilityScope
+                                    )
+                                }).graphicsLayer {
+                                    scaleX = iconScale
+                                    scaleY = iconScale
+                                }
+                            ) {
+                                tab.icon()
+                            }
+                        },
+                        title = {
+                            Box(
+                                Modifier.animateEnterExitTab(
+                                    sharedTransitionScope = this@ExpandedTabs,
+                                    animatedVisibilityScope = animatedVisibilityScope
+                                )
+                            ) {
+                                tab.title()
+                            }
+                        },
+                        isInline = false,
+                        modifier = Modifier
+                            .weight(1f)
+                            .skipToLookaheadSize()
+                            .clip(shapes.tabShape)
+                            .clickable(
+                                onClick = tab.onClick,
+                                indication = tab.indication?.invoke(),
+                                interactionSource = remember { MutableInteractionSource() }
+                            )
+                            .padding(sizes.tabExpandedContentPadding)
+                    )
+                }
             }
         }
     }

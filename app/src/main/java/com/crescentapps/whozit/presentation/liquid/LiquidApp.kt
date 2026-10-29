@@ -211,41 +211,41 @@ fun LiquidApp(
                     }
 
                     val isExpanded = widthClass == AppWindowWidthSizeClass.EXPANDED
-
-                    Row(modifier = Modifier.fillMaxSize()) {
-                        // Responsive Navigation Rail for tablets
-                        if (isExpanded && currentRoute in listOf(
-                                Screen.Home.route,
-                                Screen.Calendar.route,
-                                Screen.Schedules.route,
-                                Screen.Rooms.route,
-                                Screen.History.route,
-                                Screen.Settings.route
-                            )
-                        ) {
-                            WhozitLiquidNavigationRail(
-                                currentRoute = currentRoute,
-                                onNavigate = { screen ->
-                                    navController.navigate(screen.route) {
-                                        popUpTo(Screen.Home.route) { saveState = true }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
-                                },
-                                backdrop = backdrop
-                            )
-                        }
-
-                        // Main Navigation Area
-                        val showDock = !isExpanded && currentRoute in listOf(
+                    val mainRoutes = remember {
+                        listOf(
                             Screen.Home.route, Screen.Calendar.route, Screen.Schedules.route,
                             Screen.Rooms.route, Screen.History.route, Screen.Settings.route
                         )
-                        val dockState = remember(showDock) { com.crescentapps.whozit.presentation.theme.DockSafeAreaState().apply { dockHeight = if (showDock) 100.dp else 0.dp } }
+                    }
+                    val showSideDock = (isExpanded || isLandscape) && currentRoute in mainRoutes
+                    val showBottomDock = !showSideDock && currentRoute in mainRoutes
 
-                        CompositionLocalProvider(
-                            com.crescentapps.whozit.presentation.theme.LocalDockSafeArea provides dockState
-                        ) {
+                    val dockState = remember(showSideDock, showBottomDock) {
+                        com.crescentapps.whozit.presentation.theme.DockSafeAreaState().apply {
+                            dockWidth = if (showSideDock) 80.dp else 0.dp
+                            dockHeight = if (showBottomDock) 100.dp else 0.dp
+                        }
+                    }
+
+                    CompositionLocalProvider(
+                        com.crescentapps.whozit.presentation.theme.LocalDockSafeArea provides dockState
+                    ) {
+                        Row(modifier = Modifier.fillMaxSize()) {
+                            // Dedicated Liquid UI Landscape Side Dock
+                            if (showSideDock) {
+                                com.crescentapps.whozit.presentation.components.liquid.LiquidLandscapeDock(
+                                    currentRoute = currentRoute,
+                                    onNavigate = { screen ->
+                                        navController.navigate(screen.route) {
+                                            popUpTo(Screen.Home.route) { saveState = true }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    },
+                                    backdrop = backdrop
+                                )
+                            }
+
                             Box(modifier = Modifier.weight(1f).fillMaxSize()) {
                                 NavHost(
                                     navController = navController,
@@ -405,15 +405,7 @@ fun LiquidApp(
                                 }
 
                                 // Floating DhikrCounter Liquid Bottom Dock
-                                if (!isExpanded && currentRoute in listOf(
-                                        Screen.Home.route,
-                                        Screen.Calendar.route,
-                                        Screen.Schedules.route,
-                                        Screen.Rooms.route,
-                                        Screen.History.route,
-                                        Screen.Settings.route
-                                    )
-                                ) {
+                                if (showBottomDock) {
                                     Box(
                                         modifier = Modifier
                                             .fillMaxSize()

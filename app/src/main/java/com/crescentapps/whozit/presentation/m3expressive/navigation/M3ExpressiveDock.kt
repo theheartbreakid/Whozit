@@ -57,48 +57,84 @@ enum class M3NavDestination(val route: String, val label: String, val icon: Imag
 fun M3ExpressiveDock(
     currentRoute: String?,
     onNavigate: (M3NavDestination) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isVertical: Boolean = false
 ) {
     val dockSafeArea = com.crescentapps.whozit.presentation.theme.LocalDockSafeArea.current
     val density = androidx.compose.ui.platform.LocalDensity.current
 
-    Box(
-        modifier = modifier
+    val containerModifier = if (isVertical) {
+        modifier
+            .fillMaxHeight()
+            .onSizeChanged { size ->
+                dockSafeArea.dockWidth = with(density) { size.width.toDp() }
+            }
+            .statusBarsPadding()
+            .padding(horizontal = 8.dp, vertical = 12.dp)
+    } else {
+        modifier
             .fillMaxWidth()
             .onSizeChanged { size ->
                 dockSafeArea.dockHeight = with(density) { size.height.toDp() }
             }
             .navigationBarsPadding()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+    }
+
+    Box(
+        modifier = containerModifier,
         contentAlignment = Alignment.Center
     ) {
+        val dockShape = if (isVertical) RoundedCornerShape(32.dp) else CircleShape
         Surface(
             modifier = Modifier
                 .shadow(
                     elevation = 12.dp,
-                    shape = CircleShape,
+                    shape = dockShape,
                     clip = false
                 ),
-            shape = CircleShape,
+            shape = dockShape,
             color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.65f),
             contentColor = MaterialTheme.colorScheme.onSurface,
             tonalElevation = 6.dp
         ) {
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                    .animateContentSize(animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                M3NavDestination.entries.forEach { destination ->
-                    val isSelected = currentRoute == destination.route
-                    
-                    M3DockItem(
-                        destination = destination,
-                        isSelected = isSelected,
-                        onClick = { onNavigate(destination) }
-                    )
+            if (isVertical) {
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 6.dp, vertical = 10.dp)
+                        .animateContentSize(animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()),
+                    verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    M3NavDestination.entries.forEach { destination ->
+                        val isSelected = currentRoute == destination.route
+                        
+                        M3DockItem(
+                            destination = destination,
+                            isSelected = isSelected,
+                            isVertical = true,
+                            onClick = { onNavigate(destination) }
+                        )
+                    }
+                }
+            } else {
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .animateContentSize(animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    M3NavDestination.entries.forEach { destination ->
+                        val isSelected = currentRoute == destination.route
+                        
+                        M3DockItem(
+                            destination = destination,
+                            isSelected = isSelected,
+                            isVertical = false,
+                            onClick = { onNavigate(destination) }
+                        )
+                    }
                 }
             }
         }
@@ -152,7 +188,8 @@ fun M3ExpressiveNavigationRail(
 private fun M3DockItem(
     destination: M3NavDestination,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isVertical: Boolean = false
 ) {
     val containerColor by androidx.compose.animation.animateColorAsState(
         targetValue = if (isSelected) {
@@ -186,12 +223,28 @@ private fun M3DockItem(
         label = "dock_item_elevation"
     )
 
-    Box(
-        modifier = Modifier
+    val itemPadding = if (isVertical) {
+        PaddingValues(horizontal = 8.dp, vertical = if (isSelected) 10.dp else 6.dp)
+    } else {
+        PaddingValues(horizontal = if (isSelected) 14.dp else 10.dp, vertical = 8.dp)
+    }
+
+    val itemModifier = if (isVertical) {
+        Modifier
+            .width(52.dp)
+            .shadow(elevation = elevation, shape = RoundedCornerShape(cornerRadius))
+            .clip(RoundedCornerShape(cornerRadius))
+            .background(containerColor)
+    } else {
+        Modifier
             .minimumInteractiveComponentSize()
             .shadow(elevation = elevation, shape = RoundedCornerShape(cornerRadius))
             .clip(RoundedCornerShape(cornerRadius))
             .background(containerColor)
+    }
+
+    Box(
+        modifier = itemModifier
             .expressiveLightRay(
                 enabled = isSelected,
                 shape = RoundedCornerShape(cornerRadius)
@@ -207,31 +260,54 @@ private fun M3DockItem(
                 selected = isSelected
                 contentDescription = destination.label
             }
-            .padding(horizontal = if (isSelected) 14.dp else 10.dp, vertical = 8.dp)
+            .padding(itemPadding)
             .animateContentSize(animationSpec = MaterialTheme.motionScheme.fastSpatialSpec()),
         contentAlignment = Alignment.Center
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                imageVector = destination.icon,
-                contentDescription = null,
-                tint = contentColor,
-                modifier = Modifier.size(24.dp)
-            )
-
-            if (isSelected) {
-                Spacer(modifier = Modifier.width(6.dp))
+        if (isVertical) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = destination.icon,
+                    contentDescription = null,
+                    tint = contentColor,
+                    modifier = Modifier.size(22.dp)
+                )
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = destination.label,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                     color = contentColor,
                     maxLines = 1,
-                    fontSize = 14.sp
+                    fontSize = 10.sp
                 )
+            }
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = destination.icon,
+                    contentDescription = null,
+                    tint = contentColor,
+                    modifier = Modifier.size(24.dp)
+                )
+
+                if (isSelected) {
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = destination.label,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = contentColor,
+                        maxLines = 1,
+                        fontSize = 14.sp
+                    )
+                }
             }
         }
     }

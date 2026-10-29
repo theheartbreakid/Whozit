@@ -79,22 +79,27 @@ fun GaussianBlurApp(
 
     val config = androidx.compose.ui.platform.LocalConfiguration.current
     val isExpanded = config.screenWidthDp >= 600
-    val showDock = !isExpanded && currentRoute in listOf("today", "calendar", "schedules", "history", "rooms", "settings")
+    val isLandscape = config.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val mainRoutes = remember { listOf("today", "calendar", "schedules", "history", "rooms", "settings") }
+    val showSideDock = (isExpanded || isLandscape) && currentRoute in mainRoutes
+    val showBottomDock = !showSideDock && currentRoute in mainRoutes
 
     GaussianBlurTheme(prefs = prefs) {
         GaussianBlurBackdropHost(prefs = prefs) {
-            val dockState = remember(showDock) {
+            val dockState = remember(showSideDock, showBottomDock) {
                 com.crescentapps.whozit.presentation.theme.DockSafeAreaState().apply {
-                    dockHeight = if (showDock) 100.dp else 0.dp
+                    dockWidth = if (showSideDock) 80.dp else 0.dp
+                    dockHeight = if (showBottomDock) 100.dp else 0.dp
                 }
             }
             CompositionLocalProvider(
                 com.crescentapps.whozit.presentation.theme.LocalDockSafeArea provides dockState
             ) {
                 androidx.compose.foundation.layout.Row(modifier = Modifier.fillMaxSize()) {
-                    if (isExpanded && currentRoute in listOf("today", "calendar", "schedules", "history", "rooms", "settings")) {
-                        GaussianNavigationRail(
+                    if (showSideDock) {
+                        GaussianDock(
                             currentDestination = currentDockDestination,
+                            isVertical = true,
                             onNavigate = { dest ->
                                 val route = when (dest) {
                                     GaussianNavDestination.TODAY -> "today"
@@ -109,7 +114,8 @@ fun GaussianBlurApp(
                                     launchSingleTop = true
                                     restoreState = true
                                 }
-                            }
+                            },
+                            modifier = Modifier.align(Alignment.CenterVertically)
                         )
                     }
 
@@ -248,7 +254,7 @@ fun GaussianBlurApp(
                             }
                         }
 
-                        if (showDock) {
+                        if (showBottomDock) {
                             GaussianDock(
                                 currentDestination = currentDockDestination,
                                 onNavigate = { dest ->

@@ -24,6 +24,7 @@ import androidx.compose.material.icons.outlined.Today
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,6 +34,7 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.crescentapps.whozit.presentation.components.liquid.LiquidBottomTab
 import com.crescentapps.whozit.presentation.components.AppWindowWidthSizeClass
 import com.crescentapps.whozit.presentation.components.AppWindowHeightSizeClass
 import com.crescentapps.whozit.presentation.components.LocalAppWindowSizeDetails
@@ -90,13 +92,13 @@ fun WhozitLiquidDock(
     currentRoute: String?,
     onNavigate: (Screen) -> Unit,
     backdrop: Backdrop,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isVertical: Boolean = false
 ) {
     val selectedIndex = mainScreens.indexOfFirst { it.route == currentRoute }.coerceAtLeast(0)
     val sizeDetails = LocalAppWindowSizeDetails.current
     val isCompact = sizeDetails.widthClass == AppWindowWidthSizeClass.COMPACT ||
                     sizeDetails.heightClass == AppWindowHeightSizeClass.COMPACT ||
-                    sizeDetails.isLandscape ||
                     sizeDetails.heightDp < 500
 
     LiquidBottomTabs(
@@ -108,6 +110,7 @@ fun WhozitLiquidDock(
         },
         backdrop = backdrop,
         tabsCount = mainScreens.size,
+        isVertical = isVertical,
         accentColor = LocalWhozitColors.current.accent,
         modifier = modifier
     ) {
@@ -123,25 +126,27 @@ fun WhozitLiquidDock(
                 if (whozitColors.accent.luminance() > 0.65f) whozitColors.textPrimary else whozitColors.accent
             }
 
+            val unselectedColor = whozitColors.textPrimary
+            val tabColor = if (isSelected) selectedColor else unselectedColor
+
             LiquidBottomTab(
                 onClick = { onNavigate(screen) }
             ) {
                 Image(
                     imageVector = if (isSelected) screen.selectedIcon else screen.unselectedIcon,
                     contentDescription = screen.title,
-                    modifier = Modifier.size(if (isCompact) 20.dp else 22.dp),
-                    colorFilter = ColorFilter.tint(if (isSelected) selectedColor else adaptiveColor)
+                    modifier = Modifier.size(20.dp),
+                    colorFilter = ColorFilter.tint(tabColor)
                 )
-                if (!isCompact) {
-                    BasicText(
-                        text = screen.title,
-                        style = TextStyle(
-                            fontSize = 9.sp,
-                            color = if (isSelected) selectedColor else adaptiveColor.copy(alpha = 0.7f)
-                        ),
-                        maxLines = 1
-                    )
-                }
+                BasicText(
+                    text = screen.title,
+                    style = TextStyle(
+                        fontSize = 9.sp,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        color = tabColor
+                    ),
+                    maxLines = 1
+                )
             }
         }
     }

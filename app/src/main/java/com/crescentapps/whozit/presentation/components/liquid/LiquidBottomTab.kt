@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
@@ -26,8 +27,13 @@ fun RowScope.LiquidBottomTab(
     content: @Composable ColumnScope.() -> Unit
 ) {
     val scale = LocalLiquidBottomTabScale.current
-    Column(
+    val finalModifier = if (modifier != Modifier) {
         modifier
+    } else {
+        Modifier.fillMaxHeight().weight(1f)
+    }
+    Column(
+        finalModifier
             .clip(Capsule())
             .clickable(
                 interactionSource = null,
@@ -35,8 +41,6 @@ fun RowScope.LiquidBottomTab(
                 role = Role.Tab,
                 onClick = onClick
             )
-            .fillMaxHeight()
-            .weight(1f)
             .graphicsLayer {
                 val scale = scale()
                 scaleX = scale
@@ -48,3 +52,34 @@ fun RowScope.LiquidBottomTab(
     )
 }
 
+@Composable
+fun ColumnScope.LiquidBottomTab(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    val scale = LocalLiquidBottomTabScale.current
+    val finalModifier = if (modifier != Modifier) {
+        modifier
+    } else {
+        Modifier.fillMaxWidth().weight(1f)
+    }
+    Column(
+        finalModifier
+            .clip(Capsule())
+            .clickable(
+                interactionSource = null,
+                indication = null,
+                role = Role.Tab,
+                onClick = onClick
+            )
+            .graphicsLayer {
+                val scale = scale()
+                scaleX = scale
+                scaleY = scale
+            },
+        verticalArrangement = Arrangement.spacedBy(2f.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        content = content
+    )
+}

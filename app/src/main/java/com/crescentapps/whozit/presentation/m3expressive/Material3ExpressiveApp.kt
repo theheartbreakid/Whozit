@@ -62,6 +62,7 @@ fun Material3ExpressiveApp(
 
         val config = androidx.compose.ui.platform.LocalConfiguration.current
         val isExpanded = config.screenWidthDp >= 600
+        val isLandscape = config.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
         // Main top-level routes that show the floating dock
         val mainRoutes = listOf(
@@ -72,11 +73,13 @@ fun Material3ExpressiveApp(
             Screen.History.route,
             Screen.Settings.route
         )
-        val showDock = !isExpanded && currentRoute in mainRoutes
-        
-        val dockState = remember(showDock) {
+        val showSideDock = (isExpanded || isLandscape) && currentRoute in mainRoutes
+        val showBottomDock = !showSideDock && currentRoute in mainRoutes
+
+        val dockState = remember(showSideDock, showBottomDock) {
             com.crescentapps.whozit.presentation.theme.DockSafeAreaState().apply {
-                dockHeight = if (showDock) 90.dp else 0.dp
+                dockWidth = if (showSideDock) 80.dp else 0.dp
+                dockHeight = if (showBottomDock) 90.dp else 0.dp
             }
         }
 
@@ -87,9 +90,11 @@ fun Material3ExpressiveApp(
                 containerColor = Color.Transparent
             ) { paddingValues ->
                 Row(modifier = Modifier.fillMaxSize()) {
-                    if (isExpanded && currentRoute in mainRoutes) {
-                        com.crescentapps.whozit.presentation.m3expressive.navigation.M3ExpressiveNavigationRail(
+                    if (showSideDock) {
+                        M3ExpressiveDock(
                             currentRoute = currentRoute,
+                            isVertical = true,
+                            modifier = Modifier.align(androidx.compose.ui.Alignment.CenterVertically),
                             onNavigate = { destination ->
                                 navController.navigate(destination.route) {
                                     popUpTo(Screen.Home.route) {
@@ -286,7 +291,7 @@ fun Material3ExpressiveApp(
                 } // End of NavHost
                 } // End of constrained NavHost Box
                 
-                if (showDock) {
+                if (showBottomDock) {
                     M3ExpressiveDock(
                         currentRoute = currentRoute,
                         modifier = Modifier.align(androidx.compose.ui.Alignment.BottomCenter),

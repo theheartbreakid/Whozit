@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 
 class DockSafeAreaState {
     var dockHeight by mutableStateOf(0.dp)
+    var dockWidth by mutableStateOf(0.dp)
 }
 
 /**
@@ -29,16 +30,18 @@ val LocalDockSafeArea = compositionLocalOf { DockSafeAreaState() }
 
 @Composable
 fun PaddingValues.withDockPadding(extraBottom: Dp = 16.dp): PaddingValues {
-    val dock = LocalDockSafeArea.current.dockHeight
+    val dockHeight = LocalDockSafeArea.current.dockHeight
+    val dockWidth = LocalDockSafeArea.current.dockWidth
     val layoutDirection = LocalLayoutDirection.current
     
-    val additional = if (dock > 0.dp) dock + extraBottom else 0.dp
+    val additionalBottom = if (dockHeight > 0.dp) dockHeight + extraBottom else 0.dp
+    val additionalStart = if (dockWidth > 0.dp) dockWidth + 12.dp else 0.dp
     
     return PaddingValues(
-        start = this.calculateStartPadding(layoutDirection),
+        start = this.calculateStartPadding(layoutDirection) + additionalStart,
         top = this.calculateTopPadding(),
         end = this.calculateEndPadding(layoutDirection),
-        bottom = this.calculateBottomPadding() + additional
+        bottom = this.calculateBottomPadding() + additionalBottom
     )
 }
 

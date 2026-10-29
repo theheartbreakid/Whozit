@@ -34,6 +34,7 @@ fun GaussianDock(
     currentDestination: GaussianNavDestination,
     onNavigate: (GaussianNavDestination) -> Unit,
     modifier: Modifier = Modifier,
+    isVertical: Boolean = false,
     scrollConnection: FloatingTabBarScrollConnection = rememberFloatingTabBarScrollConnection()
 ) {
     val backdrop = LocalAppBackdrop.current
@@ -55,17 +56,32 @@ fun GaussianDock(
     val dockSafeArea = com.crescentapps.whozit.presentation.theme.LocalDockSafeArea.current
     val density = androidx.compose.ui.platform.LocalDensity.current
 
-    FloatingTabBar(
-        selectedTabKey = currentDestination,
-        scrollConnection = scrollConnection,
-        modifier = modifier
+    val modifierToUse = if (isVertical) {
+        modifier
+            .fillMaxHeight()
+            .wrapContentWidth()
+            .onSizeChanged { size ->
+                dockSafeArea.dockWidth = with(density) { size.width.toDp() }
+            }
+            .statusBarsPadding()
+            .padding(vertical = 12.dp)
+            .padding(start = 6.dp)
+    } else {
+        modifier
             .fillMaxWidth()
             .onSizeChanged { size ->
                 dockSafeArea.dockHeight = with(density) { size.height.toDp() }
             }
             .navigationBarsPadding()
             .padding(horizontal = 12.dp)
-            .padding(bottom = 6.dp),
+            .padding(bottom = 6.dp)
+    }
+
+    FloatingTabBar(
+        selectedTabKey = currentDestination,
+        scrollConnection = scrollConnection,
+        isVertical = isVertical,
+        modifier = modifierToUse,
         tabBarContentModifier = glassSurface,
         colors = FloatingTabBarDefaults.colors(
             backgroundColor = Color.Transparent,
