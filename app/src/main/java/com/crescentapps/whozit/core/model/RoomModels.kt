@@ -65,9 +65,9 @@ data class P2PRoom(
 @Serializable
 data class RoomMember(
     val id: Long = 0,
-    val roomId: Long,
-    val remoteMemberId: String,
-    val displayName: String,
+    val roomId: Long = 0L,
+    val remoteMemberId: String = "",
+    val displayName: String = "",
     val role: RoomRole = RoomRole.MEMBER,
     val presence: MemberPresence = MemberPresence.ONLINE,
     val joinedAt: Long = System.currentTimeMillis(),

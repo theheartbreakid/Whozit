@@ -493,6 +493,70 @@ class RoomRepository(
             SyncEventType.ROOM_DELETED -> {
                 roomDao.deleteRoom(room)
             }
+            SyncEventType.SCHEDULE_CREATED, SyncEventType.SCHEDULE_UPDATED -> {
+                // When a schedule is created or updated, we should refetch the room metadata
+                // to get the full schedule data (since the event itself might not contain the full schedule payload in our current design).
+                val result = roomService.previewRoom(room.roomCode)
+                if (result.isSuccess) {
+                    val roomData = result.getOrThrow()
+                    // Merge shared remote schedules into local database, identical to joinRoom
+                    for (remoteSchedWithP in roomData.sharedSchedules) {
+                        val remoteSched = remoteSchedWithP.schedule
+                        val existingLocalSched = scheduleDao.getAllSchedules().find { it.name.equals(remoteSched.name, ignoreCase = true) }
+
+                        val targetLocalSchedId = if (existingLocalSched != null) {
+                            // Update existing schedule (if we wanted to handle full updates)
+                            // For simplicity, we just rely on the existing schedule if it's already there
+                            existingLocalSched.id
+                        } else {
+                            // Insert participants
+                            val participantIdMap = mutableMapOf<Long, Long>()
+                            for (p in remoteSchedWithP.participants) {
+                                val pId = participantDao.insertParticipant(p.toEntity().copy(id = 0))
+                                participantIdMap[p.id] = pId
+                            }
+
+                            // Insert schedule
+                            val newSchedEntity = remoteSched.toEntity().copy(id = 0)
+                            val newSchedId = scheduleDao.insertSchedule(newSchedEntity)
+
+                            // Insert schedule participants and pattern
+                            val spList = participantIdMap.values.mapIndexed { index, pId ->
+                                ScheduleParticipantEntity(newSchedId, pId, index, true)
+                            }
+                            scheduleDao.insertScheduleParticipants(spList)
+
+                            val patternList = remoteSchedWithP.pattern.mapIndexed { index, item ->
+                                val mappedPId = participantIdMap[item.participantId] ?: participantIdMap.values.first()
+                                RotationPatternEntity(
+                                    id = 0,
+                                    scheduleId = newSchedId,
+                                    participantId = mappedPId,
+                                    patternPosition = index
+                                )
+                            }
+                            scheduleDao.insertRotationPatterns(patternList)
+
+                            newSchedId
+                        }
+
+                        // Link in shared_schedules if not already linked
+                        val remoteId = "rem_sched_${remoteSched.id}"
+                        val existingShared = roomDao.getSharedSchedulesForRoom(room.id).find { it.remoteScheduleId == remoteId }
+                        if (existingShared == null) {
+                            roomDao.insertSharedSchedule(
+                                SharedScheduleEntity(
+                                    roomId = room.id,
+                                    localScheduleId = targetLocalSchedId,
+                                    remoteScheduleId = remoteId,
+                                    sharingState = SharingState.SHARED,
+                                    permissions = RoomPermission.CAN_COMPLETE
+                                )
+                            )
+                        }
+                    }
+                }
+            }
             else -> {}
         }
     }

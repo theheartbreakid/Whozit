@@ -12,8 +12,9 @@ import kotlinx.coroutines.launch
 
 import com.crescentapps.whozit.data.network.RealtimeSyncClient
 import com.crescentapps.whozit.data.network.RoomService
-import com.crescentapps.whozit.data.network.impl.MockRealtimeSyncClient
-import com.crescentapps.whozit.data.network.impl.MockRoomService
+import com.crescentapps.whozit.data.network.firebase.FirebaseAuthManager
+import com.crescentapps.whozit.data.network.firebase.FirebaseRealtimeSyncClient
+import com.crescentapps.whozit.data.network.firebase.FirebaseRoomService
 import com.crescentapps.whozit.data.repository.RoomRepository
 import com.crescentapps.whozit.data.sync.SyncWorker
 import kotlinx.coroutines.flow.first
@@ -26,8 +27,9 @@ class WhozitApplication : Application() {
     val soundManager: com.crescentapps.whozit.core.util.SoundManager by lazy { com.crescentapps.whozit.core.util.SoundManager(this) }
     val updateManager: com.crescentapps.whozit.core.update.UpdateManager by lazy { com.crescentapps.whozit.core.update.UpdateManager.getInstance(this) }
 
-    val roomService: RoomService by lazy { MockRoomService() }
-    val realtimeSyncClient: RealtimeSyncClient by lazy { MockRealtimeSyncClient() }
+    val authManager: FirebaseAuthManager by lazy { FirebaseAuthManager() }
+    val roomService: RoomService by lazy { FirebaseRoomService(authManager) }
+    val realtimeSyncClient: RealtimeSyncClient by lazy { FirebaseRealtimeSyncClient(authManager) }
     val roomRepository: RoomRepository by lazy {
         RoomRepository(
             db = database,

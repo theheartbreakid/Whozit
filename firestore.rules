@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Check if the user is authenticated anonymously or otherwise
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if the current user is an owner of the room
+    function isRoomOwner(roomId) {
+      return isAuthenticated() &&
+             get(/databases/$(database)/documents/rooms/$(roomId)).data.ownerMemberId == request.auth.uid;
+    }
+
+    // Check if the current user is a member of the room
+    function isRoomMember(roomId) {
+      return isAuthenticated() &&
+             exists(/databases/$(database)/documents/rooms/$(roomId)/members/$(request.auth.uid));
+    }
+
+    // Room Metadata
+    match /rooms/{roomId} {
+      // Anyone authenticated can create a room, but they must set themselves as the owner
+      allow create: if isAuthenticated() && request.resource.data.ownerMemberId == request.auth.uid;
+      // Anyone authenticated can read room metadata (to preview it, roomId is unguessable)
+      allow read: if isAuthenticated();
+      // Only owners can update or delete the room
+      allow update, delete: if isRoomOwner(roomId);
+
+      // Members Subcollection
+      match /members/{memberId} {
+        // Anyone authenticated can read the member list (to preview)
+        allow read: if isAuthenticated();
+        // A user can add themselves to the room (Join Room)
+        allow create: if isAuthenticated() && memberId == request.auth.uid;
+        // A user can update their own presence, or an owner can update/remove members
+        allow update, delete: if (isAuthenticated() && memberId == request.auth.uid) || isRoomOwner(roomId);
+      }
+
+      // Schedules Subcollection
+      match /schedules/{scheduleId} {
+        // Anyone authenticated can read shared schedules (to preview)
+        allow read: if isAuthenticated();
+        // Only authorized members can write (for now, any member can add/modify shared schedules)
+        allow write: if isRoomMember(roomId) || isRoomOwner(roomId);
+      }
+
+      // Realtime Events Subcollection
+      match /events/{eventId} {
+        // Only members can read and publish sync events
+        allow read, write: if isRoomMember(roomId) || isRoomOwner(roomId);
+      }
+    }
+
+    // Room Invites (Lookup Collection)
+    match /roomInvites/{roomCode} {
+      // Any authenticated user can read an invite to preview a room
+      allow read: if isAuthenticated();
+      // Only the room owner can create or manage the invite
+      allow create: if isAuthenticated() && request.resource.data.ownerUid == request.auth.uid;
+      allow update, delete: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
+    }
+  }
+}

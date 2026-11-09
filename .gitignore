@@ -24,3 +24,6 @@ app/release-keystore.jks
 # Performance Traces & Benchmark Data
 *.perfetto-trace
 benchmarkData_*.json
+
+# Firebase Configuration
+google-services.json

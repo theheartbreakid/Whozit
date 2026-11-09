@@ -1,9 +1,14 @@
 plugins {
-    alias(libs.plugins.android.application)
+    id("com.android.application")
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.baselineprofile)
+}
+
+val hasGoogleServices = file("google-services.json").exists()
+if (hasGoogleServices) {
+    apply(plugin = "com.google.gms.google-services")
 }
 
 android {
@@ -30,6 +35,9 @@ android {
             )
             signingConfig = signingConfigs.getByName("debug")
         }
+    }
+    lint {
+        disable.add("InvalidFragmentVersionForActivityResult")
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -96,6 +104,11 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
 
     // Kyant Shapes & Backdrop for Liquid UI (backdrop source is embedded locally in com.kyant.backdrop)
     implementation(libs.kyant.shapes)

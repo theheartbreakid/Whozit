@@ -22,14 +22,14 @@ enum class SyncEventType {
 
 @Serializable
 data class SyncEvent(
-    val eventId: String,
-    val roomId: String,
-    val type: SyncEventType,
-    val senderDeviceId: String,
-    val senderMemberId: String,
-    val senderDisplayName: String,
+    val eventId: String = "",
+    val roomId: String = "",
+    val type: SyncEventType = SyncEventType.ROOM_UPDATED,
+    val senderDeviceId: String = "",
+    val senderMemberId: String = "",
+    val senderDisplayName: String = "",
     val timestamp: Long = System.currentTimeMillis(),
-    val entityId: String,
+    val entityId: String = "",
     val entityVersion: Long = 1L,
     val payloadJson: String = ""
 )

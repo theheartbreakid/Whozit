@@ -104,9 +104,9 @@ data class ResolvedTurn(
 )
 
 data class ScheduleWithParticipants(
-    val schedule: Schedule,
-    val participants: List<Participant>,
-    val pattern: List<RotationPatternItem>
+    val schedule: Schedule = Schedule(name = "", startDate = ""),
+    val participants: List<Participant> = emptyList(),
+    val pattern: List<RotationPatternItem> = emptyList()
 )
 
 data class ScheduleStats(
