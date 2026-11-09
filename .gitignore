@@ -1,29 +1,37 @@
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
+.gradle/
+/.idea/caches/
+/.idea/libraries/
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 .DS_Store
-/.agents/skills/
-/build
+/build/
 **/build/
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+/captures/
+.externalNativeBuild/
+.cxx/
 
 # Keystore & Signing Secrets
 *.jks
 *.keystore
 app/release-keystore.jks
+*.p12
+*.key
+*.pem
+local.properties
 
 # Performance Traces & Benchmark Data
 *.perfetto-trace
 benchmarkData_*.json
 
 # Firebase Configuration
+# Ignore google-services.json as it contains client credentials.
+# Developers should obtain their own copy from the Firebase Console.
 google-services.json
+
+# Agent & Dev-Tool temporary files
+/.agents/cache/
+/.agents/logs/
+/.agents/tmp/
