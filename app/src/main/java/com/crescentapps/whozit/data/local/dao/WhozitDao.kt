@@ -295,6 +295,9 @@ interface RoomDao {
     @Query("DELETE FROM sync_operations WHERE id = :id")
     suspend fun deleteOperation(id: String)
 
+    @Query("DELETE FROM sync_operations WHERE roomId = :roomId")
+    suspend fun deleteAllOperationsForRoom(roomId: Long)
+
     // Conflicts
     @Query("SELECT * FROM sync_conflicts WHERE isResolved = 0 ORDER BY detectedAt DESC")
     fun getActiveConflictsFlow(): Flow<List<SyncConflictEntity>>
@@ -304,4 +307,7 @@ interface RoomDao {
 
     @Query("UPDATE sync_conflicts SET isResolved = 1 WHERE id = :id")
     suspend fun markConflictResolved(id: Long)
+
+    @Query("DELETE FROM sync_conflicts WHERE roomId = :roomId")
+    suspend fun deleteAllConflictsForRoom(roomId: Long)
 }

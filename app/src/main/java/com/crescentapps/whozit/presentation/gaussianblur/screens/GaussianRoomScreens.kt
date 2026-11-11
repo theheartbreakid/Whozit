@@ -775,7 +775,16 @@ fun GaussianRoomDetailScreen(
     val colors = LocalGaussianBlurColors.current
     var showInviteDialog by remember { mutableStateOf(false) }
 
-    val room = uiState.room ?: return
+    val room = uiState.room
+
+    LaunchedEffect(room, uiState.isLoading) {
+        if (!uiState.isLoading && room == null) {
+            Toast.makeText(context, "This room was deleted or you are no longer a member.", Toast.LENGTH_LONG).show()
+            onNavigateBack()
+        }
+    }
+
+    if (room == null) return
 
     Column(
         modifier = modifier

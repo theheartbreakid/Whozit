@@ -16,6 +16,7 @@ import kotlinx.coroutines.tasks.await
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -128,9 +129,42 @@ class FirebaseRoomsEmulatorTest {
         val deleteResult = roomService.deleteRoom(createResponse.roomId, uidC)
         assertTrue("Only owner can delete room", deleteResult.isFailure)
         
-        // Re-authenticate as owner to cleanup
-        // (In emulator tests, the database is often cleared entirely between runs via REST API,
-        // but testing the owner delete validates the rule).
-        // Since we can't easily switch back to anonymous uidA without a custom token, we trust the rule test.
+        // 7. Test Authorized Deletion with Pagination (Phone C generates a room and deletes it)
+        val createRequestC = CreateRoomRequest(
+            name = "Room C",
+            description = "To be deleted",
+            ownerMemberId = uidC,
+            ownerDisplayName = "Charlie",
+            initialSchedules = listOf(schedWithP, schedWithP) // Add some schedules to verify pagination delete handles subcollections
+        )
+        val roomC = roomService.createRoom(createRequestC).getOrThrow()
+        
+        // Write 1000 events to force pagination in deletion logic
+        val batch1 = firestore.batch()
+        for (i in 0..450) {
+            batch1.set(firestore.collection("rooms").document(roomC.roomId).collection("events").document("evt_$i"), mapOf("test" to true))
+        }
+        batch1.commit().await()
+        val batch2 = firestore.batch()
+        for (i in 451..900) {
+            batch2.set(firestore.collection("rooms").document(roomC.roomId).collection("events").document("evt_$i"), mapOf("test" to true))
+        }
+        batch2.commit().await()
+        
+        val delSuccess = roomService.deleteRoom(roomC.roomId, uidC)
+        assertTrue("Owner should delete room", delSuccess.isSuccess)
+        
+        // Verify room and subcollections are gone completely
+        val rDoc = firestore.collection("rooms").document(roomC.roomId).get().await()
+        assertFalse(rDoc.exists())
+        
+        val memDocs = firestore.collection("rooms").document(roomC.roomId).collection("members").get().await()
+        assertTrue(memDocs.isEmpty)
+        
+        val evtDocs = firestore.collection("rooms").document(roomC.roomId).collection("events").get().await()
+        assertTrue(evtDocs.isEmpty)
+        
+        val invDoc = firestore.collection("roomInvites").document(roomC.roomCode).get().await()
+        assertFalse(invDoc.exists())
     }
 }

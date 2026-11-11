@@ -39,6 +39,15 @@ class RoomRepository(
                 handleIncomingSyncEvent(event)
             }
         }
+        
+        // Connect to existing rooms on startup
+        repoScope.launch {
+            val prefs = preferencesRepository.userPreferencesFlow.first()
+            val rooms = roomDao.getAllRooms()
+            rooms.forEach { room ->
+                realtimeClient.connect(room.remoteRoomId, prefs.deviceMemberId, prefs.userDisplayName.ifBlank { "Member" })
+            }
+        }
     }
 
     // -------------------------------------------------------------
@@ -491,7 +500,13 @@ class RoomRepository(
                 roomDao.deleteMember(room.id, event.senderMemberId)
             }
             SyncEventType.ROOM_DELETED -> {
+                // When a room is deleted remotely, we should untether all shared schedules
+                // by deleting the room locally. Room's foreign keys with CASCADE will delete
+                // RoomMemberEntity and SharedScheduleEntity automatically.
                 roomDao.deleteRoom(room)
+                roomDao.deleteAllOperationsForRoom(room.id)
+                roomDao.deleteAllConflictsForRoom(room.id)
+                realtimeClient.disconnectRoom(room.remoteRoomId)
             }
             SyncEventType.SCHEDULE_CREATED, SyncEventType.SCHEDULE_UPDATED -> {
                 // When a schedule is created or updated, we should refetch the room metadata
@@ -604,7 +619,9 @@ class RoomRepository(
         }
 
         roomDao.deleteRoomById(roomId)
-        realtimeClient.disconnect()
+        roomDao.deleteAllOperationsForRoom(roomId)
+        roomDao.deleteAllConflictsForRoom(roomId)
+        realtimeClient.disconnectRoom(room.remoteRoomId)
         Result.success(Unit)
     }
 
@@ -625,7 +642,9 @@ class RoomRepository(
         }
 
         roomDao.deleteRoomById(roomId)
-        realtimeClient.disconnect()
+        roomDao.deleteAllOperationsForRoom(roomId)
+        roomDao.deleteAllConflictsForRoom(roomId)
+        realtimeClient.disconnectRoom(room.remoteRoomId)
         Result.success(Unit)
     }
 }

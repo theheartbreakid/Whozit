@@ -26,12 +26,13 @@ class FirebaseRealtimeSyncClient(
     private val _incomingEvents = MutableSharedFlow<SyncEvent>(extraBufferCapacity = 64)
     override val incomingEvents: Flow<SyncEvent> = _incomingEvents.asSharedFlow()
 
-    private var activeRoomId: String? = null
     private var currentMemberId: String? = null
-    private var eventsListener: ListenerRegistration? = null
-    private var membersListener: ListenerRegistration? = null
-    private var schedulesListener: ListenerRegistration? = null
-    private var lastEventTimestamp: Long = 0L
+    
+    private val roomListeners = mutableMapOf<String, ListenerRegistration>()
+    private val eventsListeners = mutableMapOf<String, ListenerRegistration>()
+    private val membersListeners = mutableMapOf<String, ListenerRegistration>()
+    private val schedulesListeners = mutableMapOf<String, ListenerRegistration>()
+    private val lastEventTimestamps = mutableMapOf<String, Long>()
 
     override suspend fun connect(roomId: String, memberId: String, displayName: String) {
         val uidResult = authManager.authenticateAnonymously()
@@ -40,18 +41,42 @@ class FirebaseRealtimeSyncClient(
             return
         }
         
-        disconnect() // Cleanup previous connection if any
-        activeRoomId = roomId
+        if (roomListeners.containsKey(roomId)) return // Already connected
+        
         currentMemberId = memberId
-        lastEventTimestamp = System.currentTimeMillis()
+        lastEventTimestamps[roomId] = System.currentTimeMillis()
 
         setupListeners(roomId)
         _connectionState.value = true
     }
 
     private fun setupListeners(roomId: String) {
+        val lastEventTimestamp = lastEventTimestamps[roomId] ?: 0L
+        
+        // Listen to room deletion
+        roomListeners[roomId] = firestore.collection("rooms").document(roomId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e("FirebaseRealtimeClient", "Room listener error", error)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null && !snapshot.exists()) {
+                    _incomingEvents.tryEmit(
+                        SyncEvent(
+                            eventId = "room_del_${roomId}_${System.currentTimeMillis()}",
+                            roomId = roomId,
+                            type = com.crescentapps.whozit.core.model.SyncEventType.ROOM_DELETED,
+                            senderDeviceId = "firebase",
+                            senderMemberId = "firebase",
+                            senderDisplayName = "Firebase",
+                            entityId = roomId
+                        )
+                    )
+                }
+            }
+
         // Listen to explicit operations in the events collection (for Occurrence completion, etc.)
-        eventsListener = firestore.collection("rooms").document(roomId).collection("events")
+        eventsListeners[roomId] = firestore.collection("rooms").document(roomId).collection("events")
             .whereGreaterThan("timestamp", lastEventTimestamp)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
@@ -71,7 +96,7 @@ class FirebaseRealtimeSyncClient(
             }
 
         // Snapshot listener on Members to handle changes triggered outside explicitly pushed SyncEvents
-        membersListener = firestore.collection("rooms").document(roomId).collection("members")
+        membersListeners[roomId] = firestore.collection("rooms").document(roomId).collection("members")
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     Log.e("FirebaseRealtimeClient", "Members listener error", error)
@@ -117,7 +142,7 @@ class FirebaseRealtimeSyncClient(
             }
 
         // Snapshot listener on Schedules to broadcast when a schedule is shared or modified
-        schedulesListener = firestore.collection("rooms").document(roomId).collection("schedules")
+        schedulesListeners[roomId] = firestore.collection("rooms").document(roomId).collection("schedules")
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     Log.e("FirebaseRealtimeClient", "Schedules listener error", error)
@@ -125,7 +150,6 @@ class FirebaseRealtimeSyncClient(
                 }
 
                 snapshot?.documentChanges?.forEach { change ->
-                    // Emit a simple SCHEDULE_UPDATED event to trigger refetch in RoomRepository
                     if (change.type == com.google.firebase.firestore.DocumentChange.Type.ADDED || 
                         change.type == com.google.firebase.firestore.DocumentChange.Type.MODIFIED) {
                         
@@ -147,21 +171,37 @@ class FirebaseRealtimeSyncClient(
     }
 
     override suspend fun disconnect() {
-        eventsListener?.remove()
-        eventsListener = null
-        membersListener?.remove()
-        membersListener = null
-        schedulesListener?.remove()
-        schedulesListener = null
-        activeRoomId = null
+        roomListeners.values.forEach { it.remove() }
+        roomListeners.clear()
+        
+        eventsListeners.values.forEach { it.remove() }
+        eventsListeners.clear()
+        
+        membersListeners.values.forEach { it.remove() }
+        membersListeners.clear()
+        
+        schedulesListeners.values.forEach { it.remove() }
+        schedulesListeners.clear()
+        
         currentMemberId = null
         _connectionState.value = false
     }
 
+    override suspend fun disconnectRoom(roomId: String) {
+        roomListeners.remove(roomId)?.remove()
+        eventsListeners.remove(roomId)?.remove()
+        membersListeners.remove(roomId)?.remove()
+        schedulesListeners.remove(roomId)?.remove()
+        
+        if (roomListeners.isEmpty()) {
+            _connectionState.value = false
+        }
+    }
+
     override suspend fun sendEvent(event: SyncEvent): Boolean {
-        val roomId = activeRoomId ?: return false
+        // Send event to its respective room
         return try {
-            firestore.collection("rooms").document(roomId).collection("events")
+            firestore.collection("rooms").document(event.roomId).collection("events")
                 .document(event.eventId).set(event).await()
             true
         } catch (e: Exception) {
@@ -171,13 +211,14 @@ class FirebaseRealtimeSyncClient(
     }
 
     override suspend fun updatePresence(presence: MemberPresence) {
-        val roomId = activeRoomId ?: return
         val uid = currentMemberId ?: return
-        try {
-            firestore.collection("rooms").document(roomId).collection("members")
-                .document(uid).update("presence", presence.name).await()
-        } catch (e: Exception) {
-            Log.e("FirebaseRealtimeClient", "Failed to update presence", e)
+        roomListeners.keys.forEach { roomId ->
+            try {
+                firestore.collection("rooms").document(roomId).collection("members")
+                    .document(uid).update("presence", presence.name).await()
+            } catch (e: Exception) {
+                Log.e("FirebaseRealtimeClient", "Failed to update presence", e)
+            }
         }
     }
 }

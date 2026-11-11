@@ -10,6 +10,7 @@ interface RealtimeSyncClient {
 
     suspend fun connect(roomId: String, memberId: String, displayName: String)
     suspend fun disconnect()
+    suspend fun disconnectRoom(roomId: String)
     suspend fun sendEvent(event: SyncEvent): Boolean
     suspend fun updatePresence(presence: MemberPresence)
 }

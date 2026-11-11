@@ -238,6 +238,12 @@ class MockRealtimeSyncClient : RealtimeSyncClient {
         _connectionState.value = false
     }
 
+    override suspend fun disconnectRoom(roomId: String) {
+        if (activeRoomId == roomId) {
+            disconnect()
+        }
+    }
+
     override suspend fun sendEvent(event: SyncEvent): Boolean {
         MockNetworkServer.globalEventBus.tryEmit(event)
         return true

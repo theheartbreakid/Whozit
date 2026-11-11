@@ -219,11 +219,47 @@ class FirebaseRoomService(
     }
 
     override suspend fun deleteRoom(roomId: String, ownerMemberId: String): Result<Unit> {
-        if (authManager.currentUid != ownerMemberId) return Result.failure(IllegalStateException("Only owner can delete."))
+        val uidResult = authManager.authenticateAnonymously()
+        if (uidResult.isFailure) return Result.failure(uidResult.exceptionOrNull()!!)
+        val uid = uidResult.getOrThrow()
+
         return try {
-            firestore.collection("rooms").document(roomId).delete().await()
+            val roomRef = firestore.collection("rooms").document(roomId)
+            val roomDoc = roomRef.get().await()
+            val roomCode = roomDoc.getString("roomCode")
+            
+            val storedOwnerUid = roomDoc.getString("ownerMemberId")
+            if (uid != storedOwnerUid) {
+                return Result.failure(IllegalStateException("Only owner can delete."))
+            }
+            
+            // Note: Batch writes are limited to 500 operations.
+            // We must delete subcollections first so that isRoomOwner() in firestore.rules continues to pass
+            val subcollections = listOf("members", "schedules", "events")
+            for (coll in subcollections) {
+                var deletedSize: Int
+                do {
+                    val snapshot = roomRef.collection(coll).limit(400).get().await()
+                    deletedSize = snapshot.size()
+                    if (deletedSize > 0) {
+                        val batch = firestore.batch()
+                        snapshot.documents.forEach { batch.delete(it.reference) }
+                        batch.commit().await()
+                    }
+                } while (deletedSize >= 400)
+            }
+            
+            // Delete invite and main room document
+            val batch = firestore.batch()
+            if (roomCode != null) {
+                batch.delete(firestore.collection("roomInvites").document(roomCode))
+            }
+            batch.delete(roomRef)
+            batch.commit().await()
+            
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e("FirebaseRoomService", "Failed to delete room", e)
             Result.failure(e)
         }
     }

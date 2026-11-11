@@ -70,6 +70,13 @@ fun M3RoomDetailScreen(
 
     val room = uiState.room
 
+    LaunchedEffect(room, uiState.isLoading) {
+        if (!uiState.isLoading && room == null) {
+            Toast.makeText(context, "This room was deleted or you are no longer a member.", Toast.LENGTH_LONG).show()
+            onNavigateBack() // Fallback to rooms list
+        }
+    }
+
     if (room == null) {
         Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
