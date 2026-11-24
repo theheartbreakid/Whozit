@@ -2,6 +2,9 @@ package com.crescentapps.whozit.presentation.components.liquid
 
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.layout.*
 import com.crescentapps.whozit.presentation.components.Text
 import com.crescentapps.whozit.presentation.components.Icon
@@ -86,6 +89,21 @@ fun LiquidButton(
     val interactiveHighlight = remember(animationScope) {
         InteractiveHighlight(animationScope = animationScope)
     }
+    val interactionSource = remember { MutableInteractionSource() }
+
+    LaunchedEffect(interactionSource) {
+        interactionSource.interactions.collect { interaction ->
+            when (interaction) {
+                is PressInteraction.Press -> {
+                    interactiveHighlight.onPress(interaction.pressPosition)
+                }
+                is PressInteraction.Release, is PressInteraction.Cancel -> {
+                    interactiveHighlight.onRelease()
+                }
+            }
+        }
+    }
+
     val glassSettings = LocalGlassSettings.current
     val isLuminanceRoot = !LocalAdaptiveLuminanceActive.current && adaptiveLuminance
     val layer = if (isLuminanceRoot) rememberGraphicsLayer() else null
@@ -156,8 +174,9 @@ fun LiquidButton(
                     },
                     onDrawSurface = {}
                 )
+                .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
                 .clickable(
-                    interactionSource = null,
+                    interactionSource = interactionSource,
                     indication = if (isInteractive) null else LocalIndication.current,
                     role = Role.Button,
                     onClick = {
@@ -167,9 +186,7 @@ fun LiquidButton(
                 )
                 .then(
                     if (isInteractive) {
-                        Modifier
-                            .then(interactiveHighlight.modifier)
-                            .then(interactiveHighlight.gestureModifier)
+                        interactiveHighlight.modifier
                     } else {
                         Modifier
                     }

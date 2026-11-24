@@ -69,10 +69,20 @@ fun M3CreateRoomScreen(
     var createdRoom by remember { mutableStateOf<P2PRoom?>(null) }
     var qrBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
+    val errorMessage = uiState.errorMessage
+    LaunchedEffect(errorMessage) {
+        if (!errorMessage.isNullOrBlank()) {
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .statusBarsPadding()
+            .navigationBarsPadding()
+            .imePadding()
             .padding(horizontal = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
@@ -270,7 +280,14 @@ fun M3CreateRoomScreen(
 
                 WhozitExpressiveButton(
                     text = "Next: Select Schedules",
-                    onClick = { currentStep = 2 },
+                    enabled = roomName.isNotBlank(),
+                    onClick = {
+                        if (roomName.isBlank()) {
+                            Toast.makeText(context, "Room name is required", Toast.LENGTH_SHORT).show()
+                        } else {
+                            currentStep = 2
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 32.dp)
@@ -380,7 +397,14 @@ fun M3CreateRoomScreen(
 
                 WhozitExpressiveButton(
                     text = if (uiState.isCreating) "Creating Room..." else "Create P2P Room",
+                    enabled = !uiState.isCreating && roomName.isNotBlank(),
                     onClick = {
+                        if (uiState.isCreating) return@WhozitExpressiveButton
+                        if (roomName.isBlank()) {
+                            Toast.makeText(context, "Room name is required", Toast.LENGTH_SHORT).show()
+                            currentStep = 1
+                            return@WhozitExpressiveButton
+                        }
                         viewModel.createRoom(
                             name = roomName,
                             description = roomDescription,

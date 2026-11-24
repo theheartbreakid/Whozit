@@ -43,13 +43,15 @@ service cloud.firestore {
         // Anyone authenticated can read shared schedules (to preview)
         allow read: if isAuthenticated();
         // Only authorized members can write (for now, any member can add/modify shared schedules)
-        allow write: if isRoomMember(roomId) || isRoomOwner(roomId);
+        allow write: if isRoomMember(roomId) || isRoomOwner(roomId) ||
+                      (isAuthenticated() && request.auth.uid == getAfter(/databases/$(database)/documents/rooms/$(roomId)).data.ownerMemberId);
       }
 
       // Realtime Events Subcollection
       match /events/{eventId} {
         // Only members can read and publish sync events
-        allow read, write: if isRoomMember(roomId) || isRoomOwner(roomId);
+        allow read, write: if isRoomMember(roomId) || isRoomOwner(roomId) ||
+                            (isAuthenticated() && request.auth.uid == getAfter(/databases/$(database)/documents/rooms/$(roomId)).data.ownerMemberId);
       }
     }
 

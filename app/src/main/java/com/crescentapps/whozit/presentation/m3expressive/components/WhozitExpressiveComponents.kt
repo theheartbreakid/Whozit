@@ -53,6 +53,7 @@ fun WhozitExpressiveButton(
     modifier: Modifier = Modifier,
     text: String,
     icon: (@Composable () -> Unit)? = null,
+    enabled: Boolean = true,
     isPrimary: Boolean = true,
     isDestructive: Boolean = false
 ) {
@@ -70,6 +71,7 @@ fun WhozitExpressiveButton(
     if (isPrimary || isDestructive) {
         Button(
             onClick = onClick, 
+            enabled = enabled,
             modifier = modifier.expressiveLightRay(shape = ExpressiveShapes.Full), 
             colors = colors,
             shape = ExpressiveShapes.Full,
@@ -84,6 +86,7 @@ fun WhozitExpressiveButton(
     } else {
         FilledTonalButton(
             onClick = onClick, 
+            enabled = enabled,
             modifier = modifier.expressiveLightRay(shape = ExpressiveShapes.Full), 
             colors = colors,
             shape = ExpressiveShapes.Full,

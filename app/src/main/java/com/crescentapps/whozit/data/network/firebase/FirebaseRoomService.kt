@@ -71,23 +71,23 @@ class FirebaseRoomService(
             val memberRef = roomRef.collection("members").document(uid)
             batch.set(memberRef, ownerMemberData)
 
-            // Optional schedules
-            request.initialSchedules.forEach { s ->
-                val remoteScheduleId = "rem_sched_${s.schedule.id}"
-                val scheduleRef = roomRef.collection("schedules").document(remoteScheduleId)
-                // For simplicity, serialize objects. In real prod, custom encoding or Gson conversion.
-                // We'll trust the native field mappings for now, but a dedicated Mapper is better.
-                batch.set(scheduleRef, mapOf(
-                    "schedule" to s.schedule,
-                    "participants" to s.participants,
-                    "pattern" to s.pattern
-                ))
-            }
-
             val inviteRef = firestore.collection("roomInvites").document(roomCode)
             batch.set(inviteRef, inviteData)
 
-            batch.commit().await()
+            withTimeout(10000) {
+                batch.commit().await()
+            }
+
+            // Upload initial schedules after room and owner member records exist in Firestore
+            request.initialSchedules.forEach { s ->
+                val remoteScheduleId = "rem_sched_${s.schedule.id}"
+                val scheduleRef = roomRef.collection("schedules").document(remoteScheduleId)
+                try {
+                    scheduleRef.set(s.toFirestoreMap()).await()
+                } catch (e: Exception) {
+                    Log.e("FirebaseRoomService", "Failed to upload initial schedule ${s.schedule.id}", e)
+                }
+            }
 
             Result.success(
                 CreateRoomResponse(
@@ -132,11 +132,7 @@ class FirebaseRoomService(
 
                 val schedulesSnapshot = firestore.collection("rooms").document(roomId).collection("schedules").get().await()
                 val sharedSchedules = schedulesSnapshot.documents.mapNotNull { doc ->
-                    try {
-                        doc.toObject(ScheduleWithParticipants::class.java)
-                    } catch (e: Exception) {
-                        null
-                    }
+                    doc.toScheduleWithParticipants()
                 }
 
                 val meta = RoomMetadataResponse(
@@ -275,11 +271,7 @@ class FirebaseRoomService(
         val scheduleRef = firestore.collection("rooms").document(roomId).collection("schedules").document(remoteScheduleId)
         
         return try {
-            scheduleRef.set(mapOf(
-                "schedule" to schedule.schedule,
-                "participants" to schedule.participants,
-                "pattern" to schedule.pattern
-            )).await()
+            scheduleRef.set(schedule.toFirestoreMap()).await()
             Result.success(remoteScheduleId)
         } catch (e: Exception) {
             Result.failure(e)
@@ -326,5 +318,148 @@ class FirebaseRoomService(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+}
+
+private fun ScheduleWithParticipants.toFirestoreMap(): Map<String, Any?> {
+    return mapOf(
+        "schedule" to mapOf(
+            "id" to schedule.id,
+            "name" to schedule.name,
+            "description" to schedule.description,
+            "type" to schedule.type.name,
+            "currencyCode" to schedule.currencyCode,
+            "defaultAmount" to schedule.defaultAmount,
+            "frequencyType" to schedule.frequencyType.name,
+            "frequencyInterval" to schedule.frequencyInterval,
+            "selectedWeekdays" to schedule.selectedWeekdays,
+            "dayOfMonth" to schedule.dayOfMonth,
+            "startDate" to schedule.startDate,
+            "timezone" to schedule.timezone,
+            "isPaused" to schedule.isPaused,
+            "pauseUntil" to schedule.pauseUntil,
+            "overrideStrategy" to schedule.overrideStrategy.name,
+            "notifyTimeHour" to schedule.notifyTimeHour,
+            "notifyTimeMinute" to schedule.notifyTimeMinute,
+            "notificationsEnabled" to schedule.notificationsEnabled,
+            "isArchived" to schedule.isArchived,
+            "createdAt" to schedule.createdAt,
+            "updatedAt" to schedule.updatedAt
+        ),
+        "participants" to participants.map { p ->
+            mapOf(
+                "id" to p.id,
+                "name" to p.name,
+                "nickname" to p.nickname,
+                "colorHex" to p.colorHex,
+                "avatarEmoji" to p.avatarEmoji,
+                "isActive" to p.isActive,
+                "createdAt" to p.createdAt,
+                "updatedAt" to p.updatedAt
+            )
+        },
+        "pattern" to pattern.map { r ->
+            mapOf(
+                "id" to r.id,
+                "scheduleId" to r.scheduleId,
+                "participantId" to r.participantId,
+                "patternPosition" to r.patternPosition
+            )
+        }
+    )
+}
+
+private fun com.google.firebase.firestore.DocumentSnapshot.toScheduleWithParticipants(): ScheduleWithParticipants? {
+    return try {
+        val schedMap = get("schedule") as? Map<*, *> ?: return null
+        val id = (schedMap["id"] as? Number)?.toLong() ?: 0L
+        val name = schedMap["name"] as? String ?: ""
+        val description = schedMap["description"] as? String ?: ""
+        val typeStr = schedMap["type"] as? String ?: "GENERAL"
+        val type = runCatching { com.crescentapps.whozit.core.model.ScheduleType.valueOf(typeStr) }.getOrDefault(com.crescentapps.whozit.core.model.ScheduleType.GENERAL)
+        val currencyCode = schedMap["currencyCode"] as? String ?: "INR"
+        val defaultAmount = (schedMap["defaultAmount"] as? Number)?.toDouble()
+        val freqTypeStr = schedMap["frequencyType"] as? String ?: "DAILY"
+        val frequencyType = runCatching { com.crescentapps.whozit.core.model.FrequencyType.valueOf(freqTypeStr) }.getOrDefault(com.crescentapps.whozit.core.model.FrequencyType.DAILY)
+        val frequencyInterval = (schedMap["frequencyInterval"] as? Number)?.toInt() ?: 1
+        val selectedWeekdays = (schedMap["selectedWeekdays"] as? List<*>)?.mapNotNull { (it as? Number)?.toInt() } ?: emptyList()
+        val dayOfMonth = (schedMap["dayOfMonth"] as? Number)?.toInt()
+        val startDate = schedMap["startDate"] as? String ?: ""
+        val timezone = schedMap["timezone"] as? String ?: "UTC"
+        val isPaused = schedMap["isPaused"] as? Boolean ?: false
+        val pauseUntil = schedMap["pauseUntil"] as? String
+        val overrideStratStr = schedMap["overrideStrategy"] as? String ?: "SINGLE_DATE_ONLY"
+        val overrideStrategy = runCatching { com.crescentapps.whozit.core.model.OverrideStrategy.valueOf(overrideStratStr) }.getOrDefault(com.crescentapps.whozit.core.model.OverrideStrategy.SINGLE_DATE_ONLY)
+        val notifyHour = (schedMap["notifyTimeHour"] as? Number)?.toInt() ?: 9
+        val notifyMinute = (schedMap["notifyTimeMinute"] as? Number)?.toInt() ?: 0
+        val notificationsEnabled = schedMap["notificationsEnabled"] as? Boolean ?: true
+        val isArchived = schedMap["isArchived"] as? Boolean ?: false
+        val createdAt = (schedMap["createdAt"] as? Number)?.toLong() ?: System.currentTimeMillis()
+        val updatedAt = (schedMap["updatedAt"] as? Number)?.toLong() ?: System.currentTimeMillis()
+
+        val sched = com.crescentapps.whozit.core.model.Schedule(
+            id = id,
+            name = name,
+            description = description,
+            type = type,
+            currencyCode = currencyCode,
+            defaultAmount = defaultAmount,
+            frequencyType = frequencyType,
+            frequencyInterval = frequencyInterval,
+            selectedWeekdays = selectedWeekdays,
+            dayOfMonth = dayOfMonth,
+            startDate = startDate,
+            timezone = timezone,
+            isPaused = isPaused,
+            pauseUntil = pauseUntil,
+            overrideStrategy = overrideStrategy,
+            notifyTimeHour = notifyHour,
+            notifyTimeMinute = notifyMinute,
+            notificationsEnabled = notificationsEnabled,
+            isArchived = isArchived,
+            createdAt = createdAt,
+            updatedAt = updatedAt
+        )
+
+        val partsList = get("participants") as? List<Map<*, *>> ?: emptyList()
+        val participants = partsList.mapNotNull { pMap ->
+            val pId = (pMap["id"] as? Number)?.toLong() ?: 0L
+            val pName = pMap["name"] as? String ?: ""
+            val nickname = pMap["nickname"] as? String
+            val colorHex = pMap["colorHex"] as? String ?: "#3B82F6"
+            val avatarEmoji = pMap["avatarEmoji"] as? String
+            val isActive = pMap["isActive"] as? Boolean ?: true
+            val pCreatedAt = (pMap["createdAt"] as? Number)?.toLong() ?: System.currentTimeMillis()
+            val pUpdatedAt = (pMap["updatedAt"] as? Number)?.toLong() ?: System.currentTimeMillis()
+            com.crescentapps.whozit.core.model.Participant(
+                id = pId,
+                name = pName,
+                nickname = nickname,
+                colorHex = colorHex,
+                avatarEmoji = avatarEmoji,
+                isActive = isActive,
+                createdAt = pCreatedAt,
+                updatedAt = pUpdatedAt
+            )
+        }
+
+        val patternList = get("pattern") as? List<Map<*, *>> ?: emptyList()
+        val pattern = patternList.mapNotNull { rMap ->
+            val rId = (rMap["id"] as? Number)?.toLong() ?: 0L
+            val sId = (rMap["scheduleId"] as? Number)?.toLong() ?: 0L
+            val pId = (rMap["participantId"] as? Number)?.toLong() ?: 0L
+            val patternPos = (rMap["patternPosition"] as? Number)?.toInt() ?: 0
+            com.crescentapps.whozit.core.model.RotationPatternItem(
+                id = rId,
+                scheduleId = sId,
+                participantId = pId,
+                patternPosition = patternPos
+            )
+        }
+
+        ScheduleWithParticipants(sched, participants, pattern)
+    } catch (e: Exception) {
+        Log.e("FirebaseRoomService", "Failed to deserialize ScheduleWithParticipants", e)
+        null
     }
 }

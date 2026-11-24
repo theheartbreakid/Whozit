@@ -59,6 +59,8 @@ fun GaussianRoomListScreen(
         modifier = modifier
             .fillMaxSize()
             .statusBarsPadding()
+            .navigationBarsPadding()
+            .imePadding()
             .padding(horizontal = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
@@ -262,10 +264,20 @@ fun GaussianCreateRoomScreen(
     var createdRoom by remember { mutableStateOf<P2PRoom?>(null) }
     var qrBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
+    val errorMessage = uiState.errorMessage
+    LaunchedEffect(errorMessage) {
+        if (!errorMessage.isNullOrBlank()) {
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .statusBarsPadding()
+            .navigationBarsPadding()
+            .imePadding()
             .padding(horizontal = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
@@ -596,6 +608,8 @@ fun GaussianJoinRoomScreen(
         modifier = modifier
             .fillMaxSize()
             .statusBarsPadding()
+            .navigationBarsPadding()
+            .imePadding()
             .padding(horizontal = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
@@ -776,9 +790,12 @@ fun GaussianRoomDetailScreen(
     var showInviteDialog by remember { mutableStateOf(false) }
 
     val room = uiState.room
+    var initialLoadCompleted by remember { mutableStateOf(false) }
 
-    LaunchedEffect(room, uiState.isLoading) {
-        if (!uiState.isLoading && room == null) {
+    LaunchedEffect(room) {
+        if (room != null) {
+            initialLoadCompleted = true
+        } else if (initialLoadCompleted) {
             Toast.makeText(context, "This room was deleted or you are no longer a member.", Toast.LENGTH_LONG).show()
             onNavigateBack()
         }
@@ -790,6 +807,8 @@ fun GaussianRoomDetailScreen(
         modifier = modifier
             .fillMaxSize()
             .statusBarsPadding()
+            .navigationBarsPadding()
+            .imePadding()
             .padding(horizontal = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))

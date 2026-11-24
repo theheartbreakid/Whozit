@@ -92,6 +92,21 @@ half4 main(float2 coord) {
             drawContent()
         }
 
+    fun onPress(downPosition: Offset) {
+        startPosition = downPosition
+        animationScope.launch {
+            launch { pressProgressAnimation.animateTo(1f, pressProgressAnimationSpec) }
+            launch { positionAnimation.snapTo(startPosition) }
+        }
+    }
+
+    fun onRelease() {
+        animationScope.launch {
+            launch { pressProgressAnimation.animateTo(0f, pressProgressAnimationSpec) }
+            launch { positionAnimation.animateTo(startPosition, positionAnimationSpec) }
+        }
+    }
+
     val gestureModifier: Modifier =
         Modifier.pointerInput(animationScope) {
             inspectDragGestures(

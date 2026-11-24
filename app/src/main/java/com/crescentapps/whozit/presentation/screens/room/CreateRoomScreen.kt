@@ -71,10 +71,20 @@ fun CreateRoomScreen(
     var createdRoom by remember { mutableStateOf<P2PRoom?>(null) }
     var qrBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
+    val errorMessage = uiState.errorMessage
+    LaunchedEffect(errorMessage) {
+        if (!errorMessage.isNullOrBlank()) {
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .statusBarsPadding()
+            .navigationBarsPadding()
+            .imePadding()
             .padding(horizontal = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))

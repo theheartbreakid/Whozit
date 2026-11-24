@@ -102,6 +102,10 @@ class RoomViewModel(
         selectedScheduleIds: List<Long>,
         onSuccess: (P2PRoom) -> Unit
     ) {
+        if (name.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "Room name cannot be empty") }
+            return
+        }
         viewModelScope.launch {
             _uiState.update { it.copy(isCreating = true, errorMessage = null) }
             val result = roomRepository.createRoom(name, description, selectedScheduleIds)

@@ -134,11 +134,14 @@ fun RoomDetailScreen(
     var showInviteDialog by remember { mutableStateOf(false) }
 
     val room = uiState.room
+    var initialLoadCompleted by remember { mutableStateOf(false) }
 
-    LaunchedEffect(room, uiState.isLoading) {
-        if (!uiState.isLoading && room == null) {
+    LaunchedEffect(room) {
+        if (room != null) {
+            initialLoadCompleted = true
+        } else if (initialLoadCompleted) {
             Toast.makeText(context, "This room was deleted or you are no longer a member.", Toast.LENGTH_LONG).show()
-            onNavigateBack() // Fallback to rooms list
+            onNavigateBack()
         }
     }
 
