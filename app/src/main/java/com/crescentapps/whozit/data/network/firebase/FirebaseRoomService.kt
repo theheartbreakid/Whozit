@@ -128,7 +128,7 @@ class FirebaseRoomService(
                 if (!roomDoc.exists()) return Result.failure(IllegalArgumentException("Room no longer exists."))
                 
                 val membersSnapshot = firestore.collection("rooms").document(roomId).collection("members").get().await()
-                val members = membersSnapshot.documents.mapNotNull { it.toObject(RoomMember::class.java) }
+                val members = membersSnapshot.documents.mapNotNull { doc -> doc.toRoomMember() }
 
                 val schedulesSnapshot = firestore.collection("rooms").document(roomId).collection("schedules").get().await()
                 val sharedSchedules = schedulesSnapshot.documents.mapNotNull { doc ->
@@ -313,11 +313,72 @@ class FirebaseRoomService(
                 .get()
                 .await()
             
-            val events = snap.documents.mapNotNull { it.toObject(SyncEvent::class.java) }
+            val events = snap.documents.mapNotNull { doc -> doc.toSyncEvent() }
             Result.success(events)
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+}
+
+private fun com.google.firebase.firestore.DocumentSnapshot.toRoomMember(): RoomMember? {
+    return try {
+        val id = (get("id") as? Number)?.toLong() ?: System.currentTimeMillis()
+        val roomId = (get("roomId") as? Number)?.toLong() ?: 0L
+        val remoteMemberId = getString("remoteMemberId") ?: id.toString()
+        val displayName = getString("displayName") ?: "Member"
+        val roleStr = getString("role") ?: "MEMBER"
+        val role = runCatching { RoomRole.valueOf(roleStr) }.getOrDefault(RoomRole.MEMBER)
+        val presenceStr = getString("presence") ?: "ONLINE"
+        val presence = runCatching { com.crescentapps.whozit.core.model.MemberPresence.valueOf(presenceStr) }.getOrDefault(com.crescentapps.whozit.core.model.MemberPresence.ONLINE)
+        val joinedAt = (get("joinedAt") as? Number)?.toLong() ?: System.currentTimeMillis()
+        val lastSeenAt = (get("lastSeenAt") as? Number)?.toLong() ?: System.currentTimeMillis()
+
+        RoomMember(
+            id = id,
+            roomId = roomId,
+            remoteMemberId = remoteMemberId,
+            displayName = displayName,
+            role = role,
+            presence = presence,
+            joinedAt = joinedAt,
+            lastSeenAt = lastSeenAt
+        )
+    } catch (e: Exception) {
+        Log.e("FirebaseRoomService", "Failed to deserialize RoomMember", e)
+        null
+    }
+}
+
+fun com.google.firebase.firestore.DocumentSnapshot.toSyncEvent(): SyncEvent? {
+    return try {
+        val eventId = getString("eventId") ?: id
+        val roomId = getString("roomId") ?: ""
+        val typeStr = getString("type") ?: "ROOM_UPDATED"
+        val type = runCatching { com.crescentapps.whozit.core.model.SyncEventType.valueOf(typeStr) }.getOrDefault(com.crescentapps.whozit.core.model.SyncEventType.ROOM_UPDATED)
+        val senderDeviceId = getString("senderDeviceId") ?: ""
+        val senderMemberId = getString("senderMemberId") ?: ""
+        val senderDisplayName = getString("senderDisplayName") ?: ""
+        val timestamp = (get("timestamp") as? Number)?.toLong() ?: System.currentTimeMillis()
+        val entityId = getString("entityId") ?: ""
+        val entityVersion = (get("entityVersion") as? Number)?.toLong() ?: 1L
+        val payloadJson = getString("payloadJson") ?: ""
+
+        SyncEvent(
+            eventId = eventId,
+            roomId = roomId,
+            type = type,
+            senderDeviceId = senderDeviceId,
+            senderMemberId = senderMemberId,
+            senderDisplayName = senderDisplayName,
+            timestamp = timestamp,
+            entityId = entityId,
+            entityVersion = entityVersion,
+            payloadJson = payloadJson
+        )
+    } catch (e: Exception) {
+        Log.e("FirebaseRoomService", "Failed to deserialize SyncEvent", e)
+        null
     }
 }
 

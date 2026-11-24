@@ -592,11 +592,20 @@ fun GaussianJoinRoomScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     val colors = LocalGaussianBlurColors.current
 
     var roomCodeInput by remember { mutableStateOf(initialRoomCode.orEmpty()) }
     var userDisplayNameInput by remember { mutableStateOf("") }
     var isScanningMode by remember { mutableStateOf(false) }
+
+    val errorMessage = uiState.errorMessage
+    LaunchedEffect(errorMessage) {
+        if (!errorMessage.isNullOrBlank()) {
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
+        }
+    }
 
     LaunchedEffect(initialRoomCode) {
         if (!initialRoomCode.isNullOrBlank()) {

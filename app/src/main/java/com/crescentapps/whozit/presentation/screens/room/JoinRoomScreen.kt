@@ -1,5 +1,6 @@
 package com.crescentapps.whozit.presentation.screens.room
 
+import android.widget.Toast
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -58,6 +59,14 @@ fun JoinRoomScreen(
     var userDisplayNameInput by remember { mutableStateOf("") }
     var isScanningMode by remember { mutableStateOf(false) }
 
+    val errorMessage = uiState.errorMessage
+    LaunchedEffect(errorMessage) {
+        if (!errorMessage.isNullOrBlank()) {
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
+        }
+    }
+
     LaunchedEffect(initialRoomCode) {
         if (!initialRoomCode.isNullOrBlank()) {
             viewModel.previewRoom(initialRoomCode) {}
@@ -68,6 +77,8 @@ fun JoinRoomScreen(
         modifier = modifier
             .fillMaxSize()
             .statusBarsPadding()
+            .navigationBarsPadding()
+            .imePadding()
             .padding(horizontal = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))

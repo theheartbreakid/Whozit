@@ -86,7 +86,7 @@ class FirebaseRealtimeSyncClient(
 
                 snapshot?.documentChanges?.forEach { docChange ->
                     if (docChange.type == com.google.firebase.firestore.DocumentChange.Type.ADDED) {
-                        val event = docChange.document.toObject(SyncEvent::class.java)
+                        val event = docChange.document.toSyncEvent() ?: return@forEach
                         // Ignore events sent by ourselves since they are already persisted locally
                         if (event.senderMemberId != currentMemberId) {
                             _incomingEvents.tryEmit(event)
